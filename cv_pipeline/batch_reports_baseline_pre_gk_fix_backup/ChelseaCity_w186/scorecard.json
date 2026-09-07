@@ -1,0 +1,182 @@
+{
+  "clip": "ChelseaCity_w186",
+  "video_path": "dev_clips\\ChelseaCity_w186.mp4",
+  "timestamp": "2026-07-26T16:30:45",
+  "cache_used": false,
+  "processing_time_sec": 444.7,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 1273,
+    "n_frames_processed": 1000
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": 334,
+    "n_frames_interp_detect": 666,
+    "n_frames_calibrated": 100,
+    "n_frames_interp_calib": 900
+  },
+  "timing": {
+    "detect_wall_sec": 182.7,
+    "camera_wall_sec": 14.1,
+    "calibrate_wall_sec": 233.1,
+    "detect_frame_timing": {
+      "n": 334,
+      "mean_sec": 0.5312103097310323,
+      "median_sec": 0.5278979539871216,
+      "p95_sec": 0.5752364158630371,
+      "max_sec": 1.0355358123779297,
+      "total_sec": 177.4242434501648
+    },
+    "calibrate_frame_timing": {
+      "n": 100,
+      "mean_sec": 2.2739514827728273,
+      "median_sec": 2.2625163793563843,
+      "p95_sec": 2.347482633590698,
+      "max_sec": 2.7134132385253906,
+      "total_sec": 227.39514827728271
+    },
+    "enrichment_wall_sec": 0.2,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 12.6,
+    "team_resolve_wall_sec": 5.6,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 1.6,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 1.7
+  },
+  "team": {
+    "cluster_separation": 125.56,
+    "n_player_tracks_total": 65,
+    "n_resolved": 54,
+    "n_unresolved": 11,
+    "resolved_pct": 0.8308,
+    "gray_frame_pct": 0.0202,
+    "n_fallback_assigned": 4,
+    "n_merged_pairs": 17,
+    "n_rejected_merge_candidates": 12,
+    "verdict": "DEGRADED"
+  },
+  "calibration": {
+    "mean_confidence": 0.7879,
+    "median_confidence": 0.8095,
+    "pct_frames_below_70": 0.287,
+    "verdict": "DEGRADED"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 1,
+    "max_magnitude_px": 17.6,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 65,
+    "n_flagged_candidates": 7,
+    "strong_signature": 5,
+    "weak_signature": 2,
+    "strong_signature_per_100_frames": 0.5,
+    "weak_signature_per_100_frames": 0.2,
+    "flagged": [
+      {
+        "pid": 1,
+        "n_samples": 941,
+        "whole_purity": 0.85,
+        "weighted_purity": 1.0,
+        "improvement": 0.15,
+        "split_before_fn": 187,
+        "split_after_fn": 192,
+        "signature": "strong"
+      },
+      {
+        "pid": 6,
+        "n_samples": 145,
+        "whole_purity": 0.945,
+        "weighted_purity": 1.0,
+        "improvement": 0.055,
+        "split_before_fn": 136,
+        "split_after_fn": 137,
+        "signature": "strong"
+      },
+      {
+        "pid": 22,
+        "n_samples": 186,
+        "whole_purity": 0.919,
+        "weighted_purity": 1.0,
+        "improvement": 0.081,
+        "split_before_fn": 183,
+        "split_after_fn": 189,
+        "signature": "weak"
+      },
+      {
+        "pid": 45,
+        "n_samples": 15,
+        "whole_purity": 0.6,
+        "weighted_purity": 0.933,
+        "improvement": 0.333,
+        "split_before_fn": 145,
+        "split_after_fn": 147,
+        "signature": "strong"
+      },
+      {
+        "pid": 48,
+        "n_samples": 17,
+        "whole_purity": 0.588,
+        "weighted_purity": 1.0,
+        "improvement": 0.412,
+        "split_before_fn": 186,
+        "split_after_fn": 210,
+        "signature": "weak"
+      },
+      {
+        "pid": 77,
+        "n_samples": 784,
+        "whole_purity": 0.952,
+        "weighted_purity": 1.0,
+        "improvement": 0.048,
+        "split_before_fn": 244,
+        "split_after_fn": 249,
+        "signature": "strong"
+      },
+      {
+        "pid": 162,
+        "n_samples": 169,
+        "whole_purity": 0.556,
+        "weighted_purity": 1.0,
+        "improvement": 0.444,
+        "split_before_fn": 855,
+        "split_after_fn": 857,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 5,
+    "margin_label": "5/6 \u2014 1 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.3204,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 106,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 23.0,
+    "p90_gap_sec": 0.92,
+    "max_gap_frames": 74,
+    "max_gap_sec": 2.96,
+    "n_gaps_over_1s": 10,
+    "n_gaps_over_3s": 0,
+    "n_gaps_over_uncertain_threshold": 17,
+    "pct_frames_within_1s_of_real": 0.97,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "DEGRADED",
+  "rendered": true,
+  "render_dir": "batch_reports\\ChelseaCity_w186\\render"
+}

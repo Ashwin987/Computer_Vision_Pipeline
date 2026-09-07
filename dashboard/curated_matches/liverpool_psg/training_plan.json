@@ -1,0 +1,1347 @@
+{
+  "team_plan": {
+    "days": [
+      {
+        "day": "Monday",
+        "focus_label": "Active Recovery",
+        "focus_category": "rest",
+        "drills": [
+          {
+            "title": "Light Jog & Stretch",
+            "duration_min": 30,
+            "note": "Focus on gentle movement to aid muscle recovery and reduce stiffness after the match."
+          }
+        ],
+        "why_stat": "PHASE E TEST manually edited why stat",
+        "edited_fields": [
+          "why_stat"
+        ]
+      },
+      {
+        "day": "Tuesday",
+        "focus_label": "Rapid Transitions",
+        "focus_category": "trans",
+        "drills": [
+          {
+            "title": "Counter-Attack Drills (3v2, 4v3)",
+            "duration_min": 45,
+            "note": "Practice quick ball recovery and immediate vertical passes to exploit defensive disorganization."
+          },
+          {
+            "title": "Finishing from Fast Breaks",
+            "duration_min": 30,
+            "note": "Refine decision-making and accuracy in front of goal after rapid transitions."
+          }
+        ],
+        "why_stat": "Red was involved in a counter-attack or fast vertical transition in 7 minutes, highlighting this as their primary offensive outlet.",
+        "edited_fields": []
+      },
+      {
+        "day": "Wednesday",
+        "focus_label": "Progressive Build-Up",
+        "focus_category": "build",
+        "drills": [
+          {
+            "title": "Possession Rondo with Progression Gates",
+            "duration_min": 40,
+            "note": "Develop controlled possession with a focus on breaking lines and advancing the ball into attacking zones."
+          },
+          {
+            "title": "Attacking Third Overload Play",
+            "duration_min": 35,
+            "note": "Work on creating numerical advantages and intelligent movement in the opponent's final third."
+          }
+        ],
+        "why_stat": "Red's engagement in the attacking third was severely limited, registering only 3.2 minutes of fractional time in attack, indicating a need to improve sustained offensive pressure.",
+        "edited_fields": []
+      },
+      {
+        "day": "Thursday",
+        "focus_label": "Defensive Pressing & Shape",
+        "focus_category": "press",
+        "drills": [
+          {
+            "title": "Gegenpress Scenarios (Small-Sided Games)",
+            "duration_min": 40,
+            "note": "Train immediate high-intensity pressing upon losing possession to win the ball back quickly in advanced areas."
+          },
+          {
+            "title": "Defensive Block & Mid-Block Transition",
+            "duration_min": 35,
+            "note": "Practice shifting from a deep defensive line to a more aggressive mid-block when appropriate opportunities arise."
+          },
+          {
+            "title": "Recovery Session",
+            "duration_min": 15,
+            "note": "Focus on light activity and regeneration after high number of recovery events in the last match."
+          }
+        ],
+        "why_stat": "Red dropped its defensive line deep in 15 minutes, while also using gegenpress in 12 of 29 minutes, indicating a need to integrate these defensive actions more effectively.",
+        "edited_fields": [],
+        "chat_confirmed_fields": [
+          "drills"
+        ]
+      },
+      {
+        "day": "Friday",
+        "focus_label": "Fullback Attacking Runs",
+        "focus_category": "build",
+        "drills": [
+          {
+            "title": "Wide Play & Crossing Drills",
+            "duration_min": 40,
+            "note": "Focus on fullbacks making overlapping runs to provide width and deliver quality crosses into the box."
+          },
+          {
+            "title": "Attacking Combinations with Fullbacks",
+            "duration_min": 30,
+            "note": "Integrate fullbacks into attacking sequences with wingers and central midfielders to create varied threats."
+          }
+        ],
+        "why_stat": "Red's fullbacks played defensive in 15 minutes and overlapping in 14, suggesting an opportunity to increase their attacking contribution.",
+        "edited_fields": []
+      },
+      {
+        "day": "Saturday",
+        "focus_label": "Tactical Review & Set Pieces",
+        "focus_category": "build",
+        "drills": [
+          {
+            "title": "Light Tactical Walkthrough",
+            "duration_min": 30,
+            "note": "Review opponent's tendencies and Red's tactical plan for the upcoming match, focusing on key movements."
+          },
+          {
+            "title": "Set Piece Practice (Offensive & Defensive)",
+            "duration_min": 20,
+            "note": "Refine routines for corners, free kicks, and defensive positioning during opponent's set pieces."
+          }
+        ],
+        "why_stat": "This light session ensures players are mentally prepared and tactically aligned for the upcoming match, minimizing physical exertion.",
+        "edited_fields": []
+      },
+      {
+        "day": "Sunday",
+        "focus_label": "Complete Rest",
+        "focus_category": "rest",
+        "drills": [],
+        "why_stat": "This day provides essential complete rest for physical and mental rejuvenation, allowing players to fully recover before the start of the next training cycle.",
+        "edited_fields": []
+      }
+    ],
+    "_original_days": [
+      {
+        "day": "Monday",
+        "focus_label": "Active Recovery",
+        "focus_category": "rest",
+        "drills": [
+          {
+            "title": "Light Jog & Stretch",
+            "duration_min": 30,
+            "note": "Focus on gentle movement to aid muscle recovery and reduce stiffness after the match."
+          }
+        ],
+        "why_stat": "This day is dedicated to physical and mental recovery, crucial for player well-being and readiness for the demanding week ahead.",
+        "edited_fields": []
+      },
+      {
+        "day": "Tuesday",
+        "focus_label": "Rapid Transitions",
+        "focus_category": "trans",
+        "drills": [
+          {
+            "title": "Counter-Attack Drills (3v2, 4v3)",
+            "duration_min": 45,
+            "note": "Practice quick ball recovery and immediate vertical passes to exploit defensive disorganization."
+          },
+          {
+            "title": "Finishing from Fast Breaks",
+            "duration_min": 30,
+            "note": "Refine decision-making and accuracy in front of goal after rapid transitions."
+          }
+        ],
+        "why_stat": "Red was involved in a counter-attack or fast vertical transition in 7 minutes, highlighting this as their primary offensive outlet.",
+        "edited_fields": []
+      },
+      {
+        "day": "Wednesday",
+        "focus_label": "Progressive Build-Up",
+        "focus_category": "build",
+        "drills": [
+          {
+            "title": "Possession Rondo with Progression Gates",
+            "duration_min": 40,
+            "note": "Develop controlled possession with a focus on breaking lines and advancing the ball into attacking zones."
+          },
+          {
+            "title": "Attacking Third Overload Play",
+            "duration_min": 35,
+            "note": "Work on creating numerical advantages and intelligent movement in the opponent's final third."
+          }
+        ],
+        "why_stat": "Red's engagement in the attacking third was severely limited, registering only 3.2 minutes of fractional time in attack, indicating a need to improve sustained offensive pressure.",
+        "edited_fields": []
+      },
+      {
+        "day": "Thursday",
+        "focus_label": "Defensive Pressing & Shape",
+        "focus_category": "press",
+        "drills": [
+          {
+            "title": "Gegenpress Scenarios (Small-Sided Games)",
+            "duration_min": 40,
+            "note": "Train immediate high-intensity pressing upon losing possession to win the ball back quickly in advanced areas."
+          },
+          {
+            "title": "Defensive Block & Mid-Block Transition",
+            "duration_min": 35,
+            "note": "Practice shifting from a deep defensive line to a more aggressive mid-block when appropriate opportunities arise."
+          },
+          {
+            "title": "Recovery Session",
+            "duration_min": 15,
+            "note": "Focus on light activity and regeneration after high number of recovery events in the last match."
+          }
+        ],
+        "why_stat": "Red dropped its defensive line deep in 15 minutes, while also using gegenpress in 12 of 29 minutes, indicating a need to integrate these defensive actions more effectively.",
+        "edited_fields": []
+      },
+      {
+        "day": "Friday",
+        "focus_label": "Fullback Attacking Runs",
+        "focus_category": "build",
+        "drills": [
+          {
+            "title": "Wide Play & Crossing Drills",
+            "duration_min": 40,
+            "note": "Focus on fullbacks making overlapping runs to provide width and deliver quality crosses into the box."
+          },
+          {
+            "title": "Attacking Combinations with Fullbacks",
+            "duration_min": 30,
+            "note": "Integrate fullbacks into attacking sequences with wingers and central midfielders to create varied threats."
+          }
+        ],
+        "why_stat": "Red's fullbacks played defensive in 15 minutes and overlapping in 14, suggesting an opportunity to increase their attacking contribution.",
+        "edited_fields": []
+      },
+      {
+        "day": "Saturday",
+        "focus_label": "Tactical Review & Set Pieces",
+        "focus_category": "build",
+        "drills": [
+          {
+            "title": "Light Tactical Walkthrough",
+            "duration_min": 30,
+            "note": "Review opponent's tendencies and Red's tactical plan for the upcoming match, focusing on key movements."
+          },
+          {
+            "title": "Set Piece Practice (Offensive & Defensive)",
+            "duration_min": 20,
+            "note": "Refine routines for corners, free kicks, and defensive positioning during opponent's set pieces."
+          }
+        ],
+        "why_stat": "This light session ensures players are mentally prepared and tactically aligned for the upcoming match, minimizing physical exertion.",
+        "edited_fields": []
+      },
+      {
+        "day": "Sunday",
+        "focus_label": "Complete Rest",
+        "focus_category": "rest",
+        "drills": [],
+        "why_stat": "This day provides essential complete rest for physical and mental rejuvenation, allowing players to fully recover before the start of the next training cycle.",
+        "edited_fields": []
+      }
+    ],
+    "source_note": "Generated from real per-minute tactical patterns across the 29 analyzed minutes of this match.",
+    "generated_at": "2026-09-06T21:24:08.426127+00:00"
+  },
+  "player_plan": {
+    "players": [
+      {
+        "player_id": 8,
+        "team_label": "Red",
+        "top_speed_kmh": 34.26,
+        "avg_speed_kmh": 14.57,
+        "total_distance_m": 80.6,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Focus on maintaining and improving the peak speed of 34.26 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Runs",
+            "note": "Work on sustaining high average speeds, aiming to exceed 14.57 km/h over repeated short efforts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Movement & Mobility",
+            "note": "Enhance movement efficiency to support covering distances similar to 80.6 meters with ease.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Power Development",
+            "note": "Build explosive power to further enhance the ability to reach a top speed of 34.26 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Short Burst Acceleration Drills",
+            "note": "Improve the ability to rapidly accelerate and maintain an average speed around 14.57 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 22,
+        "team_label": "Red",
+        "top_speed_kmh": 35.24,
+        "avg_speed_kmh": 14.05,
+        "total_distance_m": 75.2,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Target pushing beyond the impressive top speed of 35.24 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Repeated High-Intensity Efforts",
+            "note": "Focus on consistently covering more distance than 75.2 meters in peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency Drills",
+            "note": "Optimize movement patterns to maintain high average speeds like 14.05 km/h with less effort.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Power Training",
+            "note": "Develop power to support and enhance the already high top speed of 35.24 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Agility & Quickness",
+            "note": "Improve rapid changes of direction while maintaining an average speed close to 14.05 km/h.",
+            "tag": "Agility",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 21,
+        "team_label": "Red",
+        "top_speed_kmh": 34.28,
+        "avg_speed_kmh": 15.55,
+        "total_distance_m": 75.1,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Development Sprints",
+            "note": "Work on enhancing the top speed, aiming to consistently exceed 34.28 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Sustained Runs",
+            "note": "Focus on maintaining the exceptional average speed of 15.55 km/h over longer short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Active Recovery & Dynamic Stretching",
+            "note": "Promote recovery and flexibility to support covering distances like 75.1 meters effectively.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Reactive Strength Training",
+            "note": "Improve reactive power to quickly reach and sustain the high average speed of 15.55 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration & Deceleration Drills",
+            "note": "Enhance the ability to rapidly accelerate to speeds near 34.28 km/h and control deceleration.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 15,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.76,
+        "avg_speed_kmh": 12.67,
+        "total_distance_m": 74.7,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Overload",
+            "note": "Challenge the body to push beyond the impressive top speed of 35.76 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Repeated Efforts",
+            "note": "Focus on increasing the average speed from 12.67 km/h during sustained short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Quality & Mobility",
+            "note": "Improve overall movement efficiency to better utilize the distance covered, which was 74.7 meters.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Power Endurance Drills",
+            "note": "Develop the ability to sustain explosive power, supporting the high top speed of 35.76 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Short Burst Acceleration",
+            "note": "Work on rapidly accelerating to higher average speeds than 12.67 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 20,
+        "team_label": "Blue",
+        "top_speed_kmh": 34.99,
+        "avg_speed_kmh": 14.23,
+        "total_distance_m": 68.1,
+        "confidence": "medium",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Maintenance Sprints",
+            "note": "Maintain and slightly improve the strong top speed of 34.99 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Interval Training for Work Rate",
+            "note": "Increase the total distance covered beyond 68.1 meters in similar high-intensity windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Active Recovery & Core Stability",
+            "note": "Support efficient movement to maintain an average speed of 14.23 km/h.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Jumps & Bounds",
+            "note": "Enhance explosive power to support reaching and sustaining speeds near 34.99 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Multi-Directional Acceleration",
+            "note": "Improve quick changes of direction while maintaining an average speed around 14.23 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 19,
+        "team_label": "Blue",
+        "top_speed_kmh": 30.75,
+        "avg_speed_kmh": 12.58,
+        "total_distance_m": 65.1,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Development Sprints",
+            "note": "Focus on improving the top speed, aiming to consistently exceed 30.75 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Repeated High-Effort Runs",
+            "note": "Increase the capacity to cover more distance than 65.1 meters in similar intense bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Pattern Drills",
+            "note": "Refine running mechanics to improve efficiency and support higher average speeds than 12.58 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength Training",
+            "note": "Develop lower body power to enhance acceleration and increase the top speed beyond 30.75 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Short Distance Acceleration",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 12.58 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 7,
+        "team_label": "Red",
+        "top_speed_kmh": 35.77,
+        "avg_speed_kmh": 11.91,
+        "total_distance_m": 62.9,
+        "confidence": "medium",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Maintain and challenge the impressive top speed of 35.77 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Work Rate Drills",
+            "note": "Focus on increasing the average speed from 11.91 km/h during intense short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Recovery",
+            "note": "Improve overall movement economy to cover more distance than 62.9 meters with greater ease.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Power Development for Acceleration",
+            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.91 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Repeated Sprint Ability",
+            "note": "Work on repeating high-speed efforts, building on the 35.77 km/h top speed.",
+            "tag": "Repeated Sprint",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 18,
+        "team_label": "Blue",
+        "top_speed_kmh": 32.13,
+        "avg_speed_kmh": 11.41,
+        "total_distance_m": 61.2,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Development Sprints",
+            "note": "Concentrate on improving the top speed, aiming to consistently exceed 32.13 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Increase the total distance covered beyond 61.2 meters in similar peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Pattern & Agility",
+            "note": "Refine movement patterns to support higher average speeds than 11.41 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength & Power",
+            "note": "Develop power to enhance acceleration and increase the top speed beyond 32.13 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration Drills",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.41 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 16,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.81,
+        "avg_speed_kmh": 11.68,
+        "total_distance_m": 60.3,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Maintain and challenge the exceptional top speed of 35.81 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Work Rate Drills",
+            "note": "Focus on increasing the average speed from 11.68 km/h during intense short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Recovery",
+            "note": "Improve overall movement economy to cover more distance than 60.3 meters with greater ease.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Power Development for Acceleration",
+            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.68 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Repeated Sprint Ability",
+            "note": "Work on repeating high-speed efforts, building on the 35.81 km/h top speed.",
+            "tag": "Repeated Sprint",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 171,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.48,
+        "avg_speed_kmh": 15.23,
+        "total_distance_m": 51.3,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Overload",
+            "note": "Challenge the body to push beyond the already high top speed of 35.48 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Sustained High-Intensity Drills",
+            "note": "Focus on increasing the total distance covered beyond 51.3 meters while maintaining high average speed.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Active Recovery & Movement Flow",
+            "note": "Promote continuous movement patterns to support covering more distance than 51.3 meters.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Reactive Power Development",
+            "note": "Enhance the ability to quickly transition into high-speed movements, leveraging the 15.23 km/h average speed.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Repeated Sprint Ability",
+            "note": "Improve the capacity to repeat high-intensity efforts, building on the impressive 15.23 km/h average speed.",
+            "tag": "Repeated Sprint",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 158,
+        "team_label": "Red",
+        "top_speed_kmh": 35.34,
+        "avg_speed_kmh": 11.23,
+        "total_distance_m": 45.9,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Maintenance Sprints",
+            "note": "Maintain and slightly improve the strong top speed of 35.34 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Focus on significantly increasing the total distance covered beyond 45.9 meters in peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Agility",
+            "note": "Refine movement patterns to support higher average speeds than 11.23 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength & Power",
+            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.23 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration Drills",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.23 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 10,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.55,
+        "avg_speed_kmh": 11.48,
+        "total_distance_m": 42.7,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Maintenance Sprints",
+            "note": "Maintain and slightly improve the strong top speed of 35.55 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Focus on significantly increasing the total distance covered beyond 42.7 meters in peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Agility",
+            "note": "Refine movement patterns to support higher average speeds than 11.48 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength & Power",
+            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.48 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration Drills",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.48 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      }
+    ],
+    "_original_players": [
+      {
+        "player_id": 8,
+        "team_label": "Red",
+        "top_speed_kmh": 34.26,
+        "avg_speed_kmh": 14.57,
+        "total_distance_m": 80.6,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Focus on maintaining and improving the peak speed of 34.26 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Runs",
+            "note": "Work on sustaining high average speeds, aiming to exceed 14.57 km/h over repeated short efforts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Movement & Mobility",
+            "note": "Enhance movement efficiency to support covering distances similar to 80.6 meters with ease.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Power Development",
+            "note": "Build explosive power to further enhance the ability to reach a top speed of 34.26 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Short Burst Acceleration Drills",
+            "note": "Improve the ability to rapidly accelerate and maintain an average speed around 14.57 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 22,
+        "team_label": "Red",
+        "top_speed_kmh": 35.24,
+        "avg_speed_kmh": 14.05,
+        "total_distance_m": 75.2,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Target pushing beyond the impressive top speed of 35.24 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Repeated High-Intensity Efforts",
+            "note": "Focus on consistently covering more distance than 75.2 meters in peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency Drills",
+            "note": "Optimize movement patterns to maintain high average speeds like 14.05 km/h with less effort.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Power Training",
+            "note": "Develop power to support and enhance the already high top speed of 35.24 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Agility & Quickness",
+            "note": "Improve rapid changes of direction while maintaining an average speed close to 14.05 km/h.",
+            "tag": "Agility",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 21,
+        "team_label": "Red",
+        "top_speed_kmh": 34.28,
+        "avg_speed_kmh": 15.55,
+        "total_distance_m": 75.1,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Development Sprints",
+            "note": "Work on enhancing the top speed, aiming to consistently exceed 34.28 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Sustained Runs",
+            "note": "Focus on maintaining the exceptional average speed of 15.55 km/h over longer short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Active Recovery & Dynamic Stretching",
+            "note": "Promote recovery and flexibility to support covering distances like 75.1 meters effectively.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Reactive Strength Training",
+            "note": "Improve reactive power to quickly reach and sustain the high average speed of 15.55 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration & Deceleration Drills",
+            "note": "Enhance the ability to rapidly accelerate to speeds near 34.28 km/h and control deceleration.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 15,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.76,
+        "avg_speed_kmh": 12.67,
+        "total_distance_m": 74.7,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Overload",
+            "note": "Challenge the body to push beyond the impressive top speed of 35.76 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Repeated Efforts",
+            "note": "Focus on increasing the average speed from 12.67 km/h during sustained short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Quality & Mobility",
+            "note": "Improve overall movement efficiency to better utilize the distance covered, which was 74.7 meters.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Power Endurance Drills",
+            "note": "Develop the ability to sustain explosive power, supporting the high top speed of 35.76 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Short Burst Acceleration",
+            "note": "Work on rapidly accelerating to higher average speeds than 12.67 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 20,
+        "team_label": "Blue",
+        "top_speed_kmh": 34.99,
+        "avg_speed_kmh": 14.23,
+        "total_distance_m": 68.1,
+        "confidence": "medium",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Maintenance Sprints",
+            "note": "Maintain and slightly improve the strong top speed of 34.99 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Interval Training for Work Rate",
+            "note": "Increase the total distance covered beyond 68.1 meters in similar high-intensity windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Active Recovery & Core Stability",
+            "note": "Support efficient movement to maintain an average speed of 14.23 km/h.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Jumps & Bounds",
+            "note": "Enhance explosive power to support reaching and sustaining speeds near 34.99 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Multi-Directional Acceleration",
+            "note": "Improve quick changes of direction while maintaining an average speed around 14.23 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 19,
+        "team_label": "Blue",
+        "top_speed_kmh": 30.75,
+        "avg_speed_kmh": 12.58,
+        "total_distance_m": 65.1,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Development Sprints",
+            "note": "Focus on improving the top speed, aiming to consistently exceed 30.75 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Repeated High-Effort Runs",
+            "note": "Increase the capacity to cover more distance than 65.1 meters in similar intense bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Pattern Drills",
+            "note": "Refine running mechanics to improve efficiency and support higher average speeds than 12.58 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength Training",
+            "note": "Develop lower body power to enhance acceleration and increase the top speed beyond 30.75 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Short Distance Acceleration",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 12.58 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 7,
+        "team_label": "Red",
+        "top_speed_kmh": 35.77,
+        "avg_speed_kmh": 11.91,
+        "total_distance_m": 62.9,
+        "confidence": "medium",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Maintain and challenge the impressive top speed of 35.77 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Work Rate Drills",
+            "note": "Focus on increasing the average speed from 11.91 km/h during intense short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Recovery",
+            "note": "Improve overall movement economy to cover more distance than 62.9 meters with greater ease.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Power Development for Acceleration",
+            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.91 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Repeated Sprint Ability",
+            "note": "Work on repeating high-speed efforts, building on the 35.77 km/h top speed.",
+            "tag": "Repeated Sprint",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 18,
+        "team_label": "Blue",
+        "top_speed_kmh": 32.13,
+        "avg_speed_kmh": 11.41,
+        "total_distance_m": 61.2,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Development Sprints",
+            "note": "Concentrate on improving the top speed, aiming to consistently exceed 32.13 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Increase the total distance covered beyond 61.2 meters in similar peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Pattern & Agility",
+            "note": "Refine movement patterns to support higher average speeds than 11.41 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength & Power",
+            "note": "Develop power to enhance acceleration and increase the top speed beyond 32.13 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration Drills",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.41 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 16,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.81,
+        "avg_speed_kmh": 11.68,
+        "total_distance_m": 60.3,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprints",
+            "note": "Maintain and challenge the exceptional top speed of 35.81 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Work Rate Drills",
+            "note": "Focus on increasing the average speed from 11.68 km/h during intense short bursts.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Recovery",
+            "note": "Improve overall movement economy to cover more distance than 60.3 meters with greater ease.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Power Development for Acceleration",
+            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.68 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Repeated Sprint Ability",
+            "note": "Work on repeating high-speed efforts, building on the 35.81 km/h top speed.",
+            "tag": "Repeated Sprint",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 171,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.48,
+        "avg_speed_kmh": 15.23,
+        "total_distance_m": 51.3,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Overload",
+            "note": "Challenge the body to push beyond the already high top speed of 35.48 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Sustained High-Intensity Drills",
+            "note": "Focus on increasing the total distance covered beyond 51.3 meters while maintaining high average speed.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Active Recovery & Movement Flow",
+            "note": "Promote continuous movement patterns to support covering more distance than 51.3 meters.",
+            "tag": "Active Recovery",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Reactive Power Development",
+            "note": "Enhance the ability to quickly transition into high-speed movements, leveraging the 15.23 km/h average speed.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Repeated Sprint Ability",
+            "note": "Improve the capacity to repeat high-intensity efforts, building on the impressive 15.23 km/h average speed.",
+            "tag": "Repeated Sprint",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 158,
+        "team_label": "Red",
+        "top_speed_kmh": 35.34,
+        "avg_speed_kmh": 11.23,
+        "total_distance_m": 45.9,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Maintenance Sprints",
+            "note": "Maintain and slightly improve the strong top speed of 35.34 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Focus on significantly increasing the total distance covered beyond 45.9 meters in peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Agility",
+            "note": "Refine movement patterns to support higher average speeds than 11.23 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength & Power",
+            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.23 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration Drills",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.23 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 10,
+        "team_label": "Blue",
+        "top_speed_kmh": 35.55,
+        "avg_speed_kmh": 11.48,
+        "total_distance_m": 42.7,
+        "confidence": "high",
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Speed Maintenance Sprints",
+            "note": "Maintain and slightly improve the strong top speed of 35.55 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Focus on significantly increasing the total distance covered beyond 42.7 meters in peak momentum windows.",
+            "tag": "Work Rate",
+            "edited_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency & Agility",
+            "note": "Refine movement patterns to support higher average speeds than 11.48 km/h.",
+            "tag": "Movement Efficiency",
+            "edited_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Strength & Power",
+            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.48 km/h.",
+            "tag": "Power",
+            "edited_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Acceleration Drills",
+            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.48 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": []
+          }
+        ]
+      }
+    ],
+    "scope_note": "Based on the match's peak-momentum window only \u2014 not a full-match average. Full-match fatigue tracking is on our roadmap.",
+    "generated_at": "2026-09-06T21:24:57.746264+00:00"
+  }
+}

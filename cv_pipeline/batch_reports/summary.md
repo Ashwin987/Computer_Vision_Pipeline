@@ -1,0 +1,24 @@
+# Batch validation summary
+
+| clip | status | n_frames | fps | resolution | team_resolved_pct | team_verdict | calib_median_pct | calib_verdict | camera_sustained_events | camera_verdict | gk_margin | gk_verdict | ball_raw_pct | ball_median_gap_sec | ball_max_gap_sec | ball_gaps_over_3s | ball_pct_within_3s | id_swap_strong | id_swap_strong_per_100f | id_swap_weak | overall_verdict | rendered |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| AlgeriaArgentia_w1206 | OK | 1000 | 29.97 | 1920x1080 | 94.4% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 32.9% | 0.07 | 2.87 | 0 | 100.0% | 11 | 1.1 | 1 | PASS | False |
+| AlgeriaArgentia_w1973 | OK | 1000 | 29.97 | 1920x1080 | 91.4% | PASS | 100.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 30.8% | 0.07 | 4.07 | 1 | 100.0% | 8 | 0.8 | 0 | PASS | False |
+| AlgeriaArgentia_w2147 | OK | 988 | 29.97 | 1920x1080 | 88.6% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 38.8% | 0.07 | 4.27 | 1 | 100.0% | 6 | 0.607 | 0 | PASS | False |
+| AlgeriaArgentia_w3281 | OK | 1000 | 29.97 | 1920x1080 | 89.2% | PASS | 100.0% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 50.9% | 0.07 | 2.17 | 0 | 100.0% | 8 | 0.8 | 4 | PASS | False |
+| AlgeriaArgentia_w3577 | OK | 1000 | 29.97 | 1920x1080 | 84.1% | DEGRADED | 94.7% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 28.4% | 0.07 | 5.07 | 2 | 94.5% | 2 | 0.2 | 1 | DEGRADED | True |
+| AlgeriaArgentia_w5318 | OK | 1000 | 29.97 | 1920x1080 | 93.2% | PASS | 89.5% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 31.1% | 0.17 | 2.17 | 0 | 100.0% | 7 | 0.7 | 0 | DEGRADED | True |
+| AlgeriaArgentia_w5320 | OK | 1000 | 29.97 | 1920x1080 | 91.7% | PASS | 89.5% | DEGRADED | 0 | PASS | 2/6 — 4 under limit | PASS | 33.2% | 0.17 | 2.17 | 0 | 100.0% | 9 | 0.9 | 0 | DEGRADED | True |
+| AlgeriaArgentia_w5684 | OK | 1000 | 29.97 | 1920x1080 | 91.1% | PASS | 85.0% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 50.6% | 0.07 | 1.97 | 0 | 100.0% | 4 | 0.4 | 2 | DEGRADED | True |
+| AlgeriaArgentia_w624 | OK | 1000 | 29.97 | 1920x1080 | 90.7% | PASS | 100.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 32.0% | 0.07 | 2.47 | 0 | 100.0% | 3 | 0.3 | 0 | PASS | False |
+| AlgeriaArgentia_w685 | OK | 1000 | 29.97 | 1920x1080 | 96.7% | PASS | 95.7% | PASS | 0 | PASS | 7/6 — over limit | FAIL | 38.9% | 0.07 | 5.21 | 3 | 93.3% | 6 | 0.6 | 0 | FAIL | True |
+| MarseilevsLyonFull__trim_no_halftime_w2171 | OK | 1000 | 25.0 | 1920x1080 | 94.5% | PASS | 78.6% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 21.0% | 0.2 | 5.6 | 1 | 100.0% | 2 | 0.2 | 1 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w2780 | OK | 1000 | 25.0 | 1920x1080 | 90.4% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 47.3% | 0.08 | 4.28 | 1 | 100.0% | 11 | 1.1 | 1 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w2833 | OK | 1000 | 25.0 | 1920x1080 | 95.7% | PASS | 85.0% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 25.1% | 0.08 | 9.32 | 2 | 90.0% | 2 | 0.2 | 0 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w3305 | OK | 1000 | 25.0 | 1920x1080 | 89.6% | PASS | 95.2% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 25.1% | 0.08 | 8.04 | 1 | 87.4% | 4 | 0.4 | 2 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w3345 | OK | 1000 | 25.0 | 1920x1080 | 88.3% | PASS | 75.0% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 44.6% | 0.08 | 2.84 | 0 | 100.0% | 4 | 0.4 | 0 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w3351 | OK | 1000 | 25.0 | 1920x1080 | 91.8% | PASS | 82.8% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 42.5% | 0.08 | 2.84 | 0 | 100.0% | 2 | 0.2 | 0 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w4176 | OK | 1000 | 25.0 | 1920x1080 | 89.7% | PASS | 95.0% | PASS | 0 | PASS | 3/6 — 3 under limit | PASS | 27.0% | 0.08 | 11.48 | 2 | 69.5% | 3 | 0.3 | 2 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w4576 | OK | 1000 | 25.0 | 1920x1080 | 97.0% | PASS | 95.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 40.1% | 0.08 | 4.28 | 1 | 100.0% | 12 | 1.2 | 2 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w4650 | OK | 1000 | 25.0 | 1920x1080 | 92.8% | PASS | 85.7% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 37.7% | 0.08 | 3.2 | 1 | 100.0% | 11 | 1.1 | 1 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w5212 | OK | 801 | 25.0 | 1920x1080 | 93.2% | PASS | 100.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 29.2% | 0.2 | 3.32 | 1 | 99.0% | 10 | 1.248 | 5 | PASS | False |

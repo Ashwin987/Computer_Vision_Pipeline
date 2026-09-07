@@ -1,0 +1,12 @@
+{
+  "cv_output_dir": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified",
+  "cv_verified": true,
+  "stats_video": {
+    "n_frames": 752,
+    "fps": 25.0,
+    "duration_sec": 30.1
+  },
+  "stats_video_path": "c:\\UCLA\\football_analysis\\simulation\\Dashboard\\curated_matches\\liverpool_psg\\peak_momentum_segment.mp4",
+  "segment_path": "c:\\UCLA\\football_analysis\\simulation\\Dashboard\\curated_matches\\liverpool_psg\\peak_momentum_segment.mp4",
+  "segment_real_duration_sec": 30.08
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "clip": "AlgeriaArgentia_w1354_review",
+    "n_samples": 610,
+    "bgr_raw_sep": 23.592416763305664,
+    "bgr_norm_sep": "3.5349295",
+    "bgr_pops": [
+      352,
+      243,
+      15
+    ],
+    "hsv_raw_sep": 25.151689529418945,
+    "hsv_norm_sep": "3.7454398",
+    "hsv_pops": [
+      362,
+      232,
+      16
+    ]
+  },
+  {
+    "clip": "AlgeriaArgentia_w685",
+    "n_samples": 630,
+    "bgr_raw_sep": 39.20949935913086,
+    "bgr_norm_sep": "4.123022",
+    "bgr_pops": [
+      485,
+      98,
+      47
+    ],
+    "hsv_raw_sep": 41.97597885131836,
+    "hsv_norm_sep": "4.968452",
+    "hsv_pops": [
+      469,
+      93,
+      68
+    ]
+  },
+  {
+    "clip": "BarcaMadridPT1_w449",
+    "n_samples": 556,
+    "bgr_raw_sep": 161.9562225341797,
+    "bgr_norm_sep": "19.544872",
+    "bgr_pops": [
+      262,
+      250,
+      44
+    ],
+    "hsv_raw_sep": 106.36112976074219,
+    "hsv_norm_sep": "11.783039",
+    "hsv_pops": [
+      268,
+      250,
+      38
+    ]
+  },
+  {
+    "clip": "BarcaMadridPT1_w529",
+    "n_samples": 344,
+    "bgr_raw_sep": 159.55210876464844,
+    "bgr_norm_sep": "16.216372",
+    "bgr_pops": [
+      179,
+      143,
+      22
+    ],
+    "hsv_raw_sep": 106.9529800415039,
+    "hsv_norm_sep": "10.431626",
+    "hsv_pops": [
+      182,
+      143,
+      19
+    ]
+  },
+  {
+    "clip": "ChelseaCity_w252",
+    "n_samples": 498,
+    "bgr_raw_sep": 184.78497314453125,
+    "bgr_norm_sep": "13.915097",
+    "bgr_pops": [
+      265,
+      126,
+      107
+    ],
+    "hsv_raw_sep": 84.27310943603516,
+    "hsv_norm_sep": "5.252243",
+    "hsv_pops": [
+      264,
+      118,
+      116
+    ]
+  },
+  {
+    "clip": "ChelseaCity_w672",
+    "n_samples": 506,
+    "bgr_raw_sep": 159.36619567871094,
+    "bgr_norm_sep": "13.447364",
+    "bgr_pops": [
+      228,
+      140,
+      138
+    ],
+    "hsv_raw_sep": 116.18758392333984,
+    "hsv_norm_sep": "9.49498",
+    "hsv_pops": [
+      228,
+      156,
+      122
+    ]
+  },
+  {
+    "clip": "LiverpoolMadrid_w877",
+    "n_samples": 578,
+    "bgr_raw_sep": 107.0701904296875,
+    "bgr_norm_sep": "9.183928",
+    "bgr_pops": [
+      288,
+      163,
+      127
+    ],
+    "hsv_raw_sep": 88.42845153808594,
+    "hsv_norm_sep": "8.486711",
+    "hsv_pops": [
+      290,
+      264,
+      24
+    ]
+  },
+  {
+    "clip": "LiverpoolMadrid_w4573",
+    "n_samples": 592,
+    "bgr_raw_sep": 133.47572326660156,
+    "bgr_norm_sep": "14.319508",
+    "bgr_pops": [
+      283,
+      234,
+      75
+    ],
+    "hsv_raw_sep": 88.12068176269531,
+    "hsv_norm_sep": "8.271178",
+    "hsv_pops": [
+      310,
+      264,
+      18
+    ]
+  },
+  {
+    "clip": "MarseilevsLyonFull_w2171",
+    "n_samples": 588,
+    "bgr_raw_sep": 44.19688034057617,
+    "bgr_norm_sep": "4.74389",
+    "bgr_pops": [
+      198,
+      195,
+      195
+    ],
+    "hsv_raw_sep": 31.26831817626953,
+    "hsv_norm_sep": "3.7636788",
+    "hsv_pops": [
+      237,
+      193,
+      158
+    ]
+  },
+  {
+    "clip": "MarseilevsLyonFull_w3345",
+    "n_samples": 586,
+    "bgr_raw_sep": 52.4498291015625,
+    "bgr_norm_sep": "5.2509747",
+    "bgr_pops": [
+      228,
+      182,
+      176
+    ],
+    "hsv_raw_sep": 34.981693267822266,
+    "hsv_norm_sep": "3.939112",
+    "hsv_pops": [
+      253,
+      177,
+      156
+    ]
+  }
+]

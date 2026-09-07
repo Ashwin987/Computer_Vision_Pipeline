@@ -1,0 +1,37 @@
+Reading video frames...
+Reading video:   0%|          | 0/750 [00:00<?, ?frame/s]Reading video:   1%|          | 5/750 [00:00<00:15, 48.05frame/s]Reading video:   3%|2         | 20/750 [00:00<00:06, 106.63frame/s]Reading video:   5%|4         | 37/750 [00:00<00:05, 132.32frame/s]Reading video:   7%|7         | 54/750 [00:00<00:04, 146.81frame/s]Reading video:  10%|9         | 72/750 [00:00<00:04, 155.28frame/s]Reading video:  12%|#1        | 88/750 [00:00<00:04, 151.81frame/s]Reading video:  14%|#3        | 104/750 [00:00<00:04, 153.26frame/s]Reading video:  16%|#6        | 120/750 [00:00<00:04, 153.95frame/s]Reading video:  18%|#8        | 137/750 [00:00<00:03, 156.11frame/s]Reading video:  21%|##        | 154/750 [00:01<00:03, 157.25frame/s]Reading video:  23%|##2       | 170/750 [00:01<00:03, 147.97frame/s]Reading video:  25%|##4       | 185/750 [00:01<00:03, 144.23frame/s]Reading video:  27%|##6       | 200/750 [00:01<00:03, 144.59frame/s]Reading video:  29%|##8       | 215/750 [00:01<00:03, 143.65frame/s]Reading video:  31%|###       | 230/750 [00:01<00:03, 144.82frame/s]Reading video:  33%|###2      | 245/750 [00:01<00:03, 141.97frame/s]Reading video:  35%|###4      | 260/750 [00:01<00:03, 139.82frame/s]Reading video:  37%|###6      | 275/750 [00:01<00:03, 138.56frame/s]Reading video:  39%|###8      | 289/750 [00:02<00:03, 130.63frame/s]Reading video:  40%|####      | 303/750 [00:02<00:03, 129.27frame/s]Reading video:  42%|####2     | 316/750 [00:02<00:03, 128.91frame/s]Reading video:  44%|####3     | 329/750 [00:02<00:03, 126.83frame/s]Reading video:  46%|####5     | 342/750 [00:02<00:03, 121.78frame/s]Reading video:  47%|####7     | 356/750 [00:02<00:03, 124.12frame/s]Reading video:  49%|####9     | 369/750 [00:02<00:03, 121.00frame/s]Reading video:  51%|#####     | 382/750 [00:02<00:03, 118.83frame/s]Reading video:  53%|#####2    | 395/750 [00:02<00:02, 121.05frame/s]Reading video:  54%|#####4    | 408/750 [00:03<00:02, 120.86frame/s]Reading video:  56%|#####6    | 421/750 [00:03<00:02, 121.37frame/s]Reading video:  58%|#####7    | 434/750 [00:03<00:02, 119.84frame/s]Reading video:  59%|#####9    | 446/750 [00:03<00:02, 119.35frame/s]Reading video:  61%|######1   | 458/750 [00:03<00:02, 119.16frame/s]Reading video:  63%|######2   | 470/750 [00:03<00:02, 118.36frame/s]Reading video:  64%|######4   | 482/750 [00:03<00:02, 115.79frame/s]Reading video:  66%|######6   | 495/750 [00:03<00:02, 118.49frame/s]Reading video:  68%|######7   | 509/750 [00:03<00:01, 123.76frame/s]Reading video:  70%|######9   | 523/750 [00:03<00:01, 125.74frame/s]Reading video:  71%|#######1  | 536/750 [00:04<00:01, 125.14frame/s]Reading video:  73%|#######3  | 549/750 [00:04<00:01, 121.44frame/s]Reading video:  75%|#######4  | 562/750 [00:04<00:01, 123.86frame/s]Reading video:  77%|#######6  | 576/750 [00:04<00:01, 125.92frame/s]Reading video:  79%|#######8  | 589/750 [00:04<00:01, 120.47frame/s]Reading video:  80%|########  | 602/750 [00:04<00:01, 121.52frame/s]Reading video:  82%|########2 | 615/750 [00:04<00:01, 117.98frame/s]Reading video:  84%|########3 | 627/750 [00:04<00:01, 107.30frame/s]Reading video:  85%|########5 | 638/750 [00:05<00:01, 93.44frame/s] Reading video:  86%|########6 | 648/750 [00:05<00:01, 87.75frame/s]Reading video:  88%|########7 | 658/750 [00:05<00:01, 77.35frame/s]Reading video:  89%|########8 | 667/750 [00:05<00:01, 73.64frame/s]Reading video:  90%|######### | 675/750 [00:05<00:01, 71.85frame/s]Reading video:  91%|#########1| 684/750 [00:05<00:00, 75.84frame/s]Reading video:  92%|#########2| 692/750 [00:05<00:00, 75.73frame/s]Reading video:  93%|#########3| 700/750 [00:05<00:00, 76.23frame/s]Reading video:  94%|#########4| 708/750 [00:06<00:00, 64.98frame/s]Reading video:  96%|#########6| 722/750 [00:06<00:00, 83.45frame/s]Reading video:  98%|#########8| 736/750 [00:06<00:00, 97.53frame/s]Reading video: 100%|#########9| 747/750 [00:06<00:00, 98.23frame/s]Reading video: 100%|##########| 750/750 [00:06<00:00, 116.62frame/s]
+[team_assigner] excluded 12 goalkeeper detection(s) from team-color clustering
+
+============================================================
+[team_assigner] KMeans fit on 589 samples from frames [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290]
+  Team 1  BGR: B= 84.9  G=108.2  R=170.6
+  Team 2  BGR: B=113.5  G=204.3  R=156.5
+  Centroid separation: 101.3  [OK]
+  Cluster populations: [np.int64(317), np.int64(146), np.int64(126)]
+============================================================
+
+
+Scanned 46 player tracks (5 excluded as majority-goalkeeper)
+
+=== STEP 1: 2 track(s) flagged as ID-swap candidates ===
+
+pid    4: 535 confident samples [182..749], whole-track purity=97%
+    best split: seg A (15 samples, team 2, purity 100%) | seg B (520 samples, team 1, purity 100%)  -- weighted purity 100% (+3% over whole-track)
+    split gap: last seg-A confident sample at fn=204, first seg-B confident sample at fn=205
+pid    9: 617 confident samples [78..749], whole-track purity=98%
+    best split: seg A (5 samples, team 2, purity 100%) | seg B (612 samples, team 1, purity 99%)  -- weighted purity 99% (+1% over whole-track)
+    split gap: last seg-A confident sample at fn=90, first seg-B confident sample at fn=92
+
+Known-positive validation: pid 4 flagged = True, pid 11 flagged = False
+
+
+=== STEP 2: continuity analysis around each flagged split ===
+
+pid 4: window fn[204..205] (2 frames)
+    frames MISSING from track in this window: 0 (NO gap -- continuously tracked straight through)
+    bbox center at fn=204: (431.5060272216797, 596.3561706542969)   at fn=205: (429.4130859375, 603.3739013671875)
+    center displacement across window: 7.3px over 1 frame(s)
+pid 9: window fn[90..92] (3 frames)
+    frames MISSING from track in this window: 0 (NO gap -- continuously tracked straight through)
+    bbox center at fn=90: (778.4969482421875, 510.1595764160156)   at fn=92: (777.7863159179688, 514.8839569091797)
+    center displacement across window: 4.8px over 2 frame(s)

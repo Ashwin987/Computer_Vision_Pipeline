@@ -1,0 +1,183 @@
+{
+  "clip": "LiverpoolMadrid_w2620",
+  "video_path": "dev_clips\\LiverpoolMadrid_w2620.mp4",
+  "timestamp": "2026-07-30T04:30:30",
+  "cache_used": true,
+  "processing_time_sec": 11.2,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 1272,
+    "n_frames_processed": 1000
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": null,
+    "n_frames_interp_detect": null,
+    "n_frames_calibrated": null,
+    "n_frames_interp_calib": null
+  },
+  "timing": {
+    "detect_wall_sec": 415.1,
+    "camera_wall_sec": 44.6,
+    "calibrate_wall_sec": 475.0,
+    "detect_frame_timing": {
+      "n": 334,
+      "mean_sec": 1.2009580113930616,
+      "median_sec": 1.16915762424469,
+      "p95_sec": 1.4027653574943542,
+      "max_sec": 2.5740044116973877,
+      "total_sec": 401.1199758052826
+    },
+    "calibrate_frame_timing": {
+      "n": 100,
+      "mean_sec": 4.630075495243073,
+      "median_sec": 4.615651249885559,
+      "p95_sec": 4.720108485221862,
+      "max_sec": 5.546916961669922,
+      "total_sec": 463.00754952430725
+    },
+    "enrichment_wall_sec": 0.3,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 10.5,
+    "team_resolve_wall_sec": 3.3,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 1.7,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 127.56,
+    "n_player_tracks_total": 127,
+    "n_resolved": 117,
+    "n_unresolved": 10,
+    "resolved_pct": 0.9213,
+    "gray_frame_pct": 0.003,
+    "n_fallback_assigned": 17,
+    "n_merged_pairs": 79,
+    "n_rejected_merge_candidates": 23,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.9508,
+    "median_confidence": 1.0,
+    "pct_frames_below_70": 0.04,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 8.91,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 127,
+    "n_flagged_candidates": 7,
+    "strong_signature": 1,
+    "weak_signature": 6,
+    "strong_signature_per_100_frames": 0.1,
+    "weak_signature_per_100_frames": 0.6,
+    "flagged": [
+      {
+        "pid": 21,
+        "n_samples": 318,
+        "whole_purity": 0.553,
+        "weighted_purity": 1.0,
+        "improvement": 0.447,
+        "split_before_fn": 159,
+        "split_after_fn": 177,
+        "signature": "weak"
+      },
+      {
+        "pid": 68,
+        "n_samples": 76,
+        "whole_purity": 0.711,
+        "weighted_purity": 0.987,
+        "improvement": 0.276,
+        "split_before_fn": 135,
+        "split_after_fn": 144,
+        "signature": "weak"
+      },
+      {
+        "pid": 92,
+        "n_samples": 92,
+        "whole_purity": 0.533,
+        "weighted_purity": 0.989,
+        "improvement": 0.457,
+        "split_before_fn": 276,
+        "split_after_fn": 288,
+        "signature": "weak"
+      },
+      {
+        "pid": 112,
+        "n_samples": 86,
+        "whole_purity": 0.512,
+        "weighted_purity": 0.93,
+        "improvement": 0.419,
+        "split_before_fn": 240,
+        "split_after_fn": 267,
+        "signature": "weak"
+      },
+      {
+        "pid": 323,
+        "n_samples": 44,
+        "whole_purity": 0.568,
+        "weighted_purity": 1.0,
+        "improvement": 0.432,
+        "split_before_fn": 414,
+        "split_after_fn": 468,
+        "signature": "weak"
+      },
+      {
+        "pid": 349,
+        "n_samples": 224,
+        "whole_purity": 0.929,
+        "weighted_purity": 1.0,
+        "improvement": 0.071,
+        "split_before_fn": 692,
+        "split_after_fn": 699,
+        "signature": "weak"
+      },
+      {
+        "pid": 414,
+        "n_samples": 236,
+        "whole_purity": 0.661,
+        "weighted_purity": 1.0,
+        "improvement": 0.339,
+        "split_before_fn": 790,
+        "split_after_fn": 791,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 1,
+    "expected_max": 6,
+    "margin_label": "1/6 \u2014 5 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.3114,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 104,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 23.0,
+    "p90_gap_sec": 0.92,
+    "max_gap_frames": 92,
+    "max_gap_sec": 3.68,
+    "n_gaps_over_1s": 10,
+    "n_gaps_over_3s": 2,
+    "n_gaps_over_uncertain_threshold": 15,
+    "pct_frames_within_1s_of_real": 0.92,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

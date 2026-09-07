@@ -1,0 +1,32 @@
+InferenceDeprecationWarning: CORE_MODEL_GAZE_ENABLED is True: POST /gaze/gaze_detection is registered as a deprecation stub returning HTTP 410 Gone. The stub and this flag will be removed end of Q2 2026. Set CORE_MODEL_GAZE_ENABLED=False to disable it now.
+
+=== PHASE: main.py clip [0:750), stride=10 ===
+[07/17/26 16:00:15] WARNING  Your inference package version      __init__.py:41
+                             1.3.0 is out of date! Please                      
+                             upgrade to version 1.3.5 of                       
+                             inference for the latest features                 
+                             and bug fixes by running `pip                     
+                             install --upgrade inference`.                     
+ModelDependencyMissing: Your `inference` configuration does not support SAM3 model. Install SAM3 dependencies and set CORE_MODEL_SAM3_ENABLED to True.
+[transformers] `DepthProImageProcessorFast` is deprecated. The `Fast` suffix for image processors has been removed; use `DepthProImageProcessor` instead.
+FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+UserWarning: Specified provider 'OpenVINOExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+UserWarning: Specified provider 'CoreMLExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  [main_sample] 25/75 frames  elapsed=216s  avg=8.65s/frame
+  [main_sample] 50/75 frames  elapsed=568s  avg=11.35s/frame
+  [main_sample] 75/75 frames  elapsed=1786s  avg=23.81s/frame
+{
+  "label": "main_sample",
+  "video_path": "Match_videos/121364_0.mp4",
+  "n_frames_tested": 75,
+  "new_model_hits": 71,
+  "new_model_hit_rate": 0.9466666666666667,
+  "baseline_hits": 12,
+  "baseline_hit_rate": 0.16,
+  "frames_recovered_by_new_model": 59,
+  "avg_sec_per_frame_slicer_only": 23.6248979473114,
+  "total_wall_sec": 1785.5987968444824
+}
+
+Wrote full results to test_roboflow_ball_results.json

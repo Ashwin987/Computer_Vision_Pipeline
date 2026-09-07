@@ -1,0 +1,9 @@
+
+=== PHASE: speed comparison (our current model vs new tiled model) ===
+{
+  "our_model_sec_per_frame_single_full_res": 0.8006037473678589,
+  "new_model_sec_per_frame_2x2_tiled": null,
+  "slowdown_factor": null
+}
+
+Wrote full results to test_roboflow_ball_results.json

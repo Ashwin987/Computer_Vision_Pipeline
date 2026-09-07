@@ -1,0 +1,14 @@
+{
+  "peak_minute": 3,
+  "peak_timestamp": "03:00-04:00",
+  "peak_score": -16.0,
+  "peak_start_sec": 180,
+  "peak_end_sec": 210,
+  "master_team_a_color": "white",
+  "master_team_b_color": "maroon",
+  "total_minutes": 24,
+  "minutes_ok": 24,
+  "failed_minutes": [],
+  "cv_output_dir": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified",
+  "cv_verified": true
+}

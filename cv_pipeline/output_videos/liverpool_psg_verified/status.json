@@ -1,0 +1,16 @@
+{
+  "status": "complete",
+  "stage_num": 19,
+  "total_stages": 19,
+  "started_at": "2026-09-05T16:58:40.905693+00:00",
+  "updated_at": "2026-09-05T22:28:50.903766+00:00",
+  "outputs": {
+    "output1.avi": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\output1.avi",
+    "output2.avi": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\output2.avi",
+    "output3.avi": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\output3.avi",
+    "output4.avi": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\output4.avi",
+    "output5.avi": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\output5.avi",
+    "output6.avi": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\output6.avi"
+  },
+  "stats_file": "C:\\UCLA\\yolo model 2\\output_videos\\liverpool_psg_verified\\stats.json"
+}

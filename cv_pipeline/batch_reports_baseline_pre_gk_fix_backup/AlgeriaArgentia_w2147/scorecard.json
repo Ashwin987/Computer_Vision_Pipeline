@@ -1,0 +1,173 @@
+{
+  "clip": "AlgeriaArgentia_w2147",
+  "video_path": "holdout_clips\\AlgeriaArgentia_w2147.mp4",
+  "timestamp": "2026-07-28T12:38:57",
+  "cache_used": true,
+  "processing_time_sec": 10.9,
+  "video": {
+    "fps": 29.97002997002997,
+    "resolution": "1920x1080",
+    "n_frames_total": 988,
+    "n_frames_processed": 988
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": null,
+    "n_frames_interp_detect": null,
+    "n_frames_calibrated": null,
+    "n_frames_interp_calib": null
+  },
+  "timing": {
+    "detect_wall_sec": 216.1,
+    "camera_wall_sec": 18.2,
+    "calibrate_wall_sec": 240.7,
+    "detect_frame_timing": {
+      "n": 330,
+      "mean_sec": 0.635035236676534,
+      "median_sec": 0.6170759201049805,
+      "p95_sec": 0.7195489168167114,
+      "max_sec": 1.5908970832824707,
+      "total_sec": 209.56162810325623
+    },
+    "calibrate_frame_timing": {
+      "n": 99,
+      "mean_sec": 2.3653800945089323,
+      "median_sec": 2.307666301727295,
+      "p95_sec": 2.6506895542144773,
+      "max_sec": 3.1198086738586426,
+      "total_sec": 234.17262935638428
+    },
+    "enrichment_wall_sec": 1.2,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 9.3,
+    "team_resolve_wall_sec": 1.9,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 0.3,
+    "team_id_swap_wall_sec": 0.2,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 24.65,
+    "n_player_tracks_total": 70,
+    "n_resolved": 62,
+    "n_unresolved": 8,
+    "resolved_pct": 0.8857,
+    "gray_frame_pct": 0.0025,
+    "n_fallback_assigned": 15,
+    "n_merged_pairs": 20,
+    "n_rejected_merge_candidates": 10,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.9292,
+    "median_confidence": 1.0,
+    "pct_frames_below_70": 0.081,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 6.36,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 70,
+    "n_flagged_candidates": 6,
+    "strong_signature": 6,
+    "weak_signature": 0,
+    "strong_signature_per_100_frames": 0.607,
+    "weak_signature_per_100_frames": 0.0,
+    "flagged": [
+      {
+        "pid": 28,
+        "n_samples": 66,
+        "whole_purity": 0.515,
+        "weighted_purity": 0.985,
+        "improvement": 0.47,
+        "split_before_fn": 136,
+        "split_after_fn": 140,
+        "signature": "strong"
+      },
+      {
+        "pid": 44,
+        "n_samples": 35,
+        "whole_purity": 0.514,
+        "weighted_purity": 0.943,
+        "improvement": 0.429,
+        "split_before_fn": 207,
+        "split_after_fn": 208,
+        "signature": "strong"
+      },
+      {
+        "pid": 47,
+        "n_samples": 718,
+        "whole_purity": 0.847,
+        "weighted_purity": 0.915,
+        "improvement": 0.068,
+        "split_before_fn": 934,
+        "split_after_fn": 935,
+        "signature": "strong"
+      },
+      {
+        "pid": 85,
+        "n_samples": 82,
+        "whole_purity": 0.683,
+        "weighted_purity": 0.963,
+        "improvement": 0.28,
+        "split_before_fn": 253,
+        "split_after_fn": 254,
+        "signature": "strong"
+      },
+      {
+        "pid": 236,
+        "n_samples": 572,
+        "whole_purity": 0.706,
+        "weighted_purity": 0.972,
+        "improvement": 0.266,
+        "split_before_fn": 785,
+        "split_after_fn": 786,
+        "signature": "strong"
+      },
+      {
+        "pid": 320,
+        "n_samples": 52,
+        "whole_purity": 0.731,
+        "weighted_purity": 0.981,
+        "improvement": 0.25,
+        "split_before_fn": 948,
+        "split_after_fn": 949,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 1,
+    "expected_max": 6,
+    "margin_label": "1/6 \u2014 5 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.3879,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 129,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.07,
+    "p90_gap_frames": 11.6,
+    "p90_gap_sec": 0.39,
+    "max_gap_frames": 128,
+    "max_gap_sec": 4.27,
+    "n_gaps_over_1s": 6,
+    "n_gaps_over_3s": 1,
+    "n_gaps_over_uncertain_threshold": 10,
+    "pct_frames_within_1s_of_real": 0.8947,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

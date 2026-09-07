@@ -1,0 +1,263 @@
+{
+  "clip": "MarseilevsLyonFull__trim_no_halftime_w4576",
+  "video_path": "holdout_clips\\MarseilevsLyonFull__trim_no_halftime_w4576.mp4",
+  "timestamp": "2026-07-30T04:36:30",
+  "cache_used": true,
+  "processing_time_sec": 11.5,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 1015,
+    "n_frames_processed": 1000
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": null,
+    "n_frames_interp_detect": null,
+    "n_frames_calibrated": null,
+    "n_frames_interp_calib": null
+  },
+  "timing": {
+    "detect_wall_sec": 189.3,
+    "camera_wall_sec": 34.7,
+    "calibrate_wall_sec": 230.6,
+    "detect_frame_timing": {
+      "n": 334,
+      "mean_sec": 0.5488518840538528,
+      "median_sec": 0.5386018753051758,
+      "p95_sec": 0.6198830366134642,
+      "max_sec": 1.259202480316162,
+      "total_sec": 183.31652927398682
+    },
+    "calibrate_frame_timing": {
+      "n": 100,
+      "mean_sec": 2.247963056564331,
+      "median_sec": 2.232400417327881,
+      "p95_sec": 2.3041935563087463,
+      "max_sec": 2.8802030086517334,
+      "total_sec": 224.7963056564331
+    },
+    "enrichment_wall_sec": 0.4,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 10.7,
+    "team_resolve_wall_sec": 3.3,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 2.0,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 45.0,
+    "n_player_tracks_total": 168,
+    "n_resolved": 164,
+    "n_unresolved": 4,
+    "resolved_pct": 0.9762,
+    "gray_frame_pct": 0.0006,
+    "n_fallback_assigned": 30,
+    "n_merged_pairs": 94,
+    "n_rejected_merge_candidates": 49,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.8724,
+    "median_confidence": 0.95,
+    "pct_frames_below_70": 0.157,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 12.05,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 168,
+    "n_flagged_candidates": 15,
+    "strong_signature": 13,
+    "weak_signature": 2,
+    "strong_signature_per_100_frames": 1.3,
+    "weak_signature_per_100_frames": 0.2,
+    "flagged": [
+      {
+        "pid": 11,
+        "n_samples": 132,
+        "whole_purity": 0.932,
+        "weighted_purity": 0.985,
+        "improvement": 0.053,
+        "split_before_fn": 6,
+        "split_after_fn": 7,
+        "signature": "strong"
+      },
+      {
+        "pid": 70,
+        "n_samples": 84,
+        "whole_purity": 0.857,
+        "weighted_purity": 0.917,
+        "improvement": 0.06,
+        "split_before_fn": 198,
+        "split_after_fn": 204,
+        "signature": "weak"
+      },
+      {
+        "pid": 139,
+        "n_samples": 64,
+        "whole_purity": 0.688,
+        "weighted_purity": 1.0,
+        "improvement": 0.312,
+        "split_before_fn": 229,
+        "split_after_fn": 230,
+        "signature": "strong"
+      },
+      {
+        "pid": 181,
+        "n_samples": 46,
+        "whole_purity": 0.739,
+        "weighted_purity": 0.935,
+        "improvement": 0.196,
+        "split_before_fn": 270,
+        "split_after_fn": 271,
+        "signature": "strong"
+      },
+      {
+        "pid": 224,
+        "n_samples": 151,
+        "whole_purity": 0.808,
+        "weighted_purity": 0.914,
+        "improvement": 0.106,
+        "split_before_fn": 430,
+        "split_after_fn": 431,
+        "signature": "strong"
+      },
+      {
+        "pid": 282,
+        "n_samples": 163,
+        "whole_purity": 0.883,
+        "weighted_purity": 0.988,
+        "improvement": 0.104,
+        "split_before_fn": 463,
+        "split_after_fn": 464,
+        "signature": "strong"
+      },
+      {
+        "pid": 305,
+        "n_samples": 147,
+        "whole_purity": 0.918,
+        "weighted_purity": 0.952,
+        "improvement": 0.034,
+        "split_before_fn": 478,
+        "split_after_fn": 479,
+        "signature": "strong"
+      },
+      {
+        "pid": 312,
+        "n_samples": 212,
+        "whole_purity": 0.571,
+        "weighted_purity": 0.986,
+        "improvement": 0.415,
+        "split_before_fn": 477,
+        "split_after_fn": 478,
+        "signature": "strong"
+      },
+      {
+        "pid": 425,
+        "n_samples": 90,
+        "whole_purity": 0.856,
+        "weighted_purity": 0.978,
+        "improvement": 0.122,
+        "split_before_fn": 590,
+        "split_after_fn": 591,
+        "signature": "strong"
+      },
+      {
+        "pid": 524,
+        "n_samples": 68,
+        "whole_purity": 0.809,
+        "weighted_purity": 1.0,
+        "improvement": 0.191,
+        "split_before_fn": 539,
+        "split_after_fn": 540,
+        "signature": "strong"
+      },
+      {
+        "pid": 537,
+        "n_samples": 418,
+        "whole_purity": 0.871,
+        "weighted_purity": 0.919,
+        "improvement": 0.048,
+        "split_before_fn": 564,
+        "split_after_fn": 582,
+        "signature": "weak"
+      },
+      {
+        "pid": 723,
+        "n_samples": 245,
+        "whole_purity": 0.661,
+        "weighted_purity": 0.967,
+        "improvement": 0.306,
+        "split_before_fn": 742,
+        "split_after_fn": 743,
+        "signature": "strong"
+      },
+      {
+        "pid": 817,
+        "n_samples": 127,
+        "whole_purity": 0.898,
+        "weighted_purity": 0.992,
+        "improvement": 0.094,
+        "split_before_fn": 781,
+        "split_after_fn": 782,
+        "signature": "strong"
+      },
+      {
+        "pid": 819,
+        "n_samples": 34,
+        "whole_purity": 0.765,
+        "weighted_purity": 0.941,
+        "improvement": 0.176,
+        "split_before_fn": 838,
+        "split_after_fn": 839,
+        "signature": "strong"
+      },
+      {
+        "pid": 974,
+        "n_samples": 34,
+        "whole_purity": 0.824,
+        "weighted_purity": 1.0,
+        "improvement": 0.176,
+        "split_before_fn": 993,
+        "split_after_fn": 994,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 0,
+    "expected_max": 6,
+    "margin_label": "0/6 \u2014 6 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.4012,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 135,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 15.8,
+    "p90_gap_sec": 0.63,
+    "max_gap_frames": 107,
+    "max_gap_sec": 4.28,
+    "n_gaps_over_1s": 5,
+    "n_gaps_over_3s": 1,
+    "n_gaps_over_uncertain_threshold": 14,
+    "pct_frames_within_1s_of_real": 0.943,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

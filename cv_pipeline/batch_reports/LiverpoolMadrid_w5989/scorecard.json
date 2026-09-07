@@ -1,0 +1,152 @@
+{
+  "clip": "LiverpoolMadrid_w5989",
+  "video_path": "dev_clips\\LiverpoolMadrid_w5989.mp4",
+  "timestamp": "2026-07-27T11:38:13",
+  "cache_used": false,
+  "processing_time_sec": 442.0,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 974,
+    "n_frames_processed": 974
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": 325,
+    "n_frames_interp_detect": 648,
+    "n_frames_calibrated": 98,
+    "n_frames_interp_calib": 876
+  },
+  "timing": {
+    "detect_wall_sec": 181.8,
+    "camera_wall_sec": 21.3,
+    "calibrate_wall_sec": 228.9,
+    "detect_frame_timing": {
+      "n": 325,
+      "mean_sec": 0.5434890321584849,
+      "median_sec": 0.5368235111236572,
+      "p95_sec": 0.5830716133117676,
+      "max_sec": 1.1571030616760254,
+      "total_sec": 176.63393545150757
+    },
+    "calibrate_frame_timing": {
+      "n": 98,
+      "mean_sec": 2.280960961264007,
+      "median_sec": 2.274545192718506,
+      "p95_sec": 2.347694957256317,
+      "max_sec": 2.6496241092681885,
+      "total_sec": 223.53417420387268
+    },
+    "enrichment_wall_sec": 0.3,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 9.4,
+    "team_resolve_wall_sec": 2.8,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 1.2,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 110.51,
+    "n_player_tracks_total": 143,
+    "n_resolved": 123,
+    "n_unresolved": 20,
+    "resolved_pct": 0.8601,
+    "gray_frame_pct": 0.0259,
+    "n_fallback_assigned": 7,
+    "n_merged_pairs": 78,
+    "n_rejected_merge_candidates": 41,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.9222,
+    "median_confidence": 1.0,
+    "pct_frames_below_70": 0.0719,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 6.47,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 143,
+    "n_flagged_candidates": 4,
+    "strong_signature": 3,
+    "weak_signature": 1,
+    "strong_signature_per_100_frames": 0.308,
+    "weak_signature_per_100_frames": 0.103,
+    "flagged": [
+      {
+        "pid": 11,
+        "n_samples": 244,
+        "whole_purity": 0.959,
+        "weighted_purity": 1.0,
+        "improvement": 0.041,
+        "split_before_fn": 272,
+        "split_after_fn": 273,
+        "signature": "strong"
+      },
+      {
+        "pid": 58,
+        "n_samples": 36,
+        "whole_purity": 0.5,
+        "weighted_purity": 1.0,
+        "improvement": 0.5,
+        "split_before_fn": 333,
+        "split_after_fn": 348,
+        "signature": "weak"
+      },
+      {
+        "pid": 344,
+        "n_samples": 148,
+        "whole_purity": 0.689,
+        "weighted_purity": 0.912,
+        "improvement": 0.223,
+        "split_before_fn": 608,
+        "split_after_fn": 609,
+        "signature": "strong"
+      },
+      {
+        "pid": 416,
+        "n_samples": 59,
+        "whole_purity": 0.763,
+        "weighted_purity": 0.932,
+        "improvement": 0.169,
+        "split_before_fn": 727,
+        "split_after_fn": 729,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 6,
+    "margin_label": "6/6 \u2014 at limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.2246,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 74,
+    "median_gap_frames": 5.0,
+    "median_gap_sec": 0.2,
+    "p90_gap_frames": 20.0,
+    "p90_gap_sec": 0.8,
+    "max_gap_frames": 290,
+    "max_gap_sec": 11.6,
+    "n_gaps_over_1s": 7,
+    "n_gaps_over_3s": 1,
+    "n_gaps_over_uncertain_threshold": 15,
+    "pct_frames_within_1s_of_real": 0.7515,
+    "pct_frames_within_3s_of_real": 0.8563,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

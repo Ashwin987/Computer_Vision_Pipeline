@@ -1,0 +1,9 @@
+UNCERTAIN ball-tracking windows — source='fastpipe' window=[39000:39400)
+(>15 consecutive frames / 0.60s with no raw, non-interpolated ball detection. NOT shown in the video overlay — logged here instead.)
+5 window(s) found.
+
+  #1  00:26:01.72 - 00:26:02.36  (0.68s, 17 frames)   frames 39043-39059
+  #2  00:26:03.64 - 00:26:05.36  (1.76s, 44 frames)   frames 39091-39134
+  #3  00:26:05.92 - 00:26:08.60  (2.72s, 68 frames)   frames 39148-39215
+  #4  00:26:12.04 - 00:26:13.88  (1.88s, 47 frames)   frames 39301-39347
+  #5  00:26:13.96 - 00:26:15.96  (2.04s, 51 frames)   frames 39349-39399

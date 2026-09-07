@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "C:\UCLA\yolo model 2\trackers\__init__.py", line 1, in <module>
+    from .tracker import Tracker
+  File "C:\UCLA\yolo model 2\trackers\tracker.py", line 1, in <module>
+    from ultralytics import YOLO
+  File "C:\Users\latha\AppData\Local\Programs\Python\Python312\Lib\site-packages\ultralytics\__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "C:\Users\latha\AppData\Local\Programs\Python\Python312\Lib\site-packages\ultralytics\utils\__init__.py", line 26, in <module>
+    import torch
+  File "C:\Users\latha\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\__init__.py", line 281, in <module>
+    _load_dll_libraries()
+  File "C:\Users\latha\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\__init__.py", line 264, in _load_dll_libraries
+    raise err
+OSError: [WinError 1114] A dynamic link library (DLL) initialization routine failed. Error loading "C:\Users\latha\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\lib\c10.dll" or one of its dependencies.

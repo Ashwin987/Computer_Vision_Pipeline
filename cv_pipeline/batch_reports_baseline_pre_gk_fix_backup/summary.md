@@ -1,0 +1,63 @@
+# Batch validation summary
+
+| clip | status | n_frames | fps | resolution | team_resolved_pct | team_verdict | calib_median_pct | calib_verdict | camera_sustained_events | camera_verdict | gk_margin | gk_verdict | ball_raw_pct | ball_median_gap_sec | ball_max_gap_sec | ball_gaps_over_3s | ball_pct_within_3s | id_swap_strong | id_swap_strong_per_100f | id_swap_weak | overall_verdict | rendered |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| AlgeriaArgentia_w1206 | OK | 1000 | 29.97 | 1920x1080 | 94.4% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 32.9% | 0.07 | 2.87 | 0 | 100.0% | 11 | 1.1 | 1 | PASS | False |
+| AlgeriaArgentia_w1973 | OK | 1000 | 29.97 | 1920x1080 | 91.4% | PASS | 100.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 30.8% | 0.07 | 4.07 | 1 | 100.0% | 8 | 0.8 | 0 | PASS | False |
+| AlgeriaArgentia_w2147 | OK | 988 | 29.97 | 1920x1080 | 88.6% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 38.8% | 0.07 | 4.27 | 1 | 100.0% | 6 | 0.607 | 0 | PASS | False |
+| AlgeriaArgentia_w3281 | OK | 1000 | 29.97 | 1920x1080 | 89.2% | PASS | 100.0% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 50.9% | 0.07 | 2.17 | 0 | 100.0% | 8 | 0.8 | 4 | PASS | False |
+| AlgeriaArgentia_w3577 | OK | 1000 | 29.97 | 1920x1080 | 84.1% | DEGRADED | 94.7% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 28.4% | 0.07 | 5.07 | 2 | 94.5% | 2 | 0.2 | 1 | DEGRADED | True |
+| AlgeriaArgentia_w5318 | OK | 1000 | 29.97 | 1920x1080 | 93.2% | PASS | 89.5% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 31.1% | 0.17 | 2.17 | 0 | 100.0% | 7 | 0.7 | 0 | DEGRADED | True |
+| AlgeriaArgentia_w5320 | OK | 1000 | 29.97 | 1920x1080 | 91.7% | PASS | 89.5% | DEGRADED | 0 | PASS | 2/6 — 4 under limit | PASS | 33.2% | 0.17 | 2.17 | 0 | 100.0% | 9 | 0.9 | 0 | DEGRADED | True |
+| AlgeriaArgentia_w5684 | OK | 1000 | 29.97 | 1920x1080 | 91.1% | PASS | 85.0% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 50.6% | 0.07 | 1.97 | 0 | 100.0% | 4 | 0.4 | 2 | DEGRADED | True |
+| AlgeriaArgentia_w624 | OK | 1000 | 29.97 | 1920x1080 | 90.7% | PASS | 100.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 32.0% | 0.07 | 2.47 | 0 | 100.0% | 3 | 0.3 | 0 | PASS | False |
+| AlgeriaArgentia_w685 | OK | 1000 | 29.97 | 1920x1080 | 96.7% | PASS | 95.7% | PASS | 0 | PASS | 7/6 — over limit | FAIL | 38.9% | 0.07 | 5.21 | 3 | 93.3% | 6 | 0.6 | 0 | FAIL | True |
+| BarcaMadridPT1_w142 | OK | 892 | 25.0 | 1920x1080 | 85.0% | PASS | 100.0% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 24.8% | 0.2 | 7.4 | 2 | 96.1% | 2 | 0.224 | 0 | PASS | False |
+| BarcaMadridPT1_w152 | OK | 1000 | 25.0 | 1920x1080 | 86.0% | PASS | 100.0% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 37.7% | 0.08 | 5.52 | 2 | 93.7% | 2 | 0.2 | 3 | PASS | False |
+| BarcaMadridPT1_w167 | OK | 930 | 25.0 | 1920x1080 | 93.2% | PASS | 100.0% | PASS | 0 | PASS | 5/6 — 1 under limit | PASS | 40.0% | 0.08 | 6.32 | 2 | 99.1% | 2 | 0.215 | 2 | PASS | False |
+| BarcaMadridPT1_w185 | OK | 1000 | 25.0 | 1920x1080 | 91.1% | PASS | 100.0% | PASS | 0 | PASS | 3/6 — 3 under limit | PASS | 34.7% | 0.08 | 4.16 | 1 | 100.0% | 3 | 0.3 | 2 | PASS | False |
+| BarcaMadridPT1_w310 | OK | 1000 | 25.0 | 1920x1080 | 84.8% | DEGRADED | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 42.2% | 0.08 | 2.72 | 0 | 100.0% | 4 | 0.4 | 3 | DEGRADED | True |
+| BarcaMadridPT1_w356 | OK | 774 | 25.0 | 1920x1080 | 83.9% | DEGRADED | 100.0% | PASS | 0 | PASS | 3/6 — 3 under limit | PASS | 17.1% | 0.2 | 8.48 | 2 | 92.0% | 1 | 0.129 | 2 | DEGRADED | True |
+| BarcaMadridPT1_w358 | OK | 1000 | 25.0 | 1920x1080 | 85.8% | PASS | 100.0% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 26.7% | 0.14 | 9.08 | 2 | 91.5% | 1 | 0.1 | 1 | PASS | False |
+| BarcaMadridPT1_w449 | OK | 1000 | 25.0 | 1920x1080 | 91.6% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 59.3% | 0.08 | 10.16 | 1 | 89.6% | 1 | 0.1 | 4 | PASS | False |
+| BarcaMadridPT1_w529 | OK | 1000 | 25.0 | 1920x1080 | 92.8% | PASS | 100.0% | PASS | 0 | PASS | 7/6 — over limit | FAIL | 23.1% | 0.08 | 3.32 | 1 | 100.0% | 5 | 0.5 | 8 | FAIL | True |
+| BarcaMadridPT1_w568 | OK | 1000 | 25.0 | 1920x1080 | 89.1% | PASS | 95.7% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 37.1% | 0.08 | 7.64 | 3 | 95.3% | 3 | 0.3 | 4 | PASS | False |
+| BarcaMadridPT1_w591 | OK | 1000 | 25.0 | 1920x1080 | 92.0% | PASS | 100.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 43.4% | 0.08 | 10.16 | 2 | 86.6% | 3 | 0.3 | 3 | PASS | False |
+| BarcaMadridPT1_w688 | OK | 1000 | 25.0 | 1920x1080 | 92.2% | PASS | 100.0% | PASS | 0 | PASS | 5/6 — 1 under limit | PASS | 30.2% | 0.2 | 2.96 | 0 | 100.0% | 5 | 0.5 | 7 | PASS | False |
+| BarcaMadridPT1_w791 | OK | 1000 | 25.0 | 1920x1080 | 88.1% | PASS | 100.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 33.5% | 0.08 | 3.56 | 1 | 100.0% | 2 | 0.2 | 4 | PASS | False |
+| ChelseaCity_w186 | OK | 1000 | 25.0 | 1920x1080 | 83.1% | DEGRADED | 81.0% | DEGRADED | 0 | PASS | 5/6 — 1 under limit | PASS | 32.0% | 0.08 | 2.96 | 0 | 100.0% | 5 | 0.5 | 2 | DEGRADED | True |
+| ChelseaCity_w244 | OK | 1000 | 25.0 | 1920x1080 | 87.6% | PASS | 100.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 38.9% | 0.08 | 1.52 | 0 | 100.0% | 2 | 0.2 | 2 | PASS | False |
+| ChelseaCity_w248 | OK | 1000 | 25.0 | 1920x1080 | 90.5% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 36.8% | 0.08 | 2.64 | 0 | 100.0% | 3 | 0.3 | 4 | PASS | False |
+| ChelseaCity_w252 | OK | 1000 | 25.0 | 1920x1080 | 92.5% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 36.2% | 0.08 | 4.28 | 1 | 100.0% | 3 | 0.3 | 5 | PASS | False |
+| ChelseaCity_w377 | OK | 1000 | 25.0 | 1920x1080 | 85.4% | PASS | 90.9% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 33.2% | 0.2 | 4.2 | 1 | 97.0% | 6 | 0.6 | 4 | PASS | False |
+| ChelseaCity_w384 | OK | 869 | 25.0 | 1920x1080 | 86.7% | PASS | 93.8% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 34.5% | 0.2 | 1.88 | 0 | 100.0% | 4 | 0.46 | 3 | PASS | False |
+| ChelseaCity_w435 | OK | 1000 | 25.0 | 1920x1080 | 79.8% | DEGRADED | 100.0% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 14.7% | 0.2 | 7.76 | 5 | 88.4% | 2 | 0.2 | 6 | DEGRADED | True |
+| ChelseaCity_w446 | OK | 849 | 25.0 | 1920x1080 | 82.4% | DEGRADED | 100.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 21.2% | 0.14 | 7.76 | 3 | 94.8% | 4 | 0.471 | 6 | DEGRADED | True |
+| ChelseaCity_w458 | OK | 1000 | 25.0 | 1920x1080 | 87.1% | PASS | 100.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 22.2% | 0.2 | 6.08 | 3 | 99.8% | 3 | 0.3 | 8 | PASS | False |
+| ChelseaCity_w613 | OK | 1000 | 25.0 | 1920x1080 | 81.8% | DEGRADED | 95.2% | PASS | 0 | PASS | 4/6 — 2 under limit | PASS | 29.3% | 0.08 | 9.96 | 3 | 82.6% | 1 | 0.1 | 2 | DEGRADED | True |
+| ChelseaCity_w663 | OK | 1000 | 25.0 | 1920x1080 | 85.9% | PASS | 90.0% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 16.5% | 0.2 | 5.12 | 2 | 100.0% | 4 | 0.4 | 3 | PASS | False |
+| ChelseaCity_w672 | OK | 1000 | 25.0 | 1920x1080 | 80.0% | DEGRADED | 88.2% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 15.6% | 0.08 | 5.12 | 3 | 97.3% | 2 | 0.2 | 0 | DEGRADED | True |
+| ChelseaCity_w680 | OK | 1000 | 25.0 | 1920x1080 | 87.2% | PASS | 88.2% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 26.7% | 0.08 | 4.88 | 2 | 100.0% | 2 | 0.2 | 2 | DEGRADED | True |
+| LiverpoolMadrid_w1717 | OK | 1000 | 25.0 | 1920x1080 | 82.5% | DEGRADED | 95.5% | PASS | 0 | PASS | 6/6 — at limit | PASS | 46.7% | 0.08 | 1.76 | 0 | 100.0% | 3 | 0.3 | 3 | DEGRADED | True |
+| LiverpoolMadrid_w2042 | OK | 905 | 25.0 | 1920x1080 | 92.7% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 24.8% | 0.2 | 3.8 | 1 | 100.0% | 7 | 0.773 | 3 | PASS | False |
+| LiverpoolMadrid_w2620 | OK | 1000 | 25.0 | 1920x1080 | 92.9% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 31.1% | 0.08 | 3.68 | 2 | 100.0% | 1 | 0.1 | 6 | PASS | False |
+| LiverpoolMadrid_w3470 | OK | 1000 | 25.0 | 1920x1080 | 90.1% | PASS | 94.9% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 28.4% | 0.2 | 4.2 | 3 | 97.0% | 4 | 0.4 | 2 | PASS | False |
+| LiverpoolMadrid_w381 | OK | 867 | 25.0 | 1920x1080 | 88.4% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 22.1% | 0.2 | 10.2 | 1 | 79.2% | 2 | 0.231 | 1 | PASS | False |
+| LiverpoolMadrid_w3997 | OK | 1000 | 25.0 | 1920x1080 | 78.3% | DEGRADED | 100.0% | PASS | 0 | PASS | 5/6 — 1 under limit | PASS | 6.3% | 0.44 | 10.04 | 4 | 75.6% | 4 | 0.4 | 2 | DEGRADED | True |
+| LiverpoolMadrid_w4573 | OK | 815 | 25.0 | 1920x1080 | 84.9% | DEGRADED | 93.3% | PASS | 0 | PASS | 2/6 — 4 under limit | PASS | 43.8% | 0.08 | 2.12 | 0 | 100.0% | 2 | 0.245 | 3 | DEGRADED | True |
+| LiverpoolMadrid_w4624 | OK | 1000 | 25.0 | 1920x1080 | 94.8% | PASS | 86.4% | DEGRADED | 0 | PASS | 2/6 — 4 under limit | PASS | 27.0% | 0.2 | 5.72 | 2 | 100.0% | 4 | 0.4 | 3 | DEGRADED | True |
+| LiverpoolMadrid_w4960 | OK | 807 | 25.0 | 1920x1080 | 75.7% | DEGRADED | 76.5% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 10.8% | 0.14 | 9.44 | 3 | 74.5% | 4 | 0.496 | 0 | DEGRADED | True |
+| LiverpoolMadrid_w4999 | OK | 1000 | 25.0 | 1920x1080 | 87.8% | PASS | 92.9% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 58.7% | 0.08 | 2.0 | 0 | 100.0% | 1 | 0.1 | 4 | PASS | False |
+| LiverpoolMadrid_w5989 | OK | 974 | 25.0 | 1920x1080 | 86.0% | PASS | 100.0% | PASS | 0 | PASS | 6/6 — at limit | PASS | 22.5% | 0.2 | 11.6 | 1 | 85.6% | 3 | 0.308 | 1 | PASS | False |
+| LiverpoolMadrid_w698 | OK | 1000 | 25.0 | 1920x1080 | 92.6% | PASS | 95.0% | PASS | 0 | PASS | 5/6 — 1 under limit | PASS | 48.8% | 0.08 | 1.88 | 0 | 100.0% | 3 | 0.3 | 7 | PASS | False |
+| LiverpoolMadrid_w877 | OK | 1000 | 25.0 | 1920x1080 | 92.0% | PASS | 95.2% | PASS | 0 | PASS | 9/6 — over limit | FAIL | 34.7% | 0.08 | 4.04 | 1 | 100.0% | 6 | 0.6 | 4 | FAIL | True |
+| MarseilevsLyonFull__trim_no_halftime_w2171 | OK | 1000 | 25.0 | 1920x1080 | 94.5% | PASS | 78.6% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 21.0% | 0.2 | 5.6 | 1 | 100.0% | 2 | 0.2 | 1 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w2780 | OK | 1000 | 25.0 | 1920x1080 | 90.4% | PASS | 100.0% | PASS | 0 | PASS | 1/6 — 5 under limit | PASS | 47.3% | 0.08 | 4.28 | 1 | 100.0% | 11 | 1.1 | 1 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w2833 | OK | 1000 | 25.0 | 1920x1080 | 95.7% | PASS | 85.0% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 25.1% | 0.08 | 9.32 | 2 | 90.0% | 2 | 0.2 | 0 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w3305 | OK | 1000 | 25.0 | 1920x1080 | 89.6% | PASS | 95.2% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 25.1% | 0.08 | 8.04 | 1 | 87.4% | 4 | 0.4 | 2 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w3345 | OK | 1000 | 25.0 | 1920x1080 | 88.3% | PASS | 75.0% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 44.6% | 0.08 | 2.84 | 0 | 100.0% | 4 | 0.4 | 0 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w3351 | OK | 1000 | 25.0 | 1920x1080 | 91.8% | PASS | 82.8% | DEGRADED | 0 | PASS | 0/6 — 6 under limit | PASS | 42.5% | 0.08 | 2.84 | 0 | 100.0% | 2 | 0.2 | 0 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w4176 | OK | 1000 | 25.0 | 1920x1080 | 89.7% | PASS | 95.0% | PASS | 0 | PASS | 3/6 — 3 under limit | PASS | 27.0% | 0.08 | 11.48 | 2 | 69.5% | 3 | 0.3 | 2 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w4576 | OK | 1000 | 25.0 | 1920x1080 | 97.0% | PASS | 95.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 40.1% | 0.08 | 4.28 | 1 | 100.0% | 12 | 1.2 | 2 | PASS | False |
+| MarseilevsLyonFull__trim_no_halftime_w4650 | OK | 1000 | 25.0 | 1920x1080 | 92.8% | PASS | 85.7% | DEGRADED | 0 | PASS | 1/6 — 5 under limit | PASS | 37.7% | 0.08 | 3.2 | 1 | 100.0% | 11 | 1.1 | 1 | DEGRADED | True |
+| MarseilevsLyonFull__trim_no_halftime_w5212 | OK | 801 | 25.0 | 1920x1080 | 93.2% | PASS | 100.0% | PASS | 0 | PASS | 0/6 — 6 under limit | PASS | 29.2% | 0.2 | 3.32 | 1 | 99.0% | 10 | 1.248 | 5 | PASS | False |

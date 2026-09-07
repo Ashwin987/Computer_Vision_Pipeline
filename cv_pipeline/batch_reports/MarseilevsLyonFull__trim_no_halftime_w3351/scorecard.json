@@ -1,0 +1,133 @@
+{
+  "clip": "MarseilevsLyonFull__trim_no_halftime_w3351",
+  "video_path": "holdout_clips\\MarseilevsLyonFull__trim_no_halftime_w3351.mp4",
+  "timestamp": "2026-07-28T15:06:03",
+  "cache_used": false,
+  "processing_time_sec": 447.6,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 1319,
+    "n_frames_processed": 1000
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": 334,
+    "n_frames_interp_detect": 666,
+    "n_frames_calibrated": 100,
+    "n_frames_interp_calib": 900
+  },
+  "timing": {
+    "detect_wall_sec": 188.9,
+    "camera_wall_sec": 15.4,
+    "calibrate_wall_sec": 230.5,
+    "detect_frame_timing": {
+      "n": 334,
+      "mean_sec": 0.5471474967316953,
+      "median_sec": 0.534170389175415,
+      "p95_sec": 0.6086102604866025,
+      "max_sec": 1.385547399520874,
+      "total_sec": 182.74726390838623
+    },
+    "calibrate_frame_timing": {
+      "n": 100,
+      "mean_sec": 2.249628491401672,
+      "median_sec": 2.243982195854187,
+      "p95_sec": 2.2997706174850463,
+      "max_sec": 2.643057346343994,
+      "total_sec": 224.96284914016724
+    },
+    "enrichment_wall_sec": 0.2,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 10.5,
+    "team_resolve_wall_sec": 3.6,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 0.9,
+    "team_id_swap_wall_sec": 0.3,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 1.8
+  },
+  "team": {
+    "cluster_separation": 100.91,
+    "n_player_tracks_total": 73,
+    "n_resolved": 67,
+    "n_unresolved": 6,
+    "resolved_pct": 0.9178,
+    "gray_frame_pct": 0.0073,
+    "n_fallback_assigned": 1,
+    "n_merged_pairs": 30,
+    "n_rejected_merge_candidates": 8,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.8157,
+    "median_confidence": 0.8284,
+    "pct_frames_below_70": 0.206,
+    "verdict": "DEGRADED"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 5.58,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 73,
+    "n_flagged_candidates": 2,
+    "strong_signature": 2,
+    "weak_signature": 0,
+    "strong_signature_per_100_frames": 0.2,
+    "weak_signature_per_100_frames": 0.0,
+    "flagged": [
+      {
+        "pid": 11,
+        "n_samples": 479,
+        "whole_purity": 0.898,
+        "weighted_purity": 0.971,
+        "improvement": 0.073,
+        "split_before_fn": 492,
+        "split_after_fn": 493,
+        "signature": "strong"
+      },
+      {
+        "pid": 18,
+        "n_samples": 392,
+        "whole_purity": 0.962,
+        "weighted_purity": 0.995,
+        "improvement": 0.033,
+        "split_before_fn": 12,
+        "split_after_fn": 13,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 0,
+    "expected_max": 6,
+    "margin_label": "0/6 \u2014 6 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.4251,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 141,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 11.0,
+    "p90_gap_sec": 0.44,
+    "max_gap_frames": 71,
+    "max_gap_sec": 2.84,
+    "n_gaps_over_1s": 10,
+    "n_gaps_over_3s": 0,
+    "n_gaps_over_uncertain_threshold": 12,
+    "pct_frames_within_1s_of_real": 0.964,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "DEGRADED",
+  "rendered": true,
+  "render_dir": "batch_reports\\MarseilevsLyonFull__trim_no_halftime_w3351\\render"
+}

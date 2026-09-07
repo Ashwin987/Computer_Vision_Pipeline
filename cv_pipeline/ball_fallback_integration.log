@@ -1,0 +1,77 @@
+InferenceDeprecationWarning: CORE_MODEL_GAZE_ENABLED is True: POST /gaze/gaze_detection is registered as a deprecation stub returning HTTP 410 Gone. The stub and this flag will be removed end of Q2 2026. Set CORE_MODEL_GAZE_ENABLED=False to disable it now.
+gap47: attempted=15 primary_hits=0 primary_misses=15
+fastpipe9000: attempted=3000 primary_hits=864 primary_misses=2136
+
+Running ONE real, sequential fallback pass over 103 frames (all 15 gap47 misses + a stride-24 sample of the 2136 fastpipe9000-window misses)...
+
+[07/17/26 17:18:00] WARNING  Your inference package version      __init__.py:41
+                             1.3.0 is out of date! Please                      
+                             upgrade to version 1.3.5 of                       
+                             inference for the latest features                 
+                             and bug fixes by running `pip                     
+                             install --upgrade inference`.                     
+ModelDependencyMissing: Your `inference` configuration does not support SAM3 model. Install SAM3 dependencies and set CORE_MODEL_SAM3_ENABLED to True.
+[transformers] `DepthProImageProcessorFast` is deprecated. The `Fast` suffix for image processors has been removed; use `DepthProImageProcessor` instead.
+FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+UserWarning: Specified provider 'OpenVINOExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+UserWarning: Specified provider 'CoreMLExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  [fallback_pass] 10/103  elapsed=1344s  avg=134.44s/frame
+  [fallback_pass] 20/103  elapsed=1711s  avg=85.55s/frame
+  [fallback_pass] 30/103  elapsed=1959s  avg=65.29s/frame
+  [fallback_pass] 40/103  elapsed=2152s  avg=53.81s/frame
+  [fallback_pass] 50/103  elapsed=2398s  avg=47.95s/frame
+  [fallback_pass] 60/103  elapsed=2641s  avg=44.02s/frame
+  [fallback_pass] 70/103  elapsed=2804s  avg=40.06s/frame
+  [fallback_pass] 80/103  elapsed=2934s  avg=36.67s/frame
+  [fallback_pass] 90/103  elapsed=3014s  avg=33.49s/frame
+  [fallback_pass] 100/103  elapsed=3096s  avg=30.96s/frame
+
+{
+  "gap47": {
+    "window_frames": 47,
+    "attempted": 15,
+    "primary_hits": 0,
+    "primary_hit_rate_of_attempted": 0.0,
+    "fallback_triggered": 15,
+    "fallback_recovered": 12,
+    "fallback_recovery_rate": 0.8,
+    "new_hits_total": 12,
+    "new_raw_detection_rate": 0.2553191489361702,
+    "new_pct_of_attempted": 0.8,
+    "still_missed_frames": [
+      39312,
+      39318,
+      39330
+    ],
+    "measurement": "EXACT \u2014 every one of the 15 real misses was run through the real fallback, no sampling"
+  },
+  "fastpipe9000_window": {
+    "window_frames": 9000,
+    "attempted": 3000,
+    "primary_hits": 864,
+    "primary_hit_rate_of_attempted": 0.288,
+    "primary_misses_exact": 2136,
+    "note_on_82_90pct_expectation": "Real miss rate among ATTEMPTED frames is 71.2% (2136/3000), below the 82-90% guess \u2014 that guess likely assumed a denominator of all frames or drew on the smaller earlier sample. As a fraction of ALL 9000 frames in the window (attempted + skipped), triggered frames are 23.7%.",
+    "real_sampled_triggers": 103,
+    "real_sampled_recovered": 74,
+    "measured_recovery_rate": 0.7184466019417476,
+    "real_measured_total_fallback_sec_for_sample": 2121.7738082408905,
+    "real_measured_avg_sec_per_trigger": 20.599745711076608,
+    "extrapolated_total_added_sec_for_full_window": 44001.05683885964,
+    "extrapolated_total_added_hours_for_full_window": 12.222515788572121,
+    "estimated_new_hits_total": 2398.6019417475727,
+    "estimated_new_raw_detection_rate": 0.2665113268608414,
+    "estimated_new_pct_of_attempted": 0.7995339805825242,
+    "measurement": "EXTRAPOLATED \u2014 primary_misses_exact (2136) is exact (from the real cached stub), but only 103 of those misses were actually run through the real fallback in this session; the rest are projected using the measured avg_sec_per_trigger and measured recovery_rate from that real sample."
+  },
+  "raw_fallback_summary_for_sample": {
+    "n_triggered": 103,
+    "n_recovered": 74,
+    "recovery_rate": 0.7184466019417476,
+    "total_fallback_sec": 2121.7738082408905,
+    "avg_sec_per_trigger": 20.599745711076608
+  }
+}
+
+Wrote test_ball_fallback_integration_results.json

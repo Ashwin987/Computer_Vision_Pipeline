@@ -1,0 +1,13 @@
+{
+  "peak_minute": 0,
+  "peak_timestamp": "00:00-01:00",
+  "peak_score": -17.0,
+  "peak_start_sec": 0,
+  "peak_end_sec": 30,
+  "master_team_a_color": "red",
+  "master_team_b_color": "blue",
+  "total_minutes": 29,
+  "minutes_ok": 29,
+  "failed_minutes": [],
+  "duration_sec": 1699.0
+}

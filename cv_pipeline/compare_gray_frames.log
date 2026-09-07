@@ -1,0 +1,51 @@
+Reading video frames...
+Reading video:   0%|          | 0/750 [00:00<?, ?frame/s]Reading video:   0%|          | 3/750 [00:00<00:27, 27.26frame/s]Reading video:   2%|2         | 17/750 [00:00<00:08, 86.96frame/s]Reading video:   4%|4         | 31/750 [00:00<00:06, 106.54frame/s]Reading video:   6%|5         | 44/750 [00:00<00:06, 112.16frame/s]Reading video:   8%|7         | 58/750 [00:00<00:05, 120.58frame/s]Reading video:  10%|9         | 72/750 [00:00<00:05, 124.58frame/s]Reading video:  11%|#1        | 85/750 [00:00<00:05, 120.57frame/s]Reading video:  13%|#3        | 98/750 [00:00<00:05, 119.25frame/s]Reading video:  15%|#4        | 111/750 [00:00<00:05, 121.40frame/s]Reading video:  17%|#6        | 125/750 [00:01<00:05, 124.32frame/s]Reading video:  19%|#8        | 139/750 [00:01<00:04, 126.65frame/s]Reading video:  20%|##        | 153/750 [00:01<00:04, 128.27frame/s]Reading video:  22%|##2       | 167/750 [00:01<00:04, 129.93frame/s]Reading video:  24%|##4       | 181/750 [00:01<00:04, 130.93frame/s]Reading video:  26%|##6       | 195/750 [00:01<00:04, 131.56frame/s]Reading video:  28%|##7       | 209/750 [00:01<00:04, 132.25frame/s]Reading video:  30%|##9       | 223/750 [00:01<00:03, 134.27frame/s]Reading video:  32%|###1      | 237/750 [00:01<00:03, 132.23frame/s]Reading video:  33%|###3      | 251/750 [00:02<00:03, 130.14frame/s]Reading video:  35%|###5      | 265/750 [00:02<00:03, 127.64frame/s]Reading video:  37%|###7      | 278/750 [00:02<00:03, 127.47frame/s]Reading video:  39%|###8      | 292/750 [00:02<00:03, 130.15frame/s]Reading video:  41%|####      | 306/750 [00:02<00:03, 124.82frame/s]Reading video:  43%|####2     | 319/750 [00:02<00:03, 120.72frame/s]Reading video:  44%|####4     | 332/750 [00:02<00:03, 112.98frame/s]Reading video:  46%|####5     | 344/750 [00:02<00:03, 106.20frame/s]Reading video:  47%|####7     | 355/750 [00:02<00:03, 103.20frame/s]Reading video:  49%|####8     | 366/750 [00:03<00:03, 102.04frame/s]Reading video:  50%|#####     | 377/750 [00:03<00:03, 103.82frame/s]Reading video:  52%|#####1    | 388/750 [00:03<00:03, 102.54frame/s]Reading video:  53%|#####3    | 399/750 [00:03<00:03, 97.35frame/s] Reading video:  55%|#####4    | 411/750 [00:03<00:03, 100.70frame/s]Reading video:  56%|#####6    | 422/750 [00:03<00:03, 102.65frame/s]Reading video:  58%|#####7    | 433/750 [00:03<00:03, 103.04frame/s]Reading video:  59%|#####9    | 444/750 [00:03<00:03, 101.73frame/s]Reading video:  61%|######    | 455/750 [00:03<00:02, 101.09frame/s]Reading video:  62%|######2   | 466/750 [00:04<00:02, 99.89frame/s] Reading video:  64%|######3   | 477/750 [00:04<00:02, 100.33frame/s]Reading video:  65%|######5   | 489/750 [00:04<00:02, 103.39frame/s]Reading video:  67%|######6   | 500/750 [00:04<00:02, 104.64frame/s]Reading video:  68%|######8   | 511/750 [00:04<00:02, 103.74frame/s]Reading video:  70%|######9   | 522/750 [00:04<00:02, 101.48frame/s]Reading video:  71%|#######1  | 533/750 [00:04<00:02, 88.92frame/s] Reading video:  73%|#######2  | 544/750 [00:04<00:02, 93.28frame/s]Reading video:  74%|#######3  | 554/750 [00:04<00:02, 94.64frame/s]Reading video:  75%|#######5  | 564/750 [00:05<00:01, 94.25frame/s]Reading video:  77%|#######6  | 574/750 [00:05<00:01, 95.12frame/s]Reading video:  78%|#######7  | 584/750 [00:05<00:01, 95.98frame/s]Reading video:  79%|#######9  | 594/750 [00:05<00:01, 86.30frame/s]Reading video:  81%|########  | 606/750 [00:05<00:01, 93.55frame/s]Reading video:  82%|########2 | 616/750 [00:05<00:01, 94.98frame/s]Reading video:  83%|########3 | 626/750 [00:05<00:01, 95.57frame/s]Reading video:  85%|########4 | 636/750 [00:05<00:01, 91.34frame/s]Reading video:  86%|########6 | 646/750 [00:05<00:01, 91.58frame/s]Reading video:  88%|########7 | 657/750 [00:06<00:00, 95.55frame/s]Reading video:  89%|########9 | 668/750 [00:06<00:00, 99.05frame/s]Reading video:  90%|######### | 678/750 [00:06<00:00, 82.24frame/s]Reading video:  92%|#########1| 687/750 [00:06<00:01, 58.87frame/s]Reading video:  93%|#########2| 695/750 [00:06<00:01, 49.83frame/s]Reading video:  94%|#########3| 702/750 [00:06<00:00, 49.79frame/s]Reading video:  94%|#########4| 708/750 [00:07<00:00, 47.81frame/s]Reading video:  95%|#########5| 714/750 [00:07<00:00, 49.86frame/s]Reading video:  96%|#########6| 721/750 [00:07<00:00, 53.35frame/s]Reading video:  97%|#########7| 729/750 [00:07<00:00, 59.70frame/s]Reading video:  98%|#########8| 736/750 [00:07<00:00, 60.62frame/s]Reading video:  99%|#########9| 743/750 [00:07<00:00, 62.25frame/s]Reading video: 100%|##########| 750/750 [00:07<00:00, 64.07frame/s]Reading video: 100%|##########| 750/750 [00:07<00:00, 96.12frame/s]
+[team_assigner] excluded 12 goalkeeper detection(s) from team-color clustering
+
+============================================================
+[team_assigner] KMeans fit on 589 samples from frames [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290]
+  Team 1  BGR: B= 84.9  G=108.2  R=170.6
+  Team 2  BGR: B=113.5  G=204.3  R=156.5
+  Centroid separation: 101.3  [OK]
+  Cluster populations: [np.int64(317), np.int64(146), np.int64(126)]
+============================================================
+
+[team_assigner] excluded 12 goalkeeper detection(s) from team-color clustering
+
+============================================================
+[team_assigner] KMeans fit on 589 samples from frames [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290]
+  Team 1  BGR: B= 84.9  G=108.2  R=170.6
+  Team 2  BGR: B=113.5  G=204.3  R=156.5
+  Centroid separation: 101.3  [OK]
+  Cluster populations: [np.int64(317), np.int64(146), np.int64(126)]
+============================================================
+
+
+=== OVERALL GRAY-FRAME PERCENTAGE (all player-frame instances) ===
+OLD (sequential/online): 1893/15025 = 12.6% gray
+NEW (two-pass batch):    41/15025 = 0.3% gray
+
+=== END-OF-CLIP RESOLVED/UNRESOLVED PLAYER COUNTS ===
+OLD: 4/46 players 100% gray (never resolved a single frame): [np.int64(1), np.int64(136), np.int64(158), np.int64(193)]
+NEW: 6/46 players 100% gray (never resolved a single frame): [np.int64(1), np.int64(71), np.int64(88), np.int64(136), np.int64(158), np.int64(193)]
+
+=== PIDS 10, 81, 82 — per-player gray fraction ===
+pid 10: OLD 322/741 (43% gray)  ->  NEW 0/741 (0% gray)
+pid 81: OLD 171/262 (65% gray)  ->  NEW 0/262 (0% gray)
+pid 82: OLD 476/532 (89% gray)  ->  NEW 0/532 (0% gray)
+
+=== Players with >20% gray screen time despite eventually resolving (OLD) ===
+    pid 82: 476/532 = 89% gray
+    pid 147: 2/3 = 67% gray
+    pid 81: 171/262 = 65% gray
+    pid 10: 322/741 = 43% gray
+    pid 163: 66/156 = 42% gray
+    pid 168: 2/5 = 40% gray
+    pid 4: 191/727 = 26% gray
+    pid 71: 6/23 = 26% gray
+    pid 7: 180/750 = 24% gray
+    pid 114: 71/348 = 20% gray
+  count: 10
+
+=== Same check under NEW (should be ~0, since Pass 2 applies one team uniformly) ===
+  count: 0

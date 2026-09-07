@@ -1,0 +1,78 @@
+InferenceDeprecationWarning: CORE_MODEL_GAZE_ENABLED is True: POST /gaze/gaze_detection is registered as a deprecation stub returning HTTP 410 Gone. The stub and this flag will be removed end of Q2 2026. Set CORE_MODEL_GAZE_ENABLED=False to disable it now.
+
+=== PHASE: 47-frame shot gap, frames 39301-39347 (LiverpoolPSG_short.mp4) ===
+[07/17/26 15:00:32] WARNING  Your inference package version      __init__.py:41
+                             1.3.0 is out of date! Please                      
+                             upgrade to version 1.3.5 of                       
+                             inference for the latest features                 
+                             and bug fixes by running `pip                     
+                             install --upgrade inference`.                     
+ModelDependencyMissing: Your `inference` configuration does not support SAM3 model. Install SAM3 dependencies and set CORE_MODEL_SAM3_ENABLED to True.
+[transformers] `DepthProImageProcessorFast` is deprecated. The `Fast` suffix for image processors has been removed; use `DepthProImageProcessor` instead.
+FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+UserWarning: Specified provider 'OpenVINOExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+UserWarning: Specified provider 'CoreMLExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  [gap47] 25/47 frames  elapsed=903s  avg=36.12s/frame
+{
+  "label": "gap47",
+  "video_path": "Sample_Videos/LiverpoolPSG_short.mp4",
+  "n_frames_tested": 47,
+  "new_model_hits": 42,
+  "new_model_hit_rate": 0.8936170212765957,
+  "baseline_hits": 0,
+  "baseline_hit_rate": 0.0,
+  "frames_recovered_by_new_model": 42,
+  "avg_sec_per_frame_slicer_only": 15.955433292591826,
+  "total_wall_sec": 1146.223520040512
+}
+    frame 39301: raw_n=1 max_conf=0.7474310994148254  tracked_hit=True  our_model_baseline_hit=False
+    frame 39302: raw_n=3 max_conf=0.6540920734405518  tracked_hit=True  our_model_baseline_hit=False
+    frame 39303: raw_n=2 max_conf=0.6099133491516113  tracked_hit=True  our_model_baseline_hit=False
+    frame 39304: raw_n=2 max_conf=0.6154470443725586  tracked_hit=True  our_model_baseline_hit=False
+    frame 39305: raw_n=1 max_conf=0.5512791872024536  tracked_hit=True  our_model_baseline_hit=False
+    frame 39306: raw_n=3 max_conf=0.3890412747859955  tracked_hit=True  our_model_baseline_hit=False
+    frame 39307: raw_n=3 max_conf=0.5278976559638977  tracked_hit=True  our_model_baseline_hit=False
+    frame 39308: raw_n=2 max_conf=0.4030519723892212  tracked_hit=True  our_model_baseline_hit=False
+    frame 39309: raw_n=2 max_conf=0.4699847996234894  tracked_hit=True  our_model_baseline_hit=False
+    frame 39310: raw_n=2 max_conf=0.18700098991394043  tracked_hit=True  our_model_baseline_hit=False
+    frame 39311: raw_n=2 max_conf=0.11059042811393738  tracked_hit=True  our_model_baseline_hit=False
+    frame 39312: raw_n=0 max_conf=None  tracked_hit=False  our_model_baseline_hit=False
+    frame 39313: raw_n=2 max_conf=0.3392704129219055  tracked_hit=True  our_model_baseline_hit=False
+    frame 39314: raw_n=2 max_conf=0.6346275806427002  tracked_hit=True  our_model_baseline_hit=False
+    frame 39315: raw_n=2 max_conf=0.2709706425666809  tracked_hit=True  our_model_baseline_hit=False
+    frame 39316: raw_n=1 max_conf=0.19362220168113708  tracked_hit=True  our_model_baseline_hit=False
+    frame 39317: raw_n=1 max_conf=0.2449800670146942  tracked_hit=True  our_model_baseline_hit=False
+    frame 39318: raw_n=0 max_conf=None  tracked_hit=False  our_model_baseline_hit=False
+    frame 39319: raw_n=1 max_conf=0.14460498094558716  tracked_hit=True  our_model_baseline_hit=False
+    frame 39320: raw_n=2 max_conf=0.30654528737068176  tracked_hit=True  our_model_baseline_hit=False
+    frame 39321: raw_n=1 max_conf=0.28227636218070984  tracked_hit=True  our_model_baseline_hit=False
+    frame 39322: raw_n=3 max_conf=0.15679866075515747  tracked_hit=True  our_model_baseline_hit=False
+    frame 39323: raw_n=3 max_conf=0.19426143169403076  tracked_hit=True  our_model_baseline_hit=False
+    frame 39324: raw_n=2 max_conf=0.4165887236595154  tracked_hit=True  our_model_baseline_hit=False
+    frame 39325: raw_n=2 max_conf=0.2689884901046753  tracked_hit=True  our_model_baseline_hit=False
+    frame 39326: raw_n=0 max_conf=None  tracked_hit=False  our_model_baseline_hit=False
+    frame 39327: raw_n=1 max_conf=0.14791852235794067  tracked_hit=True  our_model_baseline_hit=False
+    frame 39328: raw_n=1 max_conf=0.5537636876106262  tracked_hit=True  our_model_baseline_hit=False
+    frame 39329: raw_n=2 max_conf=0.12836697697639465  tracked_hit=True  our_model_baseline_hit=False
+    frame 39330: raw_n=0 max_conf=None  tracked_hit=False  our_model_baseline_hit=False
+    frame 39331: raw_n=0 max_conf=None  tracked_hit=False  our_model_baseline_hit=False
+    frame 39332: raw_n=2 max_conf=0.2511712908744812  tracked_hit=True  our_model_baseline_hit=False
+    frame 39333: raw_n=1 max_conf=0.4519931674003601  tracked_hit=True  our_model_baseline_hit=False
+    frame 39334: raw_n=2 max_conf=0.6051021814346313  tracked_hit=True  our_model_baseline_hit=False
+    frame 39335: raw_n=2 max_conf=0.3572002351284027  tracked_hit=True  our_model_baseline_hit=False
+    frame 39336: raw_n=1 max_conf=0.19176629185676575  tracked_hit=True  our_model_baseline_hit=False
+    frame 39337: raw_n=2 max_conf=0.2355116605758667  tracked_hit=True  our_model_baseline_hit=False
+    frame 39338: raw_n=1 max_conf=0.5295006036758423  tracked_hit=True  our_model_baseline_hit=False
+    frame 39339: raw_n=1 max_conf=0.7931511402130127  tracked_hit=True  our_model_baseline_hit=False
+    frame 39340: raw_n=2 max_conf=0.7320874333381653  tracked_hit=True  our_model_baseline_hit=False
+    frame 39341: raw_n=5 max_conf=0.6282989382743835  tracked_hit=True  our_model_baseline_hit=False
+    frame 39342: raw_n=3 max_conf=0.2572193145751953  tracked_hit=True  our_model_baseline_hit=False
+    frame 39343: raw_n=2 max_conf=0.23104453086853027  tracked_hit=True  our_model_baseline_hit=False
+    frame 39344: raw_n=3 max_conf=0.6009602546691895  tracked_hit=True  our_model_baseline_hit=False
+    frame 39345: raw_n=1 max_conf=0.2825375199317932  tracked_hit=True  our_model_baseline_hit=False
+    frame 39346: raw_n=1 max_conf=0.12550854682922363  tracked_hit=True  our_model_baseline_hit=False
+    frame 39347: raw_n=1 max_conf=0.10098129510879517  tracked_hit=True  our_model_baseline_hit=False
+
+=== PHASE: fastpipe 9000-frame window [33475:42475), stride=30 ===
+  [fastpipe_sample] 25/300 frames  elapsed=556s  avg=22.23s/frame

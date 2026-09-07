@@ -1,0 +1,12 @@
+[server]
+maxUploadSize = 2000
+# Hugging Face Spaces: parent page is huggingface.co, app runs in *.hf.space iframe;
+# cookie-based XSRF breaks st.file_uploader with 403 unless disabled. See HF Hub docs "Cookie limitations in Spaces".
+enableXsrfProtection = false
+
+[theme]
+base = "dark"
+primaryColor = "#4f8cff"
+backgroundColor = "#0b0e14"
+secondaryBackgroundColor = "#12161f"
+textColor = "#e6e9f0"

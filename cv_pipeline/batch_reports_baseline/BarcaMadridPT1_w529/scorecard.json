@@ -1,0 +1,243 @@
+{
+  "clip": "BarcaMadridPT1_w529",
+  "video_path": "dev_clips\\BarcaMadridPT1_w529.mp4",
+  "timestamp": "2026-07-30T04:26:16",
+  "cache_used": true,
+  "processing_time_sec": 12.4,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 1392,
+    "n_frames_processed": 1000
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": null,
+    "n_frames_interp_detect": null,
+    "n_frames_calibrated": null,
+    "n_frames_interp_calib": null
+  },
+  "timing": {
+    "detect_wall_sec": 423.2,
+    "camera_wall_sec": 55.9,
+    "calibrate_wall_sec": 465.4,
+    "detect_frame_timing": {
+      "n": 334,
+      "mean_sec": 1.2264334777158177,
+      "median_sec": 1.1851763725280762,
+      "p95_sec": 1.4229419231414795,
+      "max_sec": 2.5680336952209473,
+      "total_sec": 409.62878155708313
+    },
+    "calibrate_frame_timing": {
+      "n": 100,
+      "mean_sec": 4.539026248455047,
+      "median_sec": 4.613759160041809,
+      "p95_sec": 4.734467995166779,
+      "max_sec": 5.583519458770752,
+      "total_sec": 453.90262484550476
+    },
+    "enrichment_wall_sec": 0.3,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 11.9,
+    "team_resolve_wall_sec": 3.4,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 2.7,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 159.65,
+    "n_player_tracks_total": 237,
+    "n_resolved": 219,
+    "n_unresolved": 18,
+    "resolved_pct": 0.9241,
+    "gray_frame_pct": 0.0396,
+    "n_fallback_assigned": 28,
+    "n_merged_pairs": 147,
+    "n_rejected_merge_candidates": 126,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.9488,
+    "median_confidence": 1.0,
+    "pct_frames_below_70": 0.051,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 9.26,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 237,
+    "n_flagged_candidates": 13,
+    "strong_signature": 5,
+    "weak_signature": 8,
+    "strong_signature_per_100_frames": 0.5,
+    "weak_signature_per_100_frames": 0.8,
+    "flagged": [
+      {
+        "pid": 3,
+        "n_samples": 39,
+        "whole_purity": 0.872,
+        "weighted_purity": 1.0,
+        "improvement": 0.128,
+        "split_before_fn": 33,
+        "split_after_fn": 42,
+        "signature": "weak"
+      },
+      {
+        "pid": 10,
+        "n_samples": 39,
+        "whole_purity": 0.795,
+        "weighted_purity": 1.0,
+        "improvement": 0.205,
+        "split_before_fn": 118,
+        "split_after_fn": 183,
+        "signature": "weak"
+      },
+      {
+        "pid": 15,
+        "n_samples": 22,
+        "whole_purity": 0.636,
+        "weighted_purity": 0.955,
+        "improvement": 0.318,
+        "split_before_fn": 12,
+        "split_after_fn": 26,
+        "signature": "strong"
+      },
+      {
+        "pid": 408,
+        "n_samples": 111,
+        "whole_purity": 0.937,
+        "weighted_purity": 1.0,
+        "improvement": 0.063,
+        "split_before_fn": 120,
+        "split_after_fn": 124,
+        "signature": "strong"
+      },
+      {
+        "pid": 518,
+        "n_samples": 58,
+        "whole_purity": 0.914,
+        "weighted_purity": 1.0,
+        "improvement": 0.086,
+        "split_before_fn": 201,
+        "split_after_fn": 252,
+        "signature": "weak"
+      },
+      {
+        "pid": 546,
+        "n_samples": 88,
+        "whole_purity": 0.875,
+        "weighted_purity": 1.0,
+        "improvement": 0.125,
+        "split_before_fn": 264,
+        "split_after_fn": 276,
+        "signature": "weak"
+      },
+      {
+        "pid": 865,
+        "n_samples": 82,
+        "whole_purity": 0.707,
+        "weighted_purity": 0.951,
+        "improvement": 0.244,
+        "split_before_fn": 514,
+        "split_after_fn": 515,
+        "signature": "strong"
+      },
+      {
+        "pid": 866,
+        "n_samples": 102,
+        "whole_purity": 0.931,
+        "weighted_purity": 0.98,
+        "improvement": 0.049,
+        "split_before_fn": 546,
+        "split_after_fn": 558,
+        "signature": "weak"
+      },
+      {
+        "pid": 900,
+        "n_samples": 175,
+        "whole_purity": 0.72,
+        "weighted_purity": 1.0,
+        "improvement": 0.28,
+        "split_before_fn": 510,
+        "split_after_fn": 558,
+        "signature": "weak"
+      },
+      {
+        "pid": 1044,
+        "n_samples": 196,
+        "whole_purity": 0.872,
+        "weighted_purity": 1.0,
+        "improvement": 0.128,
+        "split_before_fn": 597,
+        "split_after_fn": 598,
+        "signature": "strong"
+      },
+      {
+        "pid": 1023,
+        "n_samples": 420,
+        "whole_purity": 0.971,
+        "weighted_purity": 1.0,
+        "improvement": 0.029,
+        "split_before_fn": 564,
+        "split_after_fn": 582,
+        "signature": "weak"
+      },
+      {
+        "pid": 1116,
+        "n_samples": 86,
+        "whole_purity": 0.535,
+        "weighted_purity": 1.0,
+        "improvement": 0.465,
+        "split_before_fn": 648,
+        "split_after_fn": 669,
+        "signature": "weak"
+      },
+      {
+        "pid": 1137,
+        "n_samples": 110,
+        "whole_purity": 0.909,
+        "weighted_purity": 0.991,
+        "improvement": 0.082,
+        "split_before_fn": 709,
+        "split_after_fn": 716,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 5,
+    "expected_max": 6,
+    "margin_label": "5/6 \u2014 1 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.2305,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 78,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 35.9,
+    "p90_gap_sec": 1.44,
+    "max_gap_frames": 83,
+    "max_gap_sec": 3.32,
+    "n_gaps_over_1s": 12,
+    "n_gaps_over_3s": 1,
+    "n_gaps_over_uncertain_threshold": 17,
+    "pct_frames_within_1s_of_real": 0.899,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

@@ -1,0 +1,1884 @@
+
+[short_clip] running real detection on 750 frames...
+Detecting objects:   0%|          | 0/750 [00:00<?, ?frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 477.8ms
+1: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 477.8ms
+2: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 477.8ms
+3: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 477.8ms
+4: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 477.8ms
+5: 384x640 1 goalkeeper, 20 players, 1 referee, 477.8ms
+6: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 477.8ms
+7: 384x640 1 goalkeeper, 18 players, 1 referee, 477.8ms
+8: 384x640 1 goalkeeper, 19 players, 1 referee, 477.8ms
+9: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 477.8ms
+10: 384x640 1 goalkeeper, 19 players, 1 referee, 477.8ms
+11: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 477.8ms
+12: 384x640 1 goalkeeper, 18 players, 1 referee, 477.8ms
+13: 384x640 1 goalkeeper, 18 players, 1 referee, 477.8ms
+14: 384x640 1 goalkeeper, 18 players, 1 referee, 477.8ms
+15: 384x640 19 players, 2 referees, 477.8ms
+16: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 477.8ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 477.8ms
+18: 384x640 1 goalkeeper, 19 players, 2 referees, 477.8ms
+19: 384x640 1 goalkeeper, 22 players, 2 referees, 477.8ms
+Speed: 6.5ms preprocess, 477.8ms inference, 2.3ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:   3%|2         | 20/750 [00:10<06:35,  1.85frame/s]
+0: 384x640 1 goalkeeper, 21 players, 2 referees, 407.0ms
+1: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 407.0ms
+2: 384x640 1 ball, 1 goalkeeper, 18 players, 2 referees, 407.0ms
+3: 384x640 1 goalkeeper, 18 players, 2 referees, 407.0ms
+4: 384x640 1 goalkeeper, 21 players, 2 referees, 407.0ms
+5: 384x640 1 goalkeeper, 18 players, 2 referees, 407.0ms
+6: 384x640 1 goalkeeper, 20 players, 1 referee, 407.0ms
+7: 384x640 1 ball, 1 goalkeeper, 18 players, 1 referee, 407.0ms
+8: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+9: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+10: 384x640 1 goalkeeper, 19 players, 1 referee, 407.0ms
+11: 384x640 1 goalkeeper, 20 players, 1 referee, 407.0ms
+12: 384x640 1 goalkeeper, 21 players, 2 referees, 407.0ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+14: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+15: 384x640 1 goalkeeper, 18 players, 1 referee, 407.0ms
+16: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+18: 384x640 1 goalkeeper, 19 players, 2 referees, 407.0ms
+19: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 407.0ms
+Speed: 13.1ms preprocess, 407.0ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:   5%|5         | 40/750 [00:19<05:34,  2.12frame/s]
+0: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+3: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+4: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+6: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+7: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+8: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+9: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+10: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 395.4ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+12: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 395.4ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+15: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+16: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 395.4ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 395.4ms
+18: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 395.4ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 395.4ms
+Speed: 10.6ms preprocess, 395.4ms inference, 1.2ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:   8%|8         | 60/750 [00:27<05:05,  2.26frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 406.6ms
+1: 384x640 1 goalkeeper, 19 players, 3 referees, 406.6ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 406.6ms
+3: 384x640 1 goalkeeper, 20 players, 3 referees, 406.6ms
+4: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 406.6ms
+5: 384x640 1 goalkeeper, 21 players, 2 referees, 406.6ms
+6: 384x640 18 players, 2 referees, 406.6ms
+7: 384x640 19 players, 2 referees, 406.6ms
+8: 384x640 20 players, 2 referees, 406.6ms
+9: 384x640 19 players, 2 referees, 406.6ms
+10: 384x640 19 players, 2 referees, 406.6ms
+11: 384x640 19 players, 2 referees, 406.6ms
+12: 384x640 19 players, 2 referees, 406.6ms
+13: 384x640 20 players, 2 referees, 406.6ms
+14: 384x640 19 players, 2 referees, 406.6ms
+15: 384x640 20 players, 2 referees, 406.6ms
+16: 384x640 20 players, 2 referees, 406.6ms
+17: 384x640 19 players, 2 referees, 406.6ms
+18: 384x640 20 players, 2 referees, 406.6ms
+19: 384x640 19 players, 2 referees, 406.6ms
+Speed: 17.2ms preprocess, 406.6ms inference, 0.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  11%|#         | 80/750 [00:35<04:51,  2.30frame/s]
+0: 384x640 20 players, 2 referees, 403.4ms
+1: 384x640 20 players, 2 referees, 403.4ms
+2: 384x640 20 players, 2 referees, 403.4ms
+3: 384x640 19 players, 2 referees, 403.4ms
+4: 384x640 18 players, 2 referees, 403.4ms
+5: 384x640 19 players, 2 referees, 403.4ms
+6: 384x640 20 players, 2 referees, 403.4ms
+7: 384x640 20 players, 2 referees, 403.4ms
+8: 384x640 20 players, 2 referees, 403.4ms
+9: 384x640 20 players, 2 referees, 403.4ms
+10: 384x640 21 players, 2 referees, 403.4ms
+11: 384x640 20 players, 2 referees, 403.4ms
+12: 384x640 19 players, 2 referees, 403.4ms
+13: 384x640 19 players, 2 referees, 403.4ms
+14: 384x640 19 players, 2 referees, 403.4ms
+15: 384x640 19 players, 2 referees, 403.4ms
+16: 384x640 19 players, 2 referees, 403.4ms
+17: 384x640 19 players, 2 referees, 403.4ms
+18: 384x640 19 players, 1 referee, 403.4ms
+19: 384x640 21 players, 1 referee, 403.4ms
+Speed: 19.0ms preprocess, 403.4ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  13%|#3        | 100/750 [00:44<04:40,  2.32frame/s]
+0: 384x640 21 players, 2 referees, 420.0ms
+1: 384x640 20 players, 2 referees, 420.0ms
+2: 384x640 20 players, 2 referees, 420.0ms
+3: 384x640 20 players, 2 referees, 420.0ms
+4: 384x640 20 players, 2 referees, 420.0ms
+5: 384x640 20 players, 1 referee, 420.0ms
+6: 384x640 20 players, 2 referees, 420.0ms
+7: 384x640 20 players, 2 referees, 420.0ms
+8: 384x640 20 players, 2 referees, 420.0ms
+9: 384x640 21 players, 2 referees, 420.0ms
+10: 384x640 20 players, 2 referees, 420.0ms
+11: 384x640 20 players, 2 referees, 420.0ms
+12: 384x640 20 players, 2 referees, 420.0ms
+13: 384x640 20 players, 2 referees, 420.0ms
+14: 384x640 20 players, 2 referees, 420.0ms
+15: 384x640 20 players, 1 referee, 420.0ms
+16: 384x640 20 players, 1 referee, 420.0ms
+17: 384x640 20 players, 1 referee, 420.0ms
+18: 384x640 20 players, 1 referee, 420.0ms
+19: 384x640 21 players, 1 referee, 420.0ms
+Speed: 20.0ms preprocess, 420.0ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  16%|#6        | 120/750 [00:53<04:33,  2.30frame/s]
+0: 384x640 20 players, 2 referees, 406.0ms
+1: 384x640 20 players, 2 referees, 406.0ms
+2: 384x640 20 players, 2 referees, 406.0ms
+3: 384x640 20 players, 2 referees, 406.0ms
+4: 384x640 20 players, 2 referees, 406.0ms
+5: 384x640 20 players, 2 referees, 406.0ms
+6: 384x640 20 players, 2 referees, 406.0ms
+7: 384x640 20 players, 2 referees, 406.0ms
+8: 384x640 19 players, 2 referees, 406.0ms
+9: 384x640 19 players, 2 referees, 406.0ms
+10: 384x640 19 players, 2 referees, 406.0ms
+11: 384x640 19 players, 2 referees, 406.0ms
+12: 384x640 1 ball, 19 players, 2 referees, 406.0ms
+13: 384x640 1 ball, 19 players, 2 referees, 406.0ms
+14: 384x640 1 ball, 19 players, 2 referees, 406.0ms
+15: 384x640 1 ball, 20 players, 2 referees, 406.0ms
+16: 384x640 1 ball, 20 players, 1 referee, 406.0ms
+17: 384x640 20 players, 1 referee, 406.0ms
+18: 384x640 1 ball, 20 players, 1 referee, 406.0ms
+19: 384x640 20 players, 1 referee, 406.0ms
+Speed: 24.9ms preprocess, 406.0ms inference, 1.3ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  19%|#8        | 140/750 [01:01<04:24,  2.30frame/s]
+0: 384x640 20 players, 1 referee, 459.1ms
+1: 384x640 1 ball, 20 players, 1 referee, 459.1ms
+2: 384x640 1 ball, 21 players, 2 referees, 459.1ms
+3: 384x640 20 players, 3 referees, 459.1ms
+4: 384x640 1 ball, 20 players, 2 referees, 459.1ms
+5: 384x640 1 ball, 20 players, 2 referees, 459.1ms
+6: 384x640 20 players, 1 referee, 459.1ms
+7: 384x640 21 players, 2 referees, 459.1ms
+8: 384x640 1 ball, 21 players, 2 referees, 459.1ms
+9: 384x640 20 players, 2 referees, 459.1ms
+10: 384x640 20 players, 1 referee, 459.1ms
+11: 384x640 20 players, 1 referee, 459.1ms
+12: 384x640 1 ball, 21 players, 1 referee, 459.1ms
+13: 384x640 1 ball, 20 players, 1 referee, 459.1ms
+14: 384x640 1 ball, 20 players, 1 referee, 459.1ms
+15: 384x640 1 ball, 22 players, 1 referee, 459.1ms
+16: 384x640 19 players, 2 referees, 459.1ms
+17: 384x640 19 players, 2 referees, 459.1ms
+18: 384x640 21 players, 2 referees, 459.1ms
+19: 384x640 20 players, 2 referees, 459.1ms
+Speed: 19.4ms preprocess, 459.1ms inference, 2.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  21%|##1       | 160/750 [01:11<04:25,  2.22frame/s]
+0: 384x640 21 players, 2 referees, 564.4ms
+1: 384x640 20 players, 2 referees, 564.4ms
+2: 384x640 21 players, 2 referees, 564.4ms
+3: 384x640 20 players, 2 referees, 564.4ms
+4: 384x640 19 players, 2 referees, 564.4ms
+5: 384x640 19 players, 2 referees, 564.4ms
+6: 384x640 20 players, 2 referees, 564.4ms
+7: 384x640 21 players, 2 referees, 564.4ms
+8: 384x640 20 players, 2 referees, 564.4ms
+9: 384x640 20 players, 2 referees, 564.4ms
+10: 384x640 20 players, 2 referees, 564.4ms
+11: 384x640 21 players, 2 referees, 564.4ms
+12: 384x640 20 players, 2 referees, 564.4ms
+13: 384x640 19 players, 2 referees, 564.4ms
+14: 384x640 20 players, 2 referees, 564.4ms
+15: 384x640 19 players, 2 referees, 564.4ms
+16: 384x640 20 players, 2 referees, 564.4ms
+17: 384x640 20 players, 2 referees, 564.4ms
+18: 384x640 19 players, 2 referees, 564.4ms
+19: 384x640 19 players, 2 referees, 564.4ms
+Speed: 31.1ms preprocess, 564.4ms inference, 1.3ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  24%|##4       | 180/750 [01:23<04:42,  2.02frame/s]
+0: 384x640 20 players, 2 referees, 512.8ms
+1: 384x640 20 players, 2 referees, 512.8ms
+2: 384x640 20 players, 2 referees, 512.8ms
+3: 384x640 21 players, 2 referees, 512.8ms
+4: 384x640 21 players, 2 referees, 512.8ms
+5: 384x640 20 players, 2 referees, 512.8ms
+6: 384x640 21 players, 2 referees, 512.8ms
+7: 384x640 19 players, 2 referees, 512.8ms
+8: 384x640 1 ball, 19 players, 2 referees, 512.8ms
+9: 384x640 1 ball, 19 players, 2 referees, 512.8ms
+10: 384x640 1 ball, 19 players, 2 referees, 512.8ms
+11: 384x640 22 players, 2 referees, 512.8ms
+12: 384x640 20 players, 2 referees, 512.8ms
+13: 384x640 1 ball, 20 players, 2 referees, 512.8ms
+14: 384x640 1 ball, 20 players, 1 referee, 512.8ms
+15: 384x640 1 ball, 20 players, 2 referees, 512.8ms
+16: 384x640 1 ball, 20 players, 2 referees, 512.8ms
+17: 384x640 1 ball, 21 players, 2 referees, 512.8ms
+18: 384x640 1 ball, 22 players, 2 referees, 512.8ms
+19: 384x640 20 players, 2 referees, 512.8ms
+Speed: 28.2ms preprocess, 512.8ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  27%|##6       | 200/750 [01:34<04:40,  1.96frame/s]
+0: 384x640 1 ball, 19 players, 2 referees, 400.4ms
+1: 384x640 20 players, 2 referees, 400.4ms
+2: 384x640 1 ball, 20 players, 2 referees, 400.4ms
+3: 384x640 21 players, 2 referees, 400.4ms
+4: 384x640 1 ball, 20 players, 2 referees, 400.4ms
+5: 384x640 1 ball, 21 players, 2 referees, 400.4ms
+6: 384x640 1 ball, 20 players, 2 referees, 400.4ms
+7: 384x640 1 ball, 20 players, 2 referees, 400.4ms
+8: 384x640 21 players, 2 referees, 400.4ms
+9: 384x640 2 balls, 20 players, 2 referees, 400.4ms
+10: 384x640 1 ball, 21 players, 2 referees, 400.4ms
+11: 384x640 20 players, 2 referees, 400.4ms
+12: 384x640 19 players, 2 referees, 400.4ms
+13: 384x640 19 players, 2 referees, 400.4ms
+14: 384x640 19 players, 1 referee, 400.4ms
+15: 384x640 18 players, 2 referees, 400.4ms
+16: 384x640 19 players, 2 referees, 400.4ms
+17: 384x640 21 players, 2 referees, 400.4ms
+18: 384x640 22 players, 2 referees, 400.4ms
+19: 384x640 22 players, 1 referee, 400.4ms
+Speed: 20.8ms preprocess, 400.4ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  29%|##9       | 220/750 [01:42<04:16,  2.07frame/s]
+0: 384x640 20 players, 2 referees, 493.4ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 493.4ms
+2: 384x640 23 players, 2 referees, 493.4ms
+3: 384x640 21 players, 2 referees, 493.4ms
+4: 384x640 20 players, 1 referee, 493.4ms
+5: 384x640 1 ball, 19 players, 2 referees, 493.4ms
+6: 384x640 1 ball, 21 players, 2 referees, 493.4ms
+7: 384x640 1 ball, 20 players, 2 referees, 493.4ms
+8: 384x640 1 ball, 21 players, 2 referees, 493.4ms
+9: 384x640 1 ball, 21 players, 2 referees, 493.4ms
+10: 384x640 1 ball, 20 players, 2 referees, 493.4ms
+11: 384x640 20 players, 2 referees, 493.4ms
+12: 384x640 21 players, 2 referees, 493.4ms
+13: 384x640 1 ball, 20 players, 2 referees, 493.4ms
+14: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 493.4ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 493.4ms
+16: 384x640 1 goalkeeper, 21 players, 2 referees, 493.4ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 493.4ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 493.4ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 493.4ms
+Speed: 18.7ms preprocess, 493.4ms inference, 1.5ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  32%|###2      | 240/750 [01:53<04:11,  2.03frame/s]
+0: 384x640 1 goalkeeper, 22 players, 2 referees, 542.6ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+3: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+4: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+6: 384x640 1 goalkeeper, 21 players, 2 referees, 542.6ms
+7: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+8: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+10: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+11: 384x640 1 goalkeeper, 19 players, 2 referees, 542.6ms
+12: 384x640 1 goalkeeper, 19 players, 1 referee, 542.6ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 542.6ms
+14: 384x640 1 goalkeeper, 19 players, 1 referee, 542.6ms
+15: 384x640 1 goalkeeper, 19 players, 1 referee, 542.6ms
+16: 384x640 1 goalkeeper, 19 players, 1 referee, 542.6ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 542.6ms
+19: 384x640 1 goalkeeper, 21 players, 2 referees, 542.6ms
+Speed: 24.4ms preprocess, 542.6ms inference, 1.1ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  35%|###4      | 260/750 [02:04<04:12,  1.94frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+3: 384x640 1 goalkeeper, 19 players, 2 referees, 442.0ms
+4: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+6: 384x640 1 goalkeeper, 19 players, 1 referee, 442.0ms
+7: 384x640 1 goalkeeper, 21 players, 1 referee, 442.0ms
+8: 384x640 1 goalkeeper, 20 players, 1 referee, 442.0ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+10: 384x640 1 goalkeeper, 19 players, 2 referees, 442.0ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+12: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+13: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+15: 384x640 1 goalkeeper, 20 players, 1 referee, 442.0ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+18: 384x640 1 goalkeeper, 21 players, 2 referees, 442.0ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 442.0ms
+Speed: 22.5ms preprocess, 442.0ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  37%|###7      | 280/750 [02:13<03:55,  2.00frame/s]
+0: 384x640 1 goalkeeper, 19 players, 2 referees, 409.9ms
+1: 384x640 1 goalkeeper, 17 players, 2 referees, 409.9ms
+2: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 409.9ms
+3: 384x640 1 goalkeeper, 20 players, 1 referee, 409.9ms
+4: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 409.9ms
+5: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 409.9ms
+6: 384x640 1 goalkeeper, 19 players, 1 referee, 409.9ms
+7: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 409.9ms
+8: 384x640 1 goalkeeper, 20 players, 3 referees, 409.9ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 409.9ms
+10: 384x640 1 goalkeeper, 20 players, 2 referees, 409.9ms
+11: 384x640 1 goalkeeper, 19 players, 2 referees, 409.9ms
+12: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 409.9ms
+13: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 409.9ms
+14: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 409.9ms
+15: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 409.9ms
+16: 384x640 20 players, 2 referees, 409.9ms
+17: 384x640 1 ball, 19 players, 2 referees, 409.9ms
+18: 384x640 20 players, 2 referees, 409.9ms
+19: 384x640 1 ball, 20 players, 2 referees, 409.9ms
+Speed: 14.7ms preprocess, 409.9ms inference, 0.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  40%|####      | 300/750 [02:22<03:35,  2.09frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 405.7ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 405.7ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 405.7ms
+3: 384x640 1 goalkeeper, 19 players, 2 referees, 405.7ms
+4: 384x640 1 goalkeeper, 19 players, 2 referees, 405.7ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 405.7ms
+6: 384x640 1 goalkeeper, 19 players, 2 referees, 405.7ms
+7: 384x640 1 goalkeeper, 20 players, 2 referees, 405.7ms
+8: 384x640 1 goalkeeper, 20 players, 1 referee, 405.7ms
+9: 384x640 1 goalkeeper, 19 players, 1 referee, 405.7ms
+10: 384x640 1 goalkeeper, 19 players, 1 referee, 405.7ms
+11: 384x640 1 goalkeeper, 20 players, 1 referee, 405.7ms
+12: 384x640 1 goalkeeper, 21 players, 1 referee, 405.7ms
+13: 384x640 1 goalkeeper, 19 players, 1 referee, 405.7ms
+14: 384x640 1 goalkeeper, 19 players, 1 referee, 405.7ms
+15: 384x640 1 goalkeeper, 20 players, 1 referee, 405.7ms
+16: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 405.7ms
+17: 384x640 1 goalkeeper, 18 players, 1 referee, 405.7ms
+18: 384x640 1 goalkeeper, 19 players, 1 referee, 405.7ms
+19: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 405.7ms
+Speed: 14.7ms preprocess, 405.7ms inference, 0.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  43%|####2     | 320/750 [02:30<03:18,  2.17frame/s]
+0: 384x640 20 players, 2 referees, 429.9ms
+1: 384x640 1 ball, 19 players, 2 referees, 429.9ms
+2: 384x640 1 ball, 19 players, 2 referees, 429.9ms
+3: 384x640 1 goalkeeper, 20 players, 2 referees, 429.9ms
+4: 384x640 1 ball, 1 goalkeeper, 20 players, 3 referees, 429.9ms
+5: 384x640 1 ball, 1 goalkeeper, 20 players, 3 referees, 429.9ms
+6: 384x640 1 goalkeeper, 20 players, 3 referees, 429.9ms
+7: 384x640 1 goalkeeper, 20 players, 2 referees, 429.9ms
+8: 384x640 1 goalkeeper, 20 players, 2 referees, 429.9ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 429.9ms
+10: 384x640 1 goalkeeper, 19 players, 2 referees, 429.9ms
+11: 384x640 1 goalkeeper, 19 players, 2 referees, 429.9ms
+12: 384x640 1 goalkeeper, 19 players, 2 referees, 429.9ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 429.9ms
+14: 384x640 19 players, 2 referees, 429.9ms
+15: 384x640 20 players, 2 referees, 429.9ms
+16: 384x640 20 players, 2 referees, 429.9ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 429.9ms
+18: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 429.9ms
+19: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 429.9ms
+Speed: 11.3ms preprocess, 429.9ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  45%|####5     | 340/750 [02:39<03:06,  2.19frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 408.8ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 408.8ms
+2: 384x640 1 goalkeeper, 19 players, 2 referees, 408.8ms
+3: 384x640 1 goalkeeper, 19 players, 2 referees, 408.8ms
+4: 384x640 1 goalkeeper, 20 players, 2 referees, 408.8ms
+5: 384x640 1 goalkeeper, 19 players, 2 referees, 408.8ms
+6: 384x640 1 goalkeeper, 18 players, 2 referees, 408.8ms
+7: 384x640 1 goalkeeper, 18 players, 2 referees, 408.8ms
+8: 384x640 1 goalkeeper, 18 players, 2 referees, 408.8ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 408.8ms
+10: 384x640 1 goalkeeper, 19 players, 2 referees, 408.8ms
+11: 384x640 1 goalkeeper, 18 players, 2 referees, 408.8ms
+12: 384x640 1 goalkeeper, 18 players, 2 referees, 408.8ms
+13: 384x640 1 goalkeeper, 18 players, 2 referees, 408.8ms
+14: 384x640 1 goalkeeper, 18 players, 1 referee, 408.8ms
+15: 384x640 1 goalkeeper, 19 players, 1 referee, 408.8ms
+16: 384x640 1 goalkeeper, 19 players, 1 referee, 408.8ms
+17: 384x640 1 goalkeeper, 19 players, 1 referee, 408.8ms
+18: 384x640 1 goalkeeper, 19 players, 1 referee, 408.8ms
+19: 384x640 1 goalkeeper, 19 players, 1 referee, 408.8ms
+Speed: 10.9ms preprocess, 408.8ms inference, 0.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  48%|####8     | 360/750 [02:48<02:53,  2.25frame/s]
+0: 384x640 1 goalkeeper, 19 players, 2 referees, 398.0ms
+1: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+2: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+3: 384x640 1 goalkeeper, 19 players, 2 referees, 398.0ms
+4: 384x640 1 goalkeeper, 19 players, 2 referees, 398.0ms
+5: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+6: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+7: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+8: 384x640 1 goalkeeper, 17 players, 2 referees, 398.0ms
+9: 384x640 1 goalkeeper, 17 players, 2 referees, 398.0ms
+10: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+11: 384x640 1 goalkeeper, 18 players, 2 referees, 398.0ms
+12: 384x640 1 goalkeeper, 17 players, 2 referees, 398.0ms
+13: 384x640 1 goalkeeper, 17 players, 2 referees, 398.0ms
+14: 384x640 1 goalkeeper, 16 players, 2 referees, 398.0ms
+15: 384x640 1 goalkeeper, 16 players, 2 referees, 398.0ms
+16: 384x640 1 goalkeeper, 16 players, 2 referees, 398.0ms
+17: 384x640 1 ball, 1 goalkeeper, 18 players, 2 referees, 398.0ms
+18: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 398.0ms
+19: 384x640 1 ball, 1 goalkeeper, 18 players, 2 referees, 398.0ms
+Speed: 10.6ms preprocess, 398.0ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  51%|#####     | 380/750 [02:56<02:40,  2.30frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.4ms
+1: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.4ms
+2: 384x640 1 goalkeeper, 19 players, 2 referees, 404.4ms
+3: 384x640 1 goalkeeper, 18 players, 2 referees, 404.4ms
+4: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.4ms
+5: 384x640 1 goalkeeper, 19 players, 2 referees, 404.4ms
+6: 384x640 1 goalkeeper, 19 players, 2 referees, 404.4ms
+7: 384x640 1 ball, 1 goalkeeper, 17 players, 2 referees, 404.4ms
+8: 384x640 1 goalkeeper, 18 players, 2 referees, 404.4ms
+9: 384x640 1 goalkeeper, 18 players, 2 referees, 404.4ms
+10: 384x640 1 goalkeeper, 18 players, 2 referees, 404.4ms
+11: 384x640 1 ball, 1 goalkeeper, 18 players, 2 referees, 404.4ms
+12: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.4ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 404.4ms
+14: 384x640 1 goalkeeper, 19 players, 2 referees, 404.4ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 404.4ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 404.4ms
+17: 384x640 1 goalkeeper, 21 players, 2 referees, 404.4ms
+18: 384x640 1 goalkeeper, 21 players, 1 referee, 404.4ms
+19: 384x640 1 goalkeeper, 19 players, 1 referee, 404.4ms
+Speed: 26.2ms preprocess, 404.4ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  53%|#####3    | 400/750 [03:04<02:31,  2.30frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.9ms
+1: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 404.9ms
+2: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 404.9ms
+3: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 404.9ms
+4: 384x640 1 ball, 2 goalkeepers, 20 players, 1 referee, 404.9ms
+5: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 404.9ms
+6: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 404.9ms
+7: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.9ms
+8: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.9ms
+9: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 404.9ms
+10: 384x640 1 goalkeeper, 20 players, 2 referees, 404.9ms
+11: 384x640 2 goalkeepers, 20 players, 2 referees, 404.9ms
+12: 384x640 1 goalkeeper, 19 players, 2 referees, 404.9ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 404.9ms
+14: 384x640 1 goalkeeper, 19 players, 2 referees, 404.9ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 404.9ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 404.9ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 404.9ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 404.9ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 404.9ms
+Speed: 17.0ms preprocess, 404.9ms inference, 0.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  56%|#####6    | 420/750 [03:13<02:22,  2.32frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 413.0ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 413.0ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 413.0ms
+3: 384x640 1 goalkeeper, 20 players, 2 referees, 413.0ms
+4: 384x640 1 goalkeeper, 19 players, 2 referees, 413.0ms
+5: 384x640 1 goalkeeper, 19 players, 2 referees, 413.0ms
+6: 384x640 1 goalkeeper, 19 players, 2 referees, 413.0ms
+7: 384x640 1 ball, 1 goalkeeper, 18 players, 3 referees, 413.0ms
+8: 384x640 1 ball, 1 goalkeeper, 19 players, 3 referees, 413.0ms
+9: 384x640 1 ball, 1 goalkeeper, 19 players, 3 referees, 413.0ms
+10: 384x640 1 ball, 1 goalkeeper, 19 players, 3 referees, 413.0ms
+11: 384x640 1 ball, 1 goalkeeper, 19 players, 3 referees, 413.0ms
+12: 384x640 1 goalkeeper, 20 players, 3 referees, 413.0ms
+13: 384x640 1 goalkeeper, 20 players, 3 referees, 413.0ms
+14: 384x640 1 goalkeeper, 19 players, 3 referees, 413.0ms
+15: 384x640 1 goalkeeper, 18 players, 2 referees, 413.0ms
+16: 384x640 1 goalkeeper, 19 players, 3 referees, 413.0ms
+17: 384x640 1 ball, 1 goalkeeper, 20 players, 3 referees, 413.0ms
+18: 384x640 1 ball, 1 goalkeeper, 20 players, 5 referees, 413.0ms
+19: 384x640 1 ball, 1 goalkeeper, 19 players, 4 referees, 413.0ms
+Speed: 16.6ms preprocess, 413.0ms inference, 0.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  59%|#####8    | 440/750 [03:21<02:13,  2.32frame/s]
+0: 384x640 1 goalkeeper, 20 players, 4 referees, 414.2ms
+1: 384x640 1 goalkeeper, 20 players, 5 referees, 414.2ms
+2: 384x640 1 goalkeeper, 22 players, 5 referees, 414.2ms
+3: 384x640 1 goalkeeper, 20 players, 5 referees, 414.2ms
+4: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 414.2ms
+5: 384x640 1 ball, 1 goalkeeper, 20 players, 3 referees, 414.2ms
+6: 384x640 1 ball, 1 goalkeeper, 20 players, 4 referees, 414.2ms
+7: 384x640 1 ball, 1 goalkeeper, 20 players, 5 referees, 414.2ms
+8: 384x640 1 goalkeeper, 21 players, 4 referees, 414.2ms
+9: 384x640 1 goalkeeper, 21 players, 4 referees, 414.2ms
+10: 384x640 1 goalkeeper, 20 players, 4 referees, 414.2ms
+11: 384x640 1 goalkeeper, 19 players, 3 referees, 414.2ms
+12: 384x640 1 goalkeeper, 18 players, 2 referees, 414.2ms
+13: 384x640 1 goalkeeper, 18 players, 3 referees, 414.2ms
+14: 384x640 1 goalkeeper, 18 players, 2 referees, 414.2ms
+15: 384x640 1 goalkeeper, 18 players, 3 referees, 414.2ms
+16: 384x640 1 goalkeeper, 18 players, 5 referees, 414.2ms
+17: 384x640 1 goalkeeper, 19 players, 3 referees, 414.2ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 414.2ms
+19: 384x640 1 goalkeeper, 19 players, 2 referees, 414.2ms
+Speed: 17.7ms preprocess, 414.2ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  61%|######1   | 460/750 [03:30<02:05,  2.32frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 420.5ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 420.5ms
+2: 384x640 1 goalkeeper, 20 players, 1 referee, 420.5ms
+3: 384x640 1 goalkeeper, 20 players, 3 referees, 420.5ms
+4: 384x640 1 goalkeeper, 20 players, 3 referees, 420.5ms
+5: 384x640 1 goalkeeper, 19 players, 3 referees, 420.5ms
+6: 384x640 1 goalkeeper, 20 players, 3 referees, 420.5ms
+7: 384x640 1 goalkeeper, 20 players, 4 referees, 420.5ms
+8: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+9: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+10: 384x640 1 goalkeeper, 19 players, 3 referees, 420.5ms
+11: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+12: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+13: 384x640 1 goalkeeper, 20 players, 3 referees, 420.5ms
+14: 384x640 1 goalkeeper, 18 players, 4 referees, 420.5ms
+15: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+16: 384x640 1 goalkeeper, 19 players, 3 referees, 420.5ms
+17: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+18: 384x640 1 goalkeeper, 19 players, 3 referees, 420.5ms
+19: 384x640 1 goalkeeper, 19 players, 4 referees, 420.5ms
+Speed: 16.8ms preprocess, 420.5ms inference, 1.4ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  64%|######4   | 480/750 [03:39<01:57,  2.30frame/s]
+0: 384x640 1 goalkeeper, 19 players, 3 referees, 484.9ms
+1: 384x640 1 goalkeeper, 19 players, 3 referees, 484.9ms
+2: 384x640 1 goalkeeper, 19 players, 3 referees, 484.9ms
+3: 384x640 1 goalkeeper, 20 players, 3 referees, 484.9ms
+4: 384x640 1 goalkeeper, 19 players, 3 referees, 484.9ms
+5: 384x640 1 goalkeeper, 21 players, 3 referees, 484.9ms
+6: 384x640 1 goalkeeper, 20 players, 3 referees, 484.9ms
+7: 384x640 1 goalkeeper, 19 players, 3 referees, 484.9ms
+8: 384x640 1 goalkeeper, 18 players, 3 referees, 484.9ms
+9: 384x640 1 goalkeeper, 18 players, 3 referees, 484.9ms
+10: 384x640 1 goalkeeper, 19 players, 4 referees, 484.9ms
+11: 384x640 1 goalkeeper, 20 players, 3 referees, 484.9ms
+12: 384x640 1 goalkeeper, 20 players, 3 referees, 484.9ms
+13: 384x640 1 goalkeeper, 20 players, 4 referees, 484.9ms
+14: 384x640 1 goalkeeper, 19 players, 4 referees, 484.9ms
+15: 384x640 1 goalkeeper, 19 players, 4 referees, 484.9ms
+16: 384x640 1 goalkeeper, 19 players, 3 referees, 484.9ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 484.9ms
+18: 384x640 1 goalkeeper, 20 players, 1 referee, 484.9ms
+19: 384x640 1 goalkeeper, 19 players, 2 referees, 484.9ms
+Speed: 27.1ms preprocess, 484.9ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  67%|######6   | 500/750 [03:49<01:54,  2.18frame/s]
+0: 384x640 1 goalkeeper, 18 players, 3 referees, 628.7ms
+1: 384x640 1 goalkeeper, 19 players, 2 referees, 628.7ms
+2: 384x640 1 goalkeeper, 21 players, 3 referees, 628.7ms
+3: 384x640 1 goalkeeper, 20 players, 3 referees, 628.7ms
+4: 384x640 1 goalkeeper, 21 players, 4 referees, 628.7ms
+5: 384x640 1 goalkeeper, 21 players, 3 referees, 628.7ms
+6: 384x640 1 goalkeeper, 19 players, 4 referees, 628.7ms
+7: 384x640 1 goalkeeper, 19 players, 3 referees, 628.7ms
+8: 384x640 1 goalkeeper, 19 players, 4 referees, 628.7ms
+9: 384x640 1 goalkeeper, 19 players, 3 referees, 628.7ms
+10: 384x640 1 goalkeeper, 20 players, 3 referees, 628.7ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 628.7ms
+12: 384x640 1 goalkeeper, 20 players, 2 referees, 628.7ms
+13: 384x640 1 goalkeeper, 20 players, 3 referees, 628.7ms
+14: 384x640 1 goalkeeper, 21 players, 2 referees, 628.7ms
+15: 384x640 1 goalkeeper, 20 players, 1 referee, 628.7ms
+16: 384x640 1 goalkeeper, 20 players, 1 referee, 628.7ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 628.7ms
+18: 384x640 1 goalkeeper, 19 players, 1 referee, 628.7ms
+19: 384x640 1 goalkeeper, 19 players, 2 referees, 628.7ms
+Speed: 10.8ms preprocess, 628.7ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  69%|######9   | 520/750 [04:02<01:57,  1.95frame/s]
+0: 384x640 1 goalkeeper, 19 players, 1 referee, 478.1ms
+1: 384x640 1 goalkeeper, 19 players, 2 referees, 478.1ms
+2: 384x640 1 goalkeeper, 19 players, 3 referees, 478.1ms
+3: 384x640 1 goalkeeper, 20 players, 4 referees, 478.1ms
+4: 384x640 1 goalkeeper, 20 players, 3 referees, 478.1ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+6: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+7: 384x640 2 goalkeepers, 20 players, 4 referees, 478.1ms
+8: 384x640 2 goalkeepers, 20 players, 2 referees, 478.1ms
+9: 384x640 2 goalkeepers, 20 players, 3 referees, 478.1ms
+10: 384x640 1 goalkeeper, 17 players, 3 referees, 478.1ms
+11: 384x640 1 goalkeeper, 17 players, 4 referees, 478.1ms
+12: 384x640 1 goalkeeper, 17 players, 4 referees, 478.1ms
+13: 384x640 1 goalkeeper, 18 players, 2 referees, 478.1ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 478.1ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 478.1ms
+Speed: 18.8ms preprocess, 478.1ms inference, 2.4ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  72%|#######2  | 540/750 [04:12<01:46,  1.96frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+1: 384x640 1 goalkeeper, 19 players, 2 referees, 2017.1ms
+2: 384x640 2 goalkeepers, 20 players, 2 referees, 2017.1ms
+3: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+4: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+5: 384x640 1 goalkeeper, 19 players, 3 referees, 2017.1ms
+6: 384x640 1 goalkeeper, 19 players, 4 referees, 2017.1ms
+7: 384x640 1 goalkeeper, 19 players, 2 referees, 2017.1ms
+8: 384x640 1 goalkeeper, 19 players, 1 referee, 2017.1ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+10: 384x640 1 goalkeeper, 19 players, 2 referees, 2017.1ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+12: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+13: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 2017.1ms
+19: 384x640 1 goalkeeper, 19 players, 2 referees, 2017.1ms
+Speed: 69.1ms preprocess, 2017.1ms inference, 2.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  75%|#######4  | 560/750 [04:54<03:06,  1.02frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 2112.8ms
+1: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+2: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+3: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+4: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+5: 384x640 1 goalkeeper, 19 players, 3 referees, 2112.8ms
+6: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+7: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+8: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+9: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+10: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+11: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+12: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+13: 384x640 1 goalkeeper, 17 players, 2 referees, 2112.8ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 2112.8ms
+15: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+16: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 2112.8ms
+18: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+19: 384x640 1 goalkeeper, 18 players, 2 referees, 2112.8ms
+Speed: 16.2ms preprocess, 2112.8ms inference, 5.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  77%|#######7  | 580/750 [05:37<03:46,  1.33s/frame]
+0: 384x640 1 goalkeeper, 19 players, 2 referees, 1760.9ms
+1: 384x640 1 goalkeeper, 19 players, 2 referees, 1760.9ms
+2: 384x640 1 goalkeeper, 19 players, 1 referee, 1760.9ms
+3: 384x640 1 goalkeeper, 19 players, 1 referee, 1760.9ms
+4: 384x640 1 goalkeeper, 20 players, 1 referee, 1760.9ms
+5: 384x640 1 goalkeeper, 21 players, 1 referee, 1760.9ms
+6: 384x640 1 goalkeeper, 22 players, 1 referee, 1760.9ms
+7: 384x640 1 goalkeeper, 20 players, 1 referee, 1760.9ms
+8: 384x640 1 goalkeeper, 20 players, 3 referees, 1760.9ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 1760.9ms
+10: 384x640 1 goalkeeper, 20 players, 2 referees, 1760.9ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 1760.9ms
+12: 384x640 1 goalkeeper, 19 players, 2 referees, 1760.9ms
+13: 384x640 1 goalkeeper, 19 players, 2 referees, 1760.9ms
+14: 384x640 1 goalkeeper, 19 players, 2 referees, 1760.9ms
+15: 384x640 1 goalkeeper, 18 players, 2 referees, 1760.9ms
+16: 384x640 1 goalkeeper, 18 players, 2 referees, 1760.9ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 1760.9ms
+18: 384x640 1 goalkeeper, 19 players, 3 referees, 1760.9ms
+19: 384x640 1 goalkeeper, 18 players, 2 referees, 1760.9ms
+Speed: 10.1ms preprocess, 1760.9ms inference, 1.1ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  80%|########  | 600/750 [06:12<03:39,  1.46s/frame]
+0: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+1: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+2: 384x640 1 goalkeeper, 18 players, 3 referees, 1527.8ms
+3: 384x640 1 goalkeeper, 18 players, 3 referees, 1527.8ms
+4: 384x640 1 goalkeeper, 19 players, 3 referees, 1527.8ms
+5: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+6: 384x640 1 goalkeeper, 18 players, 3 referees, 1527.8ms
+7: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+8: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+9: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+10: 384x640 1 goalkeeper, 19 players, 2 referees, 1527.8ms
+11: 384x640 1 goalkeeper, 19 players, 3 referees, 1527.8ms
+12: 384x640 1 goalkeeper, 18 players, 2 referees, 1527.8ms
+13: 384x640 1 goalkeeper, 20 players, 2 referees, 1527.8ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 1527.8ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 1527.8ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 1527.8ms
+17: 384x640 2 goalkeepers, 20 players, 2 referees, 1527.8ms
+18: 384x640 2 goalkeepers, 20 players, 2 referees, 1527.8ms
+19: 384x640 2 goalkeepers, 20 players, 2 referees, 1527.8ms
+Speed: 51.2ms preprocess, 1527.8ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  83%|########2 | 620/750 [06:44<03:14,  1.50s/frame]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+3: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+4: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+5: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+6: 384x640 1 goalkeeper, 21 players, 3 referees, 411.1ms
+7: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+8: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+9: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+10: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+11: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+12: 384x640 1 goalkeeper, 20 players, 1 referee, 411.1ms
+13: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+14: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+16: 384x640 1 goalkeeper, 19 players, 2 referees, 411.1ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+Speed: 22.6ms preprocess, 411.1ms inference, 1.5ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  85%|########5 | 640/750 [06:52<02:09,  1.18s/frame]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+2: 384x640 1 goalkeeper, 19 players, 2 referees, 411.1ms
+3: 384x640 20 players, 2 referees, 411.1ms
+4: 384x640 20 players, 2 referees, 411.1ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+6: 384x640 1 goalkeeper, 20 players, 1 referee, 411.1ms
+7: 384x640 1 goalkeeper, 19 players, 2 referees, 411.1ms
+8: 384x640 1 goalkeeper, 19 players, 2 referees, 411.1ms
+9: 384x640 1 goalkeeper, 20 players, 3 referees, 411.1ms
+10: 384x640 1 goalkeeper, 19 players, 2 referees, 411.1ms
+11: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+12: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+13: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+14: 384x640 2 goalkeepers, 20 players, 2 referees, 411.1ms
+15: 384x640 1 goalkeeper, 21 players, 2 referees, 411.1ms
+16: 384x640 1 goalkeeper, 21 players, 1 referee, 411.1ms
+17: 384x640 1 goalkeeper, 19 players, 2 referees, 411.1ms
+18: 384x640 1 goalkeeper, 20 players, 1 referee, 411.1ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 411.1ms
+Speed: 29.8ms preprocess, 411.1ms inference, 1.3ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  88%|########8 | 660/750 [07:01<01:26,  1.04frame/s]
+0: 384x640 1 goalkeeper, 19 players, 2 referees, 410.0ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 410.0ms
+2: 384x640 1 goalkeeper, 19 players, 2 referees, 410.0ms
+3: 384x640 1 goalkeeper, 21 players, 2 referees, 410.0ms
+4: 384x640 1 goalkeeper, 21 players, 2 referees, 410.0ms
+5: 384x640 1 goalkeeper, 21 players, 2 referees, 410.0ms
+6: 384x640 1 goalkeeper, 21 players, 2 referees, 410.0ms
+7: 384x640 1 goalkeeper, 23 players, 2 referees, 410.0ms
+8: 384x640 1 goalkeeper, 20 players, 2 referees, 410.0ms
+9: 384x640 1 goalkeeper, 19 players, 2 referees, 410.0ms
+10: 384x640 1 goalkeeper, 20 players, 1 referee, 410.0ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 410.0ms
+12: 384x640 1 goalkeeper, 20 players, 2 referees, 410.0ms
+13: 384x640 1 goalkeeper, 19 players, 1 referee, 410.0ms
+14: 384x640 1 goalkeeper, 19 players, 1 referee, 410.0ms
+15: 384x640 1 goalkeeper, 19 players, 1 referee, 410.0ms
+16: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 410.0ms
+17: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 410.0ms
+18: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 410.0ms
+19: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 410.0ms
+Speed: 19.2ms preprocess, 410.0ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  91%|######### | 680/750 [07:10<00:56,  1.25frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 392.1ms
+1: 384x640 1 goalkeeper, 20 players, 1 referee, 392.1ms
+2: 384x640 1 goalkeeper, 20 players, 1 referee, 392.1ms
+3: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 392.1ms
+4: 384x640 1 goalkeeper, 20 players, 2 referees, 392.1ms
+5: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 392.1ms
+6: 384x640 2 goalkeepers, 20 players, 1 referee, 392.1ms
+7: 384x640 1 goalkeeper, 20 players, 1 referee, 392.1ms
+8: 384x640 2 goalkeepers, 21 players, 1 referee, 392.1ms
+9: 384x640 1 goalkeeper, 20 players, 1 referee, 392.1ms
+10: 384x640 1 goalkeeper, 20 players, 1 referee, 392.1ms
+11: 384x640 1 goalkeeper, 20 players, 2 referees, 392.1ms
+12: 384x640 1 goalkeeper, 20 players, 1 referee, 392.1ms
+13: 384x640 2 goalkeepers, 20 players, 1 referee, 392.1ms
+14: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 392.1ms
+15: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 392.1ms
+16: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 392.1ms
+17: 384x640 1 goalkeeper, 20 players, 3 referees, 392.1ms
+18: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 392.1ms
+19: 384x640 1 ball, 1 goalkeeper, 19 players, 3 referees, 392.1ms
+Speed: 22.4ms preprocess, 392.1ms inference, 1.1ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  93%|#########3| 700/750 [07:18<00:34,  1.46frame/s]
+0: 384x640 1 goalkeeper, 19 players, 1 referee, 409.7ms
+1: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 409.7ms
+2: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 409.7ms
+3: 384x640 1 ball, 1 goalkeeper, 21 players, 409.7ms
+4: 384x640 1 ball, 1 goalkeeper, 21 players, 409.7ms
+5: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 409.7ms
+6: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 409.7ms
+7: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 409.7ms
+8: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 409.7ms
+9: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 409.7ms
+10: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 409.7ms
+11: 384x640 1 goalkeeper, 23 players, 1 referee, 409.7ms
+12: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 409.7ms
+13: 384x640 1 goalkeeper, 21 players, 2 referees, 409.7ms
+14: 384x640 1 goalkeeper, 21 players, 3 referees, 409.7ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 409.7ms
+16: 384x640 2 goalkeepers, 21 players, 1 referee, 409.7ms
+17: 384x640 2 goalkeepers, 20 players, 3 referees, 409.7ms
+18: 384x640 1 goalkeeper, 21 players, 4 referees, 409.7ms
+19: 384x640 1 goalkeeper, 20 players, 3 referees, 409.7ms
+Speed: 23.1ms preprocess, 409.7ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  96%|#########6| 720/750 [07:27<00:18,  1.64frame/s]
+0: 384x640 1 goalkeeper, 21 players, 4 referees, 404.7ms
+1: 384x640 1 goalkeeper, 20 players, 3 referees, 404.7ms
+2: 384x640 1 goalkeeper, 20 players, 3 referees, 404.7ms
+3: 384x640 1 goalkeeper, 19 players, 3 referees, 404.7ms
+4: 384x640 1 goalkeeper, 19 players, 3 referees, 404.7ms
+5: 384x640 1 goalkeeper, 19 players, 3 referees, 404.7ms
+6: 384x640 1 goalkeeper, 19 players, 2 referees, 404.7ms
+7: 384x640 1 goalkeeper, 22 players, 3 referees, 404.7ms
+8: 384x640 1 goalkeeper, 21 players, 2 referees, 404.7ms
+9: 384x640 1 goalkeeper, 20 players, 3 referees, 404.7ms
+10: 384x640 1 goalkeeper, 20 players, 2 referees, 404.7ms
+11: 384x640 1 goalkeeper, 19 players, 3 referees, 404.7ms
+12: 384x640 1 goalkeeper, 19 players, 3 referees, 404.7ms
+13: 384x640 1 goalkeeper, 20 players, 3 referees, 404.7ms
+14: 384x640 1 goalkeeper, 21 players, 3 referees, 404.7ms
+15: 384x640 1 goalkeeper, 21 players, 2 referees, 404.7ms
+16: 384x640 22 players, 2 referees, 404.7ms
+17: 384x640 1 goalkeeper, 20 players, 2 referees, 404.7ms
+18: 384x640 1 goalkeeper, 20 players, 2 referees, 404.7ms
+19: 384x640 1 goalkeeper, 20 players, 2 referees, 404.7ms
+Speed: 34.6ms preprocess, 404.7ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  99%|#########8| 740/750 [07:36<00:05,  1.79frame/s]
+0: 384x640 1 goalkeeper, 20 players, 1 referee, 454.6ms
+1: 384x640 1 goalkeeper, 21 players, 2 referees, 454.6ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 454.6ms
+3: 384x640 1 goalkeeper, 20 players, 2 referees, 454.6ms
+4: 384x640 1 goalkeeper, 21 players, 3 referees, 454.6ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 454.6ms
+6: 384x640 2 goalkeepers, 20 players, 2 referees, 454.6ms
+7: 384x640 1 goalkeeper, 20 players, 2 referees, 454.6ms
+8: 384x640 1 goalkeeper, 20 players, 2 referees, 454.6ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 454.6ms
+Speed: 29.8ms preprocess, 454.6ms inference, 1.3ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects: 100%|##########| 750/750 [07:41<00:00,  1.83frame/s]Detecting objects: 100%|##########| 750/750 [07:41<00:00,  1.63frame/s]
+[short_clip] detection done in 465.4s
+[short_clip] 103 color samples from frames [0, 10, 20, 30, 40], 5 flagged goalkeeper
+[team_assigner] excluded 5 goalkeeper detection(s) from team-color clustering
+
+============================================================
+[team_assigner] KMeans fit on 98 samples from frames [0, 10, 20, 30, 40]
+  Team 1  BGR: B= 87.7  G=106.6  R=179.9
+  Team 2  BGR: B=113.7  G=204.2  R=156.5
+  Centroid separation: 103.7  [OK]
+  Cluster populations: [np.int64(51), np.int64(25), np.int64(22)]
+============================================================
+
+{
+  "label": "short_clip",
+  "n_frames": 750,
+  "n_player_track_ids_total": 46,
+  "n_goalkeeper_track_ids": 6,
+  "n_goalkeeper_detections_total": 556,
+  "confidence_threshold": 40.0,
+  "new_team1_centroid": [
+    87.74801635742188,
+    106.60427856445312,
+    179.86106872558594
+  ],
+  "new_team2_centroid": [
+    113.70176696777344,
+    204.2437744140625,
+    156.51211547851562
+  ],
+  "new_centroid_separation": 103.6930160522461,
+  "old_behavior_centroid_separation_with_gk_polluting_fit": 108.62191009521484,
+  "old_behavior_goalkeeper_force_fit_examples": [
+    {
+      "assigned_team": 2,
+      "distance": 83.96968945717046,
+      "within_threshold": false
+    },
+    {
+      "assigned_team": 2,
+      "distance": 66.96416284830241,
+      "within_threshold": false
+    },
+    {
+      "assigned_team": 2,
+      "distance": 80.09436712296882,
+      "within_threshold": false
+    },
+    {
+      "assigned_team": 2,
+      "distance": 77.62447767388178,
+      "within_threshold": false
+    },
+    {
+      "assigned_team": 2,
+      "distance": 73.88270755386965,
+      "within_threshold": false
+    }
+  ],
+  "n_unresolved_pids_final": 4,
+  "unresolved_pids": [
+    "1",
+    "136",
+    "160",
+    "193"
+  ],
+  "unresolved_best_distances": {
+    "5": 45.44974671240147,
+    "10": 46.05249824132934,
+    "11": 52.90386920229078,
+    "15": 43.34503870021767,
+    "1": 62.48334857915813,
+    "48": 53.1474768856817,
+    "71": 42.32125067938973,
+    "82": 53.61737550422102,
+    "85": 48.676852866022756,
+    "114": 50.32860272270042,
+    "123": 83.5373532589947,
+    "133": 43.366763171379624,
+    "136": 83.6829094050784,
+    "159": 40.198913173657026,
+    "160": 50.69359498233099,
+    "162": 41.59252182439649,
+    "163": 43.73283220618669,
+    "193": 98.82134726556104
+  },
+  "n_unresolved_within_60_of_threshold": 1,
+  "final_team_distribution": {
+    "0": 4,
+    "1": 13,
+    "2": 24,
+    "3": 5
+  }
+}
+
+Wrote partial results (short_clip) to team_classification_test_results.json
+
+[long_clip_sample] running real detection on 750 frames...
+Detecting objects:   0%|          | 0/750 [00:00<?, ?frame/s]
+0: 384x640 1 ball, 2 goalkeepers, 22 players, 4 referees, 435.1ms
+1: 384x640 2 balls, 2 goalkeepers, 22 players, 3 referees, 435.1ms
+2: 384x640 1 ball, 2 goalkeepers, 22 players, 3 referees, 435.1ms
+3: 384x640 2 balls, 1 goalkeeper, 23 players, 4 referees, 435.1ms
+4: 384x640 2 balls, 22 players, 4 referees, 435.1ms
+5: 384x640 1 ball, 1 goalkeeper, 22 players, 4 referees, 435.1ms
+6: 384x640 2 goalkeepers, 20 players, 4 referees, 435.1ms
+7: 384x640 2 goalkeepers, 20 players, 3 referees, 435.1ms
+8: 384x640 1 goalkeeper, 20 players, 4 referees, 435.1ms
+9: 384x640 2 goalkeepers, 21 players, 4 referees, 435.1ms
+10: 384x640 1 goalkeeper, 24 players, 3 referees, 435.1ms
+11: 384x640 1 goalkeeper, 23 players, 3 referees, 435.1ms
+12: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 435.1ms
+13: 384x640 2 balls, 2 goalkeepers, 22 players, 3 referees, 435.1ms
+14: 384x640 1 ball, 2 goalkeepers, 22 players, 2 referees, 435.1ms
+15: 384x640 1 ball, 2 goalkeepers, 22 players, 3 referees, 435.1ms
+16: 384x640 3 balls, 1 goalkeeper, 23 players, 2 referees, 435.1ms
+17: 384x640 2 balls, 1 goalkeeper, 22 players, 3 referees, 435.1ms
+18: 384x640 2 balls, 1 goalkeeper, 22 players, 2 referees, 435.1ms
+19: 384x640 2 balls, 2 goalkeepers, 22 players, 3 referees, 435.1ms
+Speed: 14.2ms preprocess, 435.1ms inference, 2.7ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:   3%|2         | 20/750 [00:10<06:07,  1.98frame/s]
+0: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 404.0ms
+1: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 404.0ms
+2: 384x640 1 ball, 2 goalkeepers, 21 players, 3 referees, 404.0ms
+3: 384x640 1 goalkeeper, 21 players, 3 referees, 404.0ms
+4: 384x640 2 goalkeepers, 22 players, 4 referees, 404.0ms
+5: 384x640 2 goalkeepers, 21 players, 4 referees, 404.0ms
+6: 384x640 1 goalkeeper, 21 players, 2 referees, 404.0ms
+7: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 404.0ms
+8: 384x640 2 balls, 1 goalkeeper, 21 players, 4 referees, 404.0ms
+9: 384x640 1 ball, 1 goalkeeper, 22 players, 3 referees, 404.0ms
+10: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 404.0ms
+11: 384x640 2 balls, 1 goalkeeper, 23 players, 5 referees, 404.0ms
+12: 384x640 2 balls, 2 goalkeepers, 22 players, 3 referees, 404.0ms
+13: 384x640 1 goalkeeper, 22 players, 4 referees, 404.0ms
+14: 384x640 1 goalkeeper, 21 players, 4 referees, 404.0ms
+15: 384x640 1 goalkeeper, 22 players, 3 referees, 404.0ms
+16: 384x640 21 players, 3 referees, 404.0ms
+17: 384x640 21 players, 4 referees, 404.0ms
+18: 384x640 21 players, 4 referees, 404.0ms
+19: 384x640 1 goalkeeper, 21 players, 3 referees, 404.0ms
+Speed: 6.9ms preprocess, 404.0ms inference, 1.2ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:   5%|5         | 40/750 [00:18<05:19,  2.22frame/s]
+0: 384x640 1 goalkeeper, 21 players, 3 referees, 409.6ms
+1: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 409.6ms
+2: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 409.6ms
+3: 384x640 1 goalkeeper, 21 players, 2 referees, 409.6ms
+4: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 409.6ms
+5: 384x640 1 goalkeeper, 21 players, 2 referees, 409.6ms
+6: 384x640 1 goalkeeper, 22 players, 3 referees, 409.6ms
+7: 384x640 1 ball, 1 goalkeeper, 22 players, 3 referees, 409.6ms
+8: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 409.6ms
+9: 384x640 1 goalkeeper, 23 players, 2 referees, 409.6ms
+10: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 409.6ms
+11: 384x640 2 goalkeepers, 20 players, 3 referees, 409.6ms
+12: 384x640 1 goalkeeper, 21 players, 3 referees, 409.6ms
+13: 384x640 21 players, 4 referees, 409.6ms
+14: 384x640 22 players, 3 referees, 409.6ms
+15: 384x640 23 players, 3 referees, 409.6ms
+16: 384x640 23 players, 3 referees, 409.6ms
+17: 384x640 22 players, 3 referees, 409.6ms
+18: 384x640 23 players, 3 referees, 409.6ms
+19: 384x640 22 players, 3 referees, 409.6ms
+Speed: 56.1ms preprocess, 409.6ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:   8%|8         | 60/750 [00:27<05:16,  2.18frame/s]
+0: 384x640 22 players, 3 referees, 410.8ms
+1: 384x640 23 players, 3 referees, 410.8ms
+2: 384x640 1 ball, 22 players, 2 referees, 410.8ms
+3: 384x640 1 ball, 21 players, 2 referees, 410.8ms
+4: 384x640 23 players, 2 referees, 410.8ms
+5: 384x640 1 ball, 22 players, 2 referees, 410.8ms
+6: 384x640 22 players, 2 referees, 410.8ms
+7: 384x640 1 ball, 1 goalkeeper, 22 players, 3 referees, 410.8ms
+8: 384x640 2 balls, 22 players, 4 referees, 410.8ms
+9: 384x640 2 balls, 22 players, 3 referees, 410.8ms
+10: 384x640 22 players, 2 referees, 410.8ms
+11: 384x640 22 players, 2 referees, 410.8ms
+12: 384x640 22 players, 3 referees, 410.8ms
+13: 384x640 1 goalkeeper, 21 players, 3 referees, 410.8ms
+14: 384x640 22 players, 4 referees, 410.8ms
+15: 384x640 21 players, 2 referees, 410.8ms
+16: 384x640 1 ball, 22 players, 2 referees, 410.8ms
+17: 384x640 22 players, 3 referees, 410.8ms
+18: 384x640 1 ball, 22 players, 2 referees, 410.8ms
+19: 384x640 1 ball, 22 players, 2 referees, 410.8ms
+Speed: 50.9ms preprocess, 410.8ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  11%|#         | 80/750 [00:36<05:08,  2.17frame/s]
+0: 384x640 1 ball, 22 players, 2 referees, 408.3ms
+1: 384x640 2 balls, 21 players, 2 referees, 408.3ms
+2: 384x640 21 players, 5 referees, 408.3ms
+3: 384x640 24 players, 3 referees, 408.3ms
+4: 384x640 23 players, 2 referees, 408.3ms
+5: 384x640 22 players, 3 referees, 408.3ms
+6: 384x640 22 players, 2 referees, 408.3ms
+7: 384x640 22 players, 2 referees, 408.3ms
+8: 384x640 23 players, 2 referees, 408.3ms
+9: 384x640 1 goalkeeper, 23 players, 2 referees, 408.3ms
+10: 384x640 23 players, 3 referees, 408.3ms
+11: 384x640 1 ball, 22 players, 3 referees, 408.3ms
+12: 384x640 1 ball, 23 players, 3 referees, 408.3ms
+13: 384x640 1 ball, 23 players, 2 referees, 408.3ms
+14: 384x640 1 ball, 22 players, 2 referees, 408.3ms
+15: 384x640 2 balls, 23 players, 3 referees, 408.3ms
+16: 384x640 1 ball, 23 players, 3 referees, 408.3ms
+17: 384x640 2 balls, 24 players, 3 referees, 408.3ms
+18: 384x640 1 goalkeeper, 22 players, 2 referees, 408.3ms
+19: 384x640 22 players, 4 referees, 408.3ms
+Speed: 45.3ms preprocess, 408.3ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  13%|#3        | 100/750 [00:46<04:57,  2.18frame/s]
+0: 384x640 1 goalkeeper, 20 players, 3 referees, 405.7ms
+1: 384x640 1 goalkeeper, 20 players, 3 referees, 405.7ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 405.7ms
+3: 384x640 1 goalkeeper, 21 players, 2 referees, 405.7ms
+4: 384x640 1 ball, 21 players, 1 referee, 405.7ms
+5: 384x640 1 ball, 21 players, 3 referees, 405.7ms
+6: 384x640 2 balls, 22 players, 2 referees, 405.7ms
+7: 384x640 1 ball, 1 goalkeeper, 20 players, 3 referees, 405.7ms
+8: 384x640 1 ball, 22 players, 2 referees, 405.7ms
+9: 384x640 2 balls, 1 goalkeeper, 21 players, 2 referees, 405.7ms
+10: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 405.7ms
+11: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 405.7ms
+12: 384x640 1 goalkeeper, 20 players, 2 referees, 405.7ms
+13: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 405.7ms
+14: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 405.7ms
+15: 384x640 1 ball, 1 goalkeeper, 23 players, 1 referee, 405.7ms
+16: 384x640 1 goalkeeper, 22 players, 1 referee, 405.7ms
+17: 384x640 2 goalkeepers, 22 players, 3 referees, 405.7ms
+18: 384x640 1 goalkeeper, 22 players, 2 referees, 405.7ms
+19: 384x640 1 goalkeeper, 22 players, 2 referees, 405.7ms
+Speed: 9.5ms preprocess, 405.7ms inference, 1.1ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  16%|#6        | 120/750 [00:54<04:39,  2.25frame/s]
+0: 384x640 2 goalkeepers, 22 players, 2 referees, 401.0ms
+1: 384x640 1 ball, 2 goalkeepers, 23 players, 2 referees, 401.0ms
+2: 384x640 2 goalkeepers, 22 players, 3 referees, 401.0ms
+3: 384x640 2 goalkeepers, 21 players, 2 referees, 401.0ms
+4: 384x640 2 goalkeepers, 21 players, 2 referees, 401.0ms
+5: 384x640 2 goalkeepers, 22 players, 3 referees, 401.0ms
+6: 384x640 2 goalkeepers, 22 players, 2 referees, 401.0ms
+7: 384x640 1 goalkeeper, 21 players, 2 referees, 401.0ms
+8: 384x640 1 goalkeeper, 22 players, 3 referees, 401.0ms
+9: 384x640 1 goalkeeper, 21 players, 2 referees, 401.0ms
+10: 384x640 1 goalkeeper, 20 players, 2 referees, 401.0ms
+11: 384x640 1 goalkeeper, 22 players, 2 referees, 401.0ms
+12: 384x640 1 goalkeeper, 21 players, 2 referees, 401.0ms
+13: 384x640 22 players, 2 referees, 401.0ms
+14: 384x640 22 players, 2 referees, 401.0ms
+15: 384x640 22 players, 2 referees, 401.0ms
+16: 384x640 1 goalkeeper, 20 players, 2 referees, 401.0ms
+17: 384x640 21 players, 2 referees, 401.0ms
+18: 384x640 1 ball, 1 goalkeeper, 22 players, 3 referees, 401.0ms
+19: 384x640 1 ball, 1 goalkeeper, 21 players, 3 referees, 401.0ms
+Speed: 6.5ms preprocess, 401.0ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  19%|#8        | 140/750 [01:02<04:24,  2.31frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 406.8ms
+1: 384x640 1 ball, 22 players, 3 referees, 406.8ms
+2: 384x640 1 ball, 22 players, 3 referees, 406.8ms
+3: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 406.8ms
+4: 384x640 1 ball, 1 goalkeeper, 20 players, 3 referees, 406.8ms
+5: 384x640 1 goalkeeper, 22 players, 4 referees, 406.8ms
+6: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 406.8ms
+7: 384x640 1 goalkeeper, 22 players, 1 referee, 406.8ms
+8: 384x640 1 goalkeeper, 20 players, 1 referee, 406.8ms
+9: 384x640 1 goalkeeper, 21 players, 2 referees, 406.8ms
+10: 384x640 1 goalkeeper, 21 players, 1 referee, 406.8ms
+11: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 406.8ms
+12: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 406.8ms
+13: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 406.8ms
+14: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 406.8ms
+15: 384x640 1 ball, 1 goalkeeper, 22 players, 3 referees, 406.8ms
+16: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 406.8ms
+17: 384x640 1 ball, 1 goalkeeper, 19 players, 2 referees, 406.8ms
+18: 384x640 1 ball, 21 players, 2 referees, 406.8ms
+19: 384x640 1 goalkeeper, 19 players, 2 referees, 406.8ms
+Speed: 12.0ms preprocess, 406.8ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  21%|##1       | 160/750 [01:10<04:13,  2.33frame/s]
+0: 384x640 1 goalkeeper, 20 players, 2 referees, 411.7ms
+1: 384x640 1 goalkeeper, 20 players, 2 referees, 411.7ms
+2: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 411.7ms
+3: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 411.7ms
+4: 384x640 2 goalkeepers, 19 players, 2 referees, 411.7ms
+5: 384x640 1 ball, 1 goalkeeper, 19 players, 1 referee, 411.7ms
+6: 384x640 1 goalkeeper, 18 players, 2 referees, 411.7ms
+7: 384x640 1 goalkeeper, 19 players, 2 referees, 411.7ms
+8: 384x640 1 goalkeeper, 19 players, 2 referees, 411.7ms
+9: 384x640 1 goalkeeper, 19 players, 2 referees, 411.7ms
+10: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 411.7ms
+11: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 411.7ms
+12: 384x640 2 goalkeepers, 21 players, 3 referees, 411.7ms
+13: 384x640 2 goalkeepers, 21 players, 2 referees, 411.7ms
+14: 384x640 1 goalkeeper, 22 players, 3 referees, 411.7ms
+15: 384x640 2 goalkeepers, 22 players, 4 referees, 411.7ms
+16: 384x640 1 goalkeeper, 22 players, 3 referees, 411.7ms
+17: 384x640 1 ball, 1 goalkeeper, 22 players, 3 referees, 411.7ms
+18: 384x640 1 goalkeeper, 24 players, 4 referees, 411.7ms
+19: 384x640 1 goalkeeper, 24 players, 4 referees, 411.7ms
+Speed: 19.1ms preprocess, 411.7ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  24%|##4       | 180/750 [01:19<04:05,  2.33frame/s]
+0: 384x640 1 goalkeeper, 22 players, 3 referees, 418.7ms
+1: 384x640 2 goalkeepers, 21 players, 4 referees, 418.7ms
+2: 384x640 1 goalkeeper, 20 players, 5 referees, 418.7ms
+3: 384x640 1 goalkeeper, 20 players, 4 referees, 418.7ms
+4: 384x640 1 goalkeeper, 24 players, 3 referees, 418.7ms
+5: 384x640 1 goalkeeper, 23 players, 1 referee, 418.7ms
+6: 384x640 1 goalkeeper, 22 players, 1 referee, 418.7ms
+7: 384x640 1 goalkeeper, 21 players, 2 referees, 418.7ms
+8: 384x640 2 goalkeepers, 21 players, 2 referees, 418.7ms
+9: 384x640 1 goalkeeper, 22 players, 2 referees, 418.7ms
+10: 384x640 1 goalkeeper, 22 players, 3 referees, 418.7ms
+11: 384x640 1 goalkeeper, 23 players, 3 referees, 418.7ms
+12: 384x640 1 goalkeeper, 22 players, 3 referees, 418.7ms
+13: 384x640 1 goalkeeper, 22 players, 2 referees, 418.7ms
+14: 384x640 1 goalkeeper, 22 players, 2 referees, 418.7ms
+15: 384x640 2 goalkeepers, 21 players, 3 referees, 418.7ms
+16: 384x640 2 goalkeepers, 21 players, 2 referees, 418.7ms
+17: 384x640 2 goalkeepers, 22 players, 2 referees, 418.7ms
+18: 384x640 2 goalkeepers, 22 players, 2 referees, 418.7ms
+19: 384x640 1 goalkeeper, 22 players, 3 referees, 418.7ms
+Speed: 18.5ms preprocess, 418.7ms inference, 1.1ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  27%|##6       | 200/750 [01:28<03:58,  2.31frame/s]
+0: 384x640 2 goalkeepers, 22 players, 3 referees, 406.4ms
+1: 384x640 2 goalkeepers, 23 players, 3 referees, 406.4ms
+2: 384x640 1 ball, 2 goalkeepers, 22 players, 4 referees, 406.4ms
+3: 384x640 1 ball, 1 goalkeeper, 24 players, 2 referees, 406.4ms
+4: 384x640 2 goalkeepers, 21 players, 4 referees, 406.4ms
+5: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 406.4ms
+6: 384x640 1 ball, 1 goalkeeper, 22 players, 1 referee, 406.4ms
+7: 384x640 1 ball, 1 goalkeeper, 23 players, 2 referees, 406.4ms
+8: 384x640 1 ball, 1 goalkeeper, 23 players, 2 referees, 406.4ms
+9: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 406.4ms
+10: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 406.4ms
+11: 384x640 1 goalkeeper, 22 players, 2 referees, 406.4ms
+12: 384x640 1 goalkeeper, 21 players, 2 referees, 406.4ms
+13: 384x640 1 goalkeeper, 22 players, 2 referees, 406.4ms
+14: 384x640 1 goalkeeper, 21 players, 2 referees, 406.4ms
+15: 384x640 1 goalkeeper, 21 players, 1 referee, 406.4ms
+16: 384x640 1 goalkeeper, 21 players, 1 referee, 406.4ms
+17: 384x640 1 goalkeeper, 21 players, 2 referees, 406.4ms
+18: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 406.4ms
+19: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 406.4ms
+Speed: 17.8ms preprocess, 406.4ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  29%|##9       | 220/750 [01:36<03:48,  2.32frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 22 players, 2 referees, 412.7ms
+1: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 412.7ms
+2: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 412.7ms
+3: 384x640 1 ball, 1 goalkeeper, 22 players, 412.7ms
+4: 384x640 1 ball, 1 goalkeeper, 23 players, 412.7ms
+5: 384x640 1 ball, 1 goalkeeper, 22 players, 412.7ms
+6: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 412.7ms
+7: 384x640 1 ball, 1 goalkeeper, 23 players, 1 referee, 412.7ms
+8: 384x640 1 goalkeeper, 21 players, 1 referee, 412.7ms
+9: 384x640 1 goalkeeper, 20 players, 2 referees, 412.7ms
+10: 384x640 1 goalkeeper, 22 players, 1 referee, 412.7ms
+11: 384x640 1 goalkeeper, 23 players, 1 referee, 412.7ms
+12: 384x640 1 goalkeeper, 23 players, 1 referee, 412.7ms
+13: 384x640 1 goalkeeper, 22 players, 2 referees, 412.7ms
+14: 384x640 1 goalkeeper, 22 players, 1 referee, 412.7ms
+15: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 412.7ms
+16: 384x640 2 goalkeepers, 22 players, 1 referee, 412.7ms
+17: 384x640 1 goalkeeper, 22 players, 1 referee, 412.7ms
+18: 384x640 2 goalkeepers, 22 players, 1 referee, 412.7ms
+19: 384x640 1 goalkeeper, 22 players, 1 referee, 412.7ms
+Speed: 18.8ms preprocess, 412.7ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  32%|###2      | 240/750 [01:45<03:40,  2.32frame/s]
+0: 384x640 1 goalkeeper, 22 players, 1 referee, 426.4ms
+1: 384x640 2 goalkeepers, 22 players, 3 referees, 426.4ms
+2: 384x640 1 goalkeeper, 21 players, 3 referees, 426.4ms
+3: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+4: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+5: 384x640 1 goalkeeper, 20 players, 2 referees, 426.4ms
+6: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+7: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+8: 384x640 2 goalkeepers, 22 players, 2 referees, 426.4ms
+9: 384x640 1 goalkeeper, 22 players, 2 referees, 426.4ms
+10: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+11: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+12: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+13: 384x640 1 goalkeeper, 22 players, 2 referees, 426.4ms
+14: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+15: 384x640 1 goalkeeper, 23 players, 2 referees, 426.4ms
+16: 384x640 1 goalkeeper, 22 players, 2 referees, 426.4ms
+17: 384x640 2 goalkeepers, 21 players, 2 referees, 426.4ms
+18: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+19: 384x640 1 goalkeeper, 21 players, 2 referees, 426.4ms
+Speed: 19.3ms preprocess, 426.4ms inference, 1.2ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  35%|###4      | 260/750 [01:54<03:33,  2.29frame/s]
+0: 384x640 2 goalkeepers, 22 players, 2 referees, 415.4ms
+1: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 415.4ms
+2: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 415.4ms
+3: 384x640 1 ball, 2 goalkeepers, 24 players, 1 referee, 415.4ms
+4: 384x640 1 ball, 3 goalkeepers, 23 players, 1 referee, 415.4ms
+5: 384x640 1 ball, 1 goalkeeper, 23 players, 1 referee, 415.4ms
+6: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 415.4ms
+7: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 415.4ms
+8: 384x640 1 ball, 2 goalkeepers, 20 players, 1 referee, 415.4ms
+9: 384x640 1 ball, 1 goalkeeper, 22 players, 1 referee, 415.4ms
+10: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 415.4ms
+11: 384x640 1 ball, 1 goalkeeper, 23 players, 2 referees, 415.4ms
+12: 384x640 1 goalkeeper, 22 players, 2 referees, 415.4ms
+13: 384x640 2 goalkeepers, 23 players, 1 referee, 415.4ms
+14: 384x640 2 goalkeepers, 22 players, 1 referee, 415.4ms
+15: 384x640 3 goalkeepers, 21 players, 1 referee, 415.4ms
+16: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 415.4ms
+17: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 415.4ms
+18: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 415.4ms
+19: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 415.4ms
+Speed: 18.3ms preprocess, 415.4ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  37%|###7      | 280/750 [02:03<03:24,  2.29frame/s]
+0: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 417.6ms
+1: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 417.6ms
+2: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 417.6ms
+3: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 417.6ms
+4: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 417.6ms
+5: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 417.6ms
+6: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 417.6ms
+7: 384x640 1 goalkeeper, 21 players, 1 referee, 417.6ms
+8: 384x640 1 goalkeeper, 21 players, 1 referee, 417.6ms
+9: 384x640 1 goalkeeper, 21 players, 1 referee, 417.6ms
+10: 384x640 1 goalkeeper, 21 players, 1 referee, 417.6ms
+11: 384x640 1 goalkeeper, 22 players, 1 referee, 417.6ms
+12: 384x640 1 goalkeeper, 23 players, 1 referee, 417.6ms
+13: 384x640 1 goalkeeper, 22 players, 1 referee, 417.6ms
+14: 384x640 2 goalkeepers, 22 players, 1 referee, 417.6ms
+15: 384x640 3 goalkeepers, 21 players, 1 referee, 417.6ms
+16: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 417.6ms
+17: 384x640 1 ball, 3 goalkeepers, 22 players, 1 referee, 417.6ms
+18: 384x640 1 ball, 2 goalkeepers, 22 players, 2 referees, 417.6ms
+19: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 417.6ms
+Speed: 20.2ms preprocess, 417.6ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  40%|####      | 300/750 [02:12<03:16,  2.29frame/s]
+0: 384x640 1 ball, 3 goalkeepers, 21 players, 2 referees, 407.1ms
+1: 384x640 1 ball, 3 goalkeepers, 21 players, 1 referee, 407.1ms
+2: 384x640 1 ball, 2 goalkeepers, 21 players, 1 referee, 407.1ms
+3: 384x640 1 ball, 1 goalkeeper, 20 players, 1 referee, 407.1ms
+4: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 407.1ms
+5: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 407.1ms
+6: 384x640 1 ball, 2 goalkeepers, 22 players, 3 referees, 407.1ms
+7: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 407.1ms
+8: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 407.1ms
+9: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 407.1ms
+10: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 407.1ms
+11: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 407.1ms
+12: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 407.1ms
+13: 384x640 1 ball, 1 goalkeeper, 21 players, 1 referee, 407.1ms
+14: 384x640 1 goalkeeper, 21 players, 1 referee, 407.1ms
+15: 384x640 1 goalkeeper, 22 players, 1 referee, 407.1ms
+16: 384x640 1 goalkeeper, 22 players, 1 referee, 407.1ms
+17: 384x640 1 goalkeeper, 21 players, 1 referee, 407.1ms
+18: 384x640 1 goalkeeper, 21 players, 2 referees, 407.1ms
+19: 384x640 1 goalkeeper, 23 players, 3 referees, 407.1ms
+Speed: 18.5ms preprocess, 407.1ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  43%|####2     | 320/750 [02:20<03:06,  2.30frame/s]
+0: 384x640 2 goalkeepers, 22 players, 2 referees, 410.9ms
+1: 384x640 1 ball, 4 goalkeepers, 22 players, 410.9ms
+2: 384x640 1 ball, 2 goalkeepers, 22 players, 1 referee, 410.9ms
+3: 384x640 1 ball, 2 goalkeepers, 23 players, 1 referee, 410.9ms
+4: 384x640 1 ball, 3 goalkeepers, 21 players, 1 referee, 410.9ms
+5: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 410.9ms
+6: 384x640 1 ball, 2 goalkeepers, 21 players, 2 referees, 410.9ms
+7: 384x640 2 goalkeepers, 20 players, 1 referee, 410.9ms
+8: 384x640 2 goalkeepers, 20 players, 3 referees, 410.9ms
+9: 384x640 3 goalkeepers, 20 players, 3 referees, 410.9ms
+10: 384x640 3 goalkeepers, 21 players, 2 referees, 410.9ms
+11: 384x640 3 goalkeepers, 21 players, 2 referees, 410.9ms
+12: 384x640 3 goalkeepers, 21 players, 2 referees, 410.9ms
+13: 384x640 1 goalkeeper, 22 players, 2 referees, 410.9ms
+14: 384x640 1 goalkeeper, 22 players, 2 referees, 410.9ms
+15: 384x640 3 goalkeepers, 22 players, 2 referees, 410.9ms
+16: 384x640 3 goalkeepers, 22 players, 2 referees, 410.9ms
+17: 384x640 3 goalkeepers, 22 players, 2 referees, 410.9ms
+18: 384x640 1 ball, 4 goalkeepers, 21 players, 2 referees, 410.9ms
+19: 384x640 2 goalkeepers, 20 players, 2 referees, 410.9ms
+Speed: 23.3ms preprocess, 410.9ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  45%|####5     | 340/750 [02:29<02:58,  2.30frame/s]
+0: 384x640 2 goalkeepers, 22 players, 1 referee, 417.2ms
+1: 384x640 1 ball, 3 goalkeepers, 21 players, 1 referee, 417.2ms
+2: 384x640 1 ball, 3 goalkeepers, 21 players, 2 referees, 417.2ms
+3: 384x640 1 ball, 3 goalkeepers, 21 players, 3 referees, 417.2ms
+4: 384x640 1 ball, 4 goalkeepers, 21 players, 3 referees, 417.2ms
+5: 384x640 2 goalkeepers, 21 players, 3 referees, 417.2ms
+6: 384x640 1 goalkeeper, 21 players, 3 referees, 417.2ms
+7: 384x640 1 goalkeeper, 21 players, 3 referees, 417.2ms
+8: 384x640 1 ball, 21 players, 2 referees, 417.2ms
+9: 384x640 1 ball, 21 players, 2 referees, 417.2ms
+10: 384x640 1 ball, 21 players, 2 referees, 417.2ms
+11: 384x640 21 players, 2 referees, 417.2ms
+12: 384x640 21 players, 2 referees, 417.2ms
+13: 384x640 21 players, 2 referees, 417.2ms
+14: 384x640 1 ball, 23 players, 2 referees, 417.2ms
+15: 384x640 1 ball, 21 players, 3 referees, 417.2ms
+16: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 417.2ms
+17: 384x640 22 players, 1 referee, 417.2ms
+18: 384x640 21 players, 2 referees, 417.2ms
+19: 384x640 2 balls, 22 players, 1 referee, 417.2ms
+Speed: 18.8ms preprocess, 417.2ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  48%|####8     | 360/750 [02:38<02:49,  2.30frame/s]
+0: 384x640 2 balls, 1 goalkeeper, 22 players, 1 referee, 410.9ms
+1: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 410.9ms
+2: 384x640 1 goalkeeper, 20 players, 2 referees, 410.9ms
+3: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 410.9ms
+4: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 410.9ms
+5: 384x640 1 ball, 2 goalkeepers, 20 players, 2 referees, 410.9ms
+6: 384x640 1 goalkeeper, 20 players, 2 referees, 410.9ms
+7: 384x640 20 players, 2 referees, 410.9ms
+8: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 410.9ms
+9: 384x640 1 ball, 1 goalkeeper, 20 players, 2 referees, 410.9ms
+10: 384x640 1 ball, 20 players, 1 referee, 410.9ms
+11: 384x640 20 players, 2 referees, 410.9ms
+12: 384x640 20 players, 2 referees, 410.9ms
+13: 384x640 1 goalkeeper, 20 players, 1 referee, 410.9ms
+14: 384x640 1 goalkeeper, 20 players, 3 referees, 410.9ms
+15: 384x640 1 goalkeeper, 20 players, 2 referees, 410.9ms
+16: 384x640 1 ball, 1 goalkeeper, 21 players, 2 referees, 410.9ms
+17: 384x640 1 ball, 21 players, 2 referees, 410.9ms
+18: 384x640 1 ball, 21 players, 1 referee, 410.9ms
+19: 384x640 21 players, 2 referees, 410.9ms
+Speed: 21.0ms preprocess, 410.9ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  51%|#####     | 380/750 [02:46<02:40,  2.30frame/s]
+0: 384x640 21 players, 2 referees, 414.1ms
+1: 384x640 21 players, 2 referees, 414.1ms
+2: 384x640 21 players, 1 referee, 414.1ms
+3: 384x640 2 balls, 21 players, 2 referees, 414.1ms
+4: 384x640 1 ball, 21 players, 1 referee, 414.1ms
+5: 384x640 1 ball, 21 players, 1 referee, 414.1ms
+6: 384x640 1 ball, 21 players, 1 referee, 414.1ms
+7: 384x640 1 ball, 21 players, 1 referee, 414.1ms
+8: 384x640 21 players, 1 referee, 414.1ms
+9: 384x640 22 players, 1 referee, 414.1ms
+10: 384x640 1 ball, 22 players, 2 referees, 414.1ms
+11: 384x640 2 balls, 22 players, 2 referees, 414.1ms
+12: 384x640 2 balls, 23 players, 1 referee, 414.1ms
+13: 384x640 2 balls, 22 players, 2 referees, 414.1ms
+14: 384x640 22 players, 414.1ms
+15: 384x640 1 ball, 21 players, 1 referee, 414.1ms
+16: 384x640 1 ball, 22 players, 3 referees, 414.1ms
+17: 384x640 21 players, 2 referees, 414.1ms
+18: 384x640 21 players, 2 referees, 414.1ms
+19: 384x640 21 players, 2 referees, 414.1ms
+Speed: 19.0ms preprocess, 414.1ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  53%|#####3    | 400/750 [02:55<02:32,  2.30frame/s]
+0: 384x640 22 players, 1 referee, 409.9ms
+1: 384x640 21 players, 3 referees, 409.9ms
+2: 384x640 21 players, 2 referees, 409.9ms
+3: 384x640 21 players, 2 referees, 409.9ms
+4: 384x640 21 players, 1 referee, 409.9ms
+5: 384x640 21 players, 1 referee, 409.9ms
+6: 384x640 1 ball, 21 players, 2 referees, 409.9ms
+7: 384x640 1 ball, 21 players, 3 referees, 409.9ms
+8: 384x640 1 ball, 23 players, 2 referees, 409.9ms
+9: 384x640 1 ball, 22 players, 2 referees, 409.9ms
+10: 384x640 1 ball, 21 players, 1 referee, 409.9ms
+11: 384x640 1 ball, 22 players, 1 referee, 409.9ms
+12: 384x640 1 ball, 21 players, 2 referees, 409.9ms
+13: 384x640 1 ball, 21 players, 1 referee, 409.9ms
+14: 384x640 1 ball, 21 players, 2 referees, 409.9ms
+15: 384x640 20 players, 2 referees, 409.9ms
+16: 384x640 22 players, 2 referees, 409.9ms
+17: 384x640 22 players, 2 referees, 409.9ms
+18: 384x640 21 players, 1 referee, 409.9ms
+19: 384x640 1 ball, 22 players, 1 referee, 409.9ms
+Speed: 19.7ms preprocess, 409.9ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  56%|#####6    | 420/750 [03:04<02:23,  2.31frame/s]
+0: 384x640 1 ball, 21 players, 3 referees, 452.9ms
+1: 384x640 1 ball, 20 players, 2 referees, 452.9ms
+2: 384x640 1 ball, 21 players, 4 referees, 452.9ms
+3: 384x640 1 ball, 20 players, 3 referees, 452.9ms
+4: 384x640 1 ball, 20 players, 3 referees, 452.9ms
+5: 384x640 21 players, 2 referees, 452.9ms
+6: 384x640 1 ball, 22 players, 1 referee, 452.9ms
+7: 384x640 22 players, 3 referees, 452.9ms
+8: 384x640 22 players, 3 referees, 452.9ms
+9: 384x640 1 ball, 23 players, 1 referee, 452.9ms
+10: 384x640 21 players, 1 referee, 452.9ms
+11: 384x640 21 players, 3 referees, 452.9ms
+12: 384x640 23 players, 2 referees, 452.9ms
+13: 384x640 22 players, 1 referee, 452.9ms
+14: 384x640 23 players, 1 referee, 452.9ms
+15: 384x640 24 players, 3 referees, 452.9ms
+16: 384x640 24 players, 2 referees, 452.9ms
+17: 384x640 24 players, 3 referees, 452.9ms
+18: 384x640 23 players, 4 referees, 452.9ms
+19: 384x640 22 players, 2 referees, 452.9ms
+Speed: 21.9ms preprocess, 452.9ms inference, 1.5ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  59%|#####8    | 440/750 [03:13<02:18,  2.24frame/s]
+0: 384x640 22 players, 2 referees, 424.5ms
+1: 384x640 22 players, 2 referees, 424.5ms
+2: 384x640 21 players, 2 referees, 424.5ms
+3: 384x640 21 players, 3 referees, 424.5ms
+4: 384x640 22 players, 2 referees, 424.5ms
+5: 384x640 21 players, 2 referees, 424.5ms
+6: 384x640 21 players, 2 referees, 424.5ms
+7: 384x640 22 players, 2 referees, 424.5ms
+8: 384x640 21 players, 3 referees, 424.5ms
+9: 384x640 22 players, 3 referees, 424.5ms
+10: 384x640 21 players, 3 referees, 424.5ms
+11: 384x640 21 players, 3 referees, 424.5ms
+12: 384x640 21 players, 3 referees, 424.5ms
+13: 384x640 22 players, 3 referees, 424.5ms
+14: 384x640 22 players, 3 referees, 424.5ms
+15: 384x640 25 players, 3 referees, 424.5ms
+16: 384x640 23 players, 3 referees, 424.5ms
+17: 384x640 22 players, 3 referees, 424.5ms
+18: 384x640 24 players, 2 referees, 424.5ms
+19: 384x640 22 players, 2 referees, 424.5ms
+Speed: 37.0ms preprocess, 424.5ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  61%|######1   | 460/750 [03:22<02:11,  2.21frame/s]
+0: 384x640 24 players, 2 referees, 401.6ms
+1: 384x640 24 players, 2 referees, 401.6ms
+2: 384x640 23 players, 2 referees, 401.6ms
+3: 384x640 24 players, 2 referees, 401.6ms
+4: 384x640 23 players, 2 referees, 401.6ms
+5: 384x640 23 players, 2 referees, 401.6ms
+6: 384x640 24 players, 2 referees, 401.6ms
+7: 384x640 24 players, 2 referees, 401.6ms
+8: 384x640 24 players, 2 referees, 401.6ms
+9: 384x640 23 players, 2 referees, 401.6ms
+10: 384x640 22 players, 2 referees, 401.6ms
+11: 384x640 22 players, 2 referees, 401.6ms
+12: 384x640 22 players, 2 referees, 401.6ms
+13: 384x640 21 players, 2 referees, 401.6ms
+14: 384x640 23 players, 4 referees, 401.6ms
+15: 384x640 21 players, 4 referees, 401.6ms
+16: 384x640 21 players, 3 referees, 401.6ms
+17: 384x640 1 ball, 21 players, 3 referees, 401.6ms
+18: 384x640 1 ball, 20 players, 3 referees, 401.6ms
+19: 384x640 1 ball, 22 players, 2 referees, 401.6ms
+Speed: 33.9ms preprocess, 401.6ms inference, 1.1ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  64%|######4   | 480/750 [03:31<02:00,  2.24frame/s]
+0: 384x640 1 ball, 22 players, 2 referees, 434.7ms
+1: 384x640 22 players, 1 referee, 434.7ms
+2: 384x640 22 players, 3 referees, 434.7ms
+3: 384x640 1 ball, 22 players, 2 referees, 434.7ms
+4: 384x640 22 players, 2 referees, 434.7ms
+5: 384x640 1 ball, 23 players, 2 referees, 434.7ms
+6: 384x640 21 players, 3 referees, 434.7ms
+7: 384x640 22 players, 3 referees, 434.7ms
+8: 384x640 23 players, 1 referee, 434.7ms
+9: 384x640 20 players, 2 referees, 434.7ms
+10: 384x640 22 players, 434.7ms
+11: 384x640 21 players, 3 referees, 434.7ms
+12: 384x640 21 players, 2 referees, 434.7ms
+13: 384x640 20 players, 2 referees, 434.7ms
+14: 384x640 23 players, 2 referees, 434.7ms
+15: 384x640 22 players, 1 referee, 434.7ms
+16: 384x640 21 players, 2 referees, 434.7ms
+17: 384x640 21 players, 1 referee, 434.7ms
+18: 384x640 21 players, 1 referee, 434.7ms
+19: 384x640 21 players, 2 referees, 434.7ms
+Speed: 10.6ms preprocess, 434.7ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  67%|######6   | 500/750 [03:40<01:51,  2.24frame/s]
+0: 384x640 21 players, 2 referees, 412.1ms
+1: 384x640 21 players, 2 referees, 412.1ms
+2: 384x640 21 players, 2 referees, 412.1ms
+3: 384x640 21 players, 3 referees, 412.1ms
+4: 384x640 21 players, 1 referee, 412.1ms
+5: 384x640 1 ball, 22 players, 1 referee, 412.1ms
+6: 384x640 1 ball, 21 players, 1 referee, 412.1ms
+7: 384x640 1 ball, 21 players, 1 referee, 412.1ms
+8: 384x640 1 ball, 21 players, 1 referee, 412.1ms
+9: 384x640 21 players, 1 referee, 412.1ms
+10: 384x640 21 players, 1 referee, 412.1ms
+11: 384x640 20 players, 1 referee, 412.1ms
+12: 384x640 19 players, 1 referee, 412.1ms
+13: 384x640 1 ball, 20 players, 2 referees, 412.1ms
+14: 384x640 1 ball, 23 players, 2 referees, 412.1ms
+15: 384x640 1 ball, 23 players, 2 referees, 412.1ms
+16: 384x640 1 ball, 20 players, 412.1ms
+17: 384x640 20 players, 412.1ms
+18: 384x640 22 players, 412.1ms
+19: 384x640 22 players, 412.1ms
+Speed: 6.2ms preprocess, 412.1ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  69%|######9   | 520/750 [03:48<01:40,  2.28frame/s]
+0: 384x640 22 players, 412.4ms
+1: 384x640 22 players, 1 referee, 412.4ms
+2: 384x640 23 players, 1 referee, 412.4ms
+3: 384x640 22 players, 2 referees, 412.4ms
+4: 384x640 22 players, 2 referees, 412.4ms
+5: 384x640 21 players, 2 referees, 412.4ms
+6: 384x640 23 players, 2 referees, 412.4ms
+7: 384x640 24 players, 1 referee, 412.4ms
+8: 384x640 21 players, 2 referees, 412.4ms
+9: 384x640 21 players, 1 referee, 412.4ms
+10: 384x640 22 players, 412.4ms
+11: 384x640 21 players, 1 referee, 412.4ms
+12: 384x640 21 players, 2 referees, 412.4ms
+13: 384x640 21 players, 3 referees, 412.4ms
+14: 384x640 21 players, 2 referees, 412.4ms
+15: 384x640 19 players, 2 referees, 412.4ms
+16: 384x640 20 players, 2 referees, 412.4ms
+17: 384x640 24 players, 3 referees, 412.4ms
+18: 384x640 23 players, 4 referees, 412.4ms
+19: 384x640 22 players, 3 referees, 412.4ms
+Speed: 6.8ms preprocess, 412.4ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  72%|#######2  | 540/750 [03:57<01:31,  2.31frame/s]
+0: 384x640 20 players, 2 referees, 407.2ms
+1: 384x640 22 players, 2 referees, 407.2ms
+2: 384x640 23 players, 2 referees, 407.2ms
+3: 384x640 23 players, 2 referees, 407.2ms
+4: 384x640 1 ball, 23 players, 2 referees, 407.2ms
+5: 384x640 21 players, 1 referee, 407.2ms
+6: 384x640 21 players, 1 referee, 407.2ms
+7: 384x640 21 players, 1 referee, 407.2ms
+8: 384x640 23 players, 1 referee, 407.2ms
+9: 384x640 22 players, 2 referees, 407.2ms
+10: 384x640 23 players, 2 referees, 407.2ms
+11: 384x640 22 players, 1 referee, 407.2ms
+12: 384x640 23 players, 2 referees, 407.2ms
+13: 384x640 23 players, 2 referees, 407.2ms
+14: 384x640 26 players, 1 referee, 407.2ms
+15: 384x640 1 ball, 25 players, 1 referee, 407.2ms
+16: 384x640 25 players, 1 referee, 407.2ms
+17: 384x640 1 ball, 23 players, 1 referee, 407.2ms
+18: 384x640 1 ball, 24 players, 2 referees, 407.2ms
+19: 384x640 23 players, 3 referees, 407.2ms
+Speed: 7.4ms preprocess, 407.2ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  75%|#######4  | 560/750 [04:05<01:21,  2.33frame/s]
+0: 384x640 25 players, 3 referees, 412.5ms
+1: 384x640 22 players, 3 referees, 412.5ms
+2: 384x640 23 players, 3 referees, 412.5ms
+3: 384x640 1 ball, 24 players, 2 referees, 412.5ms
+4: 384x640 24 players, 2 referees, 412.5ms
+5: 384x640 1 ball, 23 players, 2 referees, 412.5ms
+6: 384x640 1 ball, 21 players, 1 referee, 412.5ms
+7: 384x640 24 players, 1 referee, 412.5ms
+8: 384x640 22 players, 1 referee, 412.5ms
+9: 384x640 23 players, 2 referees, 412.5ms
+10: 384x640 21 players, 3 referees, 412.5ms
+11: 384x640 20 players, 2 referees, 412.5ms
+12: 384x640 23 players, 2 referees, 412.5ms
+13: 384x640 20 players, 3 referees, 412.5ms
+14: 384x640 21 players, 2 referees, 412.5ms
+15: 384x640 21 players, 2 referees, 412.5ms
+16: 384x640 20 players, 2 referees, 412.5ms
+17: 384x640 21 players, 2 referees, 412.5ms
+18: 384x640 21 players, 2 referees, 412.5ms
+19: 384x640 22 players, 2 referees, 412.5ms
+Speed: 10.9ms preprocess, 412.5ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  77%|#######7  | 580/750 [04:14<01:12,  2.34frame/s]
+0: 384x640 21 players, 2 referees, 416.0ms
+1: 384x640 21 players, 2 referees, 416.0ms
+2: 384x640 22 players, 1 referee, 416.0ms
+3: 384x640 22 players, 1 referee, 416.0ms
+4: 384x640 23 players, 1 referee, 416.0ms
+5: 384x640 23 players, 1 referee, 416.0ms
+6: 384x640 24 players, 1 referee, 416.0ms
+7: 384x640 24 players, 1 referee, 416.0ms
+8: 384x640 1 ball, 18 players, 2 referees, 416.0ms
+9: 384x640 23 players, 2 referees, 416.0ms
+10: 384x640 21 players, 1 referee, 416.0ms
+11: 384x640 22 players, 416.0ms
+12: 384x640 1 ball, 20 players, 416.0ms
+13: 384x640 1 ball, 21 players, 1 referee, 416.0ms
+14: 384x640 22 players, 1 referee, 416.0ms
+15: 384x640 24 players, 1 referee, 416.0ms
+16: 384x640 24 players, 1 referee, 416.0ms
+17: 384x640 23 players, 2 referees, 416.0ms
+18: 384x640 24 players, 1 referee, 416.0ms
+19: 384x640 1 ball, 21 players, 1 referee, 416.0ms
+Speed: 8.7ms preprocess, 416.0ms inference, 0.8ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  80%|########  | 600/750 [04:22<01:04,  2.34frame/s]
+0: 384x640 24 players, 2 referees, 411.0ms
+1: 384x640 1 ball, 22 players, 1 referee, 411.0ms
+2: 384x640 22 players, 1 referee, 411.0ms
+3: 384x640 1 ball, 21 players, 1 referee, 411.0ms
+4: 384x640 1 ball, 23 players, 1 referee, 411.0ms
+5: 384x640 22 players, 2 referees, 411.0ms
+6: 384x640 23 players, 1 referee, 411.0ms
+7: 384x640 1 ball, 22 players, 1 referee, 411.0ms
+8: 384x640 22 players, 3 referees, 411.0ms
+9: 384x640 21 players, 1 referee, 411.0ms
+10: 384x640 1 ball, 24 players, 1 referee, 411.0ms
+11: 384x640 1 ball, 23 players, 1 referee, 411.0ms
+12: 384x640 1 ball, 21 players, 1 referee, 411.0ms
+13: 384x640 21 players, 1 referee, 411.0ms
+14: 384x640 1 ball, 24 players, 1 referee, 411.0ms
+15: 384x640 1 ball, 22 players, 411.0ms
+16: 384x640 21 players, 1 referee, 411.0ms
+17: 384x640 22 players, 1 referee, 411.0ms
+18: 384x640 22 players, 1 referee, 411.0ms
+19: 384x640 21 players, 1 referee, 411.0ms
+Speed: 7.8ms preprocess, 411.0ms inference, 1.0ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  83%|########2 | 620/750 [04:31<00:55,  2.35frame/s]
+0: 384x640 21 players, 1 referee, 403.7ms
+1: 384x640 21 players, 1 referee, 403.7ms
+2: 384x640 20 players, 1 referee, 403.7ms
+3: 384x640 21 players, 1 referee, 403.7ms
+4: 384x640 22 players, 1 referee, 403.7ms
+5: 384x640 23 players, 1 referee, 403.7ms
+6: 384x640 23 players, 2 referees, 403.7ms
+7: 384x640 25 players, 1 referee, 403.7ms
+8: 384x640 23 players, 1 referee, 403.7ms
+9: 384x640 21 players, 2 referees, 403.7ms
+10: 384x640 23 players, 2 referees, 403.7ms
+11: 384x640 21 players, 2 referees, 403.7ms
+12: 384x640 21 players, 2 referees, 403.7ms
+13: 384x640 21 players, 2 referees, 403.7ms
+14: 384x640 22 players, 1 referee, 403.7ms
+15: 384x640 21 players, 1 referee, 403.7ms
+16: 384x640 20 players, 1 referee, 403.7ms
+17: 384x640 22 players, 1 referee, 403.7ms
+18: 384x640 22 players, 1 referee, 403.7ms
+19: 384x640 21 players, 1 referee, 403.7ms
+Speed: 4.2ms preprocess, 403.7ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  85%|########5 | 640/750 [04:39<00:46,  2.38frame/s]
+0: 384x640 21 players, 1 referee, 409.3ms
+1: 384x640 21 players, 409.3ms
+2: 384x640 21 players, 409.3ms
+3: 384x640 21 players, 409.3ms
+4: 384x640 21 players, 409.3ms
+5: 384x640 24 players, 409.3ms
+6: 384x640 23 players, 1 referee, 409.3ms
+7: 384x640 22 players, 1 referee, 409.3ms
+8: 384x640 22 players, 1 referee, 409.3ms
+9: 384x640 1 ball, 23 players, 1 referee, 409.3ms
+10: 384x640 1 ball, 24 players, 1 referee, 409.3ms
+11: 384x640 24 players, 1 referee, 409.3ms
+12: 384x640 1 ball, 24 players, 409.3ms
+13: 384x640 22 players, 409.3ms
+14: 384x640 21 players, 409.3ms
+15: 384x640 1 ball, 22 players, 1 referee, 409.3ms
+16: 384x640 22 players, 1 referee, 409.3ms
+17: 384x640 22 players, 1 referee, 409.3ms
+18: 384x640 1 ball, 23 players, 1 referee, 409.3ms
+19: 384x640 1 ball, 24 players, 1 referee, 409.3ms
+Speed: 4.4ms preprocess, 409.3ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  88%|########8 | 660/750 [04:47<00:37,  2.39frame/s]
+0: 384x640 24 players, 1 referee, 438.8ms
+1: 384x640 25 players, 1 referee, 438.8ms
+2: 384x640 22 players, 1 referee, 438.8ms
+3: 384x640 1 ball, 24 players, 1 referee, 438.8ms
+4: 384x640 23 players, 1 referee, 438.8ms
+5: 384x640 1 ball, 22 players, 1 referee, 438.8ms
+6: 384x640 22 players, 1 referee, 438.8ms
+7: 384x640 1 ball, 22 players, 2 referees, 438.8ms
+8: 384x640 23 players, 1 referee, 438.8ms
+9: 384x640 1 ball, 22 players, 1 referee, 438.8ms
+10: 384x640 24 players, 1 referee, 438.8ms
+11: 384x640 1 ball, 24 players, 1 referee, 438.8ms
+12: 384x640 1 ball, 23 players, 1 referee, 438.8ms
+13: 384x640 22 players, 1 referee, 438.8ms
+14: 384x640 21 players, 1 referee, 438.8ms
+15: 384x640 24 players, 1 referee, 438.8ms
+16: 384x640 23 players, 1 referee, 438.8ms
+17: 384x640 22 players, 1 referee, 438.8ms
+18: 384x640 25 players, 1 referee, 438.8ms
+19: 384x640 22 players, 1 referee, 438.8ms
+Speed: 5.0ms preprocess, 438.8ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  91%|######### | 680/750 [04:56<00:29,  2.34frame/s]
+0: 384x640 22 players, 1 referee, 412.2ms
+1: 384x640 22 players, 1 referee, 412.2ms
+2: 384x640 22 players, 1 referee, 412.2ms
+3: 384x640 1 ball, 22 players, 1 referee, 412.2ms
+4: 384x640 22 players, 1 referee, 412.2ms
+5: 384x640 21 players, 1 referee, 412.2ms
+6: 384x640 21 players, 1 referee, 412.2ms
+7: 384x640 21 players, 1 referee, 412.2ms
+8: 384x640 22 players, 1 referee, 412.2ms
+9: 384x640 22 players, 1 referee, 412.2ms
+10: 384x640 21 players, 1 referee, 412.2ms
+11: 384x640 25 players, 1 referee, 412.2ms
+12: 384x640 24 players, 1 referee, 412.2ms
+13: 384x640 22 players, 1 referee, 412.2ms
+14: 384x640 21 players, 1 referee, 412.2ms
+15: 384x640 22 players, 1 referee, 412.2ms
+16: 384x640 22 players, 1 referee, 412.2ms
+17: 384x640 22 players, 1 referee, 412.2ms
+18: 384x640 21 players, 1 referee, 412.2ms
+19: 384x640 22 players, 1 referee, 412.2ms
+Speed: 5.3ms preprocess, 412.2ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  93%|#########3| 700/750 [05:04<00:21,  2.36frame/s]
+0: 384x640 24 players, 1 referee, 438.8ms
+1: 384x640 24 players, 1 referee, 438.8ms
+2: 384x640 22 players, 1 referee, 438.8ms
+3: 384x640 22 players, 1 referee, 438.8ms
+4: 384x640 22 players, 1 referee, 438.8ms
+5: 384x640 22 players, 1 referee, 438.8ms
+6: 384x640 21 players, 1 referee, 438.8ms
+7: 384x640 21 players, 2 referees, 438.8ms
+8: 384x640 21 players, 1 referee, 438.8ms
+9: 384x640 22 players, 1 referee, 438.8ms
+10: 384x640 22 players, 1 referee, 438.8ms
+11: 384x640 22 players, 1 referee, 438.8ms
+12: 384x640 22 players, 1 referee, 438.8ms
+13: 384x640 22 players, 1 referee, 438.8ms
+14: 384x640 22 players, 2 referees, 438.8ms
+15: 384x640 21 players, 2 referees, 438.8ms
+16: 384x640 21 players, 1 referee, 438.8ms
+17: 384x640 22 players, 1 referee, 438.8ms
+18: 384x640 21 players, 1 referee, 438.8ms
+19: 384x640 21 players, 1 referee, 438.8ms
+Speed: 4.1ms preprocess, 438.8ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  96%|#########6| 720/750 [05:13<00:12,  2.32frame/s]
+0: 384x640 22 players, 1 referee, 404.8ms
+1: 384x640 23 players, 1 referee, 404.8ms
+2: 384x640 21 players, 1 referee, 404.8ms
+3: 384x640 21 players, 2 referees, 404.8ms
+4: 384x640 22 players, 1 referee, 404.8ms
+5: 384x640 21 players, 1 referee, 404.8ms
+6: 384x640 22 players, 2 referees, 404.8ms
+7: 384x640 21 players, 1 referee, 404.8ms
+8: 384x640 21 players, 1 referee, 404.8ms
+9: 384x640 21 players, 404.8ms
+10: 384x640 23 players, 404.8ms
+11: 384x640 22 players, 404.8ms
+12: 384x640 24 players, 404.8ms
+13: 384x640 22 players, 404.8ms
+14: 384x640 21 players, 404.8ms
+15: 384x640 21 players, 404.8ms
+16: 384x640 21 players, 404.8ms
+17: 384x640 19 players, 1 referee, 404.8ms
+18: 384x640 20 players, 1 referee, 404.8ms
+19: 384x640 23 players, 2 referees, 404.8ms
+Speed: 5.6ms preprocess, 404.8ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects:  99%|#########8| 740/750 [05:22<00:04,  2.35frame/s]
+0: 384x640 21 players, 1 referee, 477.5ms
+1: 384x640 21 players, 1 referee, 477.5ms
+2: 384x640 23 players, 477.5ms
+3: 384x640 22 players, 1 referee, 477.5ms
+4: 384x640 21 players, 1 referee, 477.5ms
+5: 384x640 22 players, 1 referee, 477.5ms
+6: 384x640 23 players, 2 referees, 477.5ms
+7: 384x640 22 players, 2 referees, 477.5ms
+8: 384x640 25 players, 1 referee, 477.5ms
+9: 384x640 22 players, 1 referee, 477.5ms
+Speed: 4.6ms preprocess, 477.5ms inference, 0.9ms postprocess per image at shape (1, 3, 384, 640)
+Detecting objects: 100%|##########| 750/750 [05:26<00:00,  2.30frame/s]Detecting objects: 100%|##########| 750/750 [05:26<00:00,  2.29frame/s]
+[long_clip_sample] detection done in 333.5s
+[long_clip_sample] 109 color samples from frames [0, 10, 20, 30, 40], 4 flagged goalkeeper
+[team_assigner] excluded 4 goalkeeper detection(s) from team-color clustering
+
+============================================================
+[team_assigner] KMeans fit on 105 samples from frames [0, 10, 20, 30, 40]
+  Team 1  BGR: B= 84.7  G= 74.2  R= 56.9
+  Team 2  BGR: B= 76.3  G=106.5  R=186.1
+  Centroid separation: 133.4  [OK]
+  Cluster populations: [np.int64(52), np.int64(50), np.int64(3)]
+============================================================
+
+{
+  "label": "long_clip_sample",
+  "n_frames": 750,
+  "n_player_track_ids_total": 104,
+  "n_goalkeeper_track_ids": 11,
+  "n_goalkeeper_detections_total": 283,
+  "confidence_threshold": 40.0,
+  "new_team1_centroid": [
+    84.73401641845703,
+    74.19322204589844,
+    56.94700622558594
+  ],
+  "new_team2_centroid": [
+    76.25204467773438,
+    106.51675415039062,
+    186.0955352783203
+  ],
+  "new_centroid_separation": 133.40200805664062,
+  "old_behavior_centroid_separation_with_gk_polluting_fit": 130.34112548828125,
+  "old_behavior_goalkeeper_force_fit_examples": [
+    {
+      "assigned_team": 2,
+      "distance": 57.12654304576887,
+      "within_threshold": false
+    },
+    {
+      "assigned_team": 1,
+      "distance": 29.4511747191189,
+      "within_threshold": true
+    },
+    {
+      "assigned_team": 1,
+      "distance": 80.24446755839192,
+      "within_threshold": false
+    },
+    {
+      "assigned_team": 1,
+      "distance": 84.02850381935123,
+      "within_threshold": false
+    }
+  ],
+  "n_unresolved_pids_final": 23,
+  "unresolved_pids": [
+    "4",
+    "24",
+    "44",
+    "47",
+    "69",
+    "27",
+    "103",
+    "101",
+    "117",
+    "118",
+    "148",
+    "147",
+    "165",
+    "195",
+    "201",
+    "214",
+    "224",
+    "238",
+    "284",
+    "342",
+    "343",
+    "359",
+    "396"
+  ],
+  "unresolved_best_distances": {
+    "4": 159.92633314829388,
+    "14": 41.16098139520873,
+    "24": 42.726836136683424,
+    "43": 55.457784879793564,
+    "44": 89.8214684688151,
+    "47": 178.15633819931065,
+    "68": 88.2833669219588,
+    "69": 175.01991251758724,
+    "27": 54.72261147079139,
+    "84": 91.28873773889943,
+    "89": 40.387537688556414,
+    "102": 80.5825764982706,
+    "103": 44.54352606318337,
+    "101": 126.73360699636517,
+    "117": 62.71463013048785,
+    "118": 198.64579696123235,
+    "148": 67.46823004349228,
+    "147": 136.0548797448456,
+    "165": 182.47758927213857,
+    "195": 148.46192848837174,
+    "201": 174.31470852384058,
+    "214": 169.8041939468061,
+    "224": 40.05487486611435,
+    "237": 48.78404086137934,
+    "243": 43.01135456944084,
+    "238": 42.17348454904243,
+    "248": 44.91708532845968,
+    "284": 47.11369800412217,
+    "306": 47.212307476033104,
+    "319": 43.754594979083016,
+    "342": 43.01086110735494,
+    "343": 54.3632606482578,
+    "350": 42.676485691530864,
+    "359": 76.13058035181196,
+    "365": 67.70274354298786,
+    "377": 40.55655043463088,
+    "384": 41.56471971649782,
+    "385": 40.08066253295898,
+    "391": 58.22632803632753,
+    "396": 61.45547291994507
+  },
+  "n_unresolved_within_60_of_threshold": 8,
+  "final_team_distribution": {
+    "0": 23,
+    "1": 32,
+    "2": 38,
+    "3": 11
+  }
+}
+
+Wrote full results to team_classification_test_results.json

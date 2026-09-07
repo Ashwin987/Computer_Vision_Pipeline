@@ -1,0 +1,18 @@
+{
+  "video_path": "Match_videos/121364_0.mp4",
+  "n_frames": 750,
+  "total_wall_sec": 7019.307419061661,
+  "total_wall_min": 116.98845698436101,
+  "primary_hits": 131,
+  "fallback_triggered": 619,
+  "fallback_recovered": 571,
+  "fallback_recovery_rate": 0.9224555735056543,
+  "fallback_total_sec": 6730.382483959198,
+  "fallback_avg_sec_per_trigger": 10.872992704295958,
+  "final_hits_combined": 702,
+  "final_detection_rate": 0.936,
+  "still_missed_frames_count": 48,
+  "primary_only_detection_rate": 0.17466666666666666,
+  "new_stub_path": "stubs/track_stubs_121364_ball_fallback.pkl",
+  "baseline_stub_path_untouched": "stubs/track_stubs_121364.pkl"
+}

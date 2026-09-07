@@ -1,0 +1,12 @@
+streamlit
+pandas
+matplotlib
+seaborn
+opencv-python-headless
+google-genai
+numpy
+moviepy
+plotly
+streamlit-autorefresh
+reportlab
+chromadb

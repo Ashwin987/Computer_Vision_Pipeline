@@ -1,0 +1,46 @@
+{
+  "gap47": {
+    "window_frames": 47,
+    "attempted": 15,
+    "primary_hits": 0,
+    "primary_hit_rate_of_attempted": 0.0,
+    "fallback_triggered": 15,
+    "fallback_recovered": 12,
+    "fallback_recovery_rate": 0.8,
+    "new_hits_total": 12,
+    "new_raw_detection_rate": 0.2553191489361702,
+    "new_pct_of_attempted": 0.8,
+    "still_missed_frames": [
+      39312,
+      39318,
+      39330
+    ],
+    "measurement": "EXACT \u2014 every one of the 15 real misses was run through the real fallback, no sampling"
+  },
+  "fastpipe9000_window": {
+    "window_frames": 9000,
+    "attempted": 3000,
+    "primary_hits": 864,
+    "primary_hit_rate_of_attempted": 0.288,
+    "primary_misses_exact": 2136,
+    "note_on_82_90pct_expectation": "Real miss rate among ATTEMPTED frames is 71.2% (2136/3000), below the 82-90% guess \u2014 that guess likely assumed a denominator of all frames or drew on the smaller earlier sample. As a fraction of ALL 9000 frames in the window (attempted + skipped), triggered frames are 23.7%.",
+    "real_sampled_triggers": 103,
+    "real_sampled_recovered": 74,
+    "measured_recovery_rate": 0.7184466019417476,
+    "real_measured_total_fallback_sec_for_sample": 2121.7738082408905,
+    "real_measured_avg_sec_per_trigger": 20.599745711076608,
+    "extrapolated_total_added_sec_for_full_window": 44001.05683885964,
+    "extrapolated_total_added_hours_for_full_window": 12.222515788572121,
+    "estimated_new_hits_total": 2398.6019417475727,
+    "estimated_new_raw_detection_rate": 0.2665113268608414,
+    "estimated_new_pct_of_attempted": 0.7995339805825242,
+    "measurement": "EXTRAPOLATED \u2014 primary_misses_exact (2136) is exact (from the real cached stub), but only 103 of those misses were actually run through the real fallback in this session; the rest are projected using the measured avg_sec_per_trigger and measured recovery_rate from that real sample."
+  },
+  "raw_fallback_summary_for_sample": {
+    "n_triggered": 103,
+    "n_recovered": 74,
+    "recovery_rate": 0.7184466019417476,
+    "total_fallback_sec": 2121.7738082408905,
+    "avg_sec_per_trigger": 20.599745711076608
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "pilot_clips": [
+    "121364_0",
+    "LiverpoolPSG_short"
+  ],
+  "n_pilot_windows": 2,
+  "mean_total_wall_sec": 412.0,
+  "stage_mean_wall_sec": {
+    "detect_wall_sec": 195.7,
+    "camera_wall_sec": 23.9,
+    "calibrate_wall_sec": 176.5,
+    "enrichment_wall_sec": 0.2,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 15.5,
+    "render_wall_sec": 0.0
+  },
+  "extrapolated_sec_by_batch_size": {
+    "25": 10300.0,
+    "50": 20600.0
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "clip": "121364_0",
+  "video_path": "pilot_clips\\121364_0.mp4",
+  "timestamp": "2026-07-25T18:33:54",
+  "cache_used": false,
+  "processing_time_sec": 475.3,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 750,
+    "n_frames_processed": 750
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": 250,
+    "n_frames_interp_detect": 498,
+    "n_frames_calibrated": 75,
+    "n_frames_interp_calib": 675
+  },
+  "timing": {
+    "detect_wall_sec": 247.3,
+    "camera_wall_sec": 24.6,
+    "calibrate_wall_sec": 182.7,
+    "detect_frame_timing": {
+      "n": 250,
+      "mean_sec": 0.9651002388000488,
+      "median_sec": 0.6239429712295532,
+      "p95_sec": 1.9328253149986268,
+      "max_sec": 2.1565134525299072,
+      "total_sec": 241.2750597000122
+    },
+    "calibrate_frame_timing": {
+      "n": 75,
+      "mean_sec": 2.374904851913452,
+      "median_sec": 2.2424979209899902,
+      "p95_sec": 2.7958593368530273,
+      "max_sec": 5.79963231086731,
+      "total_sec": 178.1178638935089
+    },
+    "enrichment_wall_sec": 0.2,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 20.3,
+    "team_resolve_wall_sec": 11.4,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 1.7,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 111.61,
+    "n_player_tracks_total": 127,
+    "n_resolved": 123,
+    "n_unresolved": 4,
+    "resolved_pct": 0.9685,
+    "gray_frame_pct": 0.0004,
+    "n_fallback_assigned": 6,
+    "n_merged_pairs": 78,
+    "n_rejected_merge_candidates": 44,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.8741,
+    "median_confidence": 0.9524,
+    "pct_frames_below_70": 0.1427,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 7.64,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 127,
+    "n_flagged_candidates": 6,
+    "strong_signature": 3,
+    "weak_signature": 3,
+    "strong_signature_per_100_frames": 0.4,
+    "weak_signature_per_100_frames": 0.4,
+    "flagged": [
+      {
+        "pid": 1,
+        "n_samples": 670,
+        "whole_purity": 0.721,
+        "weighted_purity": 0.996,
+        "improvement": 0.275,
+        "split_before_fn": 187,
+        "split_after_fn": 190,
+        "signature": "strong"
+      },
+      {
+        "pid": 139,
+        "n_samples": 324,
+        "whole_purity": 0.978,
+        "weighted_purity": 1.0,
+        "improvement": 0.022,
+        "split_before_fn": 218,
+        "split_after_fn": 221,
+        "signature": "strong"
+      },
+      {
+        "pid": 170,
+        "n_samples": 197,
+        "whole_purity": 0.827,
+        "weighted_purity": 1.0,
+        "improvement": 0.173,
+        "split_before_fn": 249,
+        "split_after_fn": 258,
+        "signature": "weak"
+      },
+      {
+        "pid": 191,
+        "n_samples": 390,
+        "whole_purity": 0.767,
+        "weighted_purity": 1.0,
+        "improvement": 0.233,
+        "split_before_fn": 315,
+        "split_after_fn": 366,
+        "signature": "weak"
+      },
+      {
+        "pid": 301,
+        "n_samples": 240,
+        "whole_purity": 0.933,
+        "weighted_purity": 1.0,
+        "improvement": 0.067,
+        "split_before_fn": 621,
+        "split_after_fn": 624,
+        "signature": "strong"
+      },
+      {
+        "pid": 371,
+        "n_samples": 58,
+        "whole_purity": 0.793,
+        "weighted_purity": 1.0,
+        "improvement": 0.207,
+        "split_before_fn": 695,
+        "split_after_fn": 702,
+        "signature": "weak"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 6,
+    "margin_label": "6/6 \u2014 at limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.184,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 46,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 35.0,
+    "p90_gap_sec": 1.4,
+    "max_gap_frames": 233,
+    "max_gap_sec": 9.32,
+    "n_gaps_over_1s": 6,
+    "n_gaps_over_3s": 2,
+    "n_gaps_over_uncertain_threshold": 9,
+    "pct_frames_within_1s_of_real": 0.6787,
+    "pct_frames_within_3s_of_real": 0.8893,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

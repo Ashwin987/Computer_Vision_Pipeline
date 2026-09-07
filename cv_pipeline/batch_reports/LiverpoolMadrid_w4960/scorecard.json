@@ -1,0 +1,152 @@
+{
+  "clip": "LiverpoolMadrid_w4960",
+  "video_path": "dev_clips\\LiverpoolMadrid_w4960.mp4",
+  "timestamp": "2026-07-27T11:23:29",
+  "cache_used": false,
+  "processing_time_sec": 355.3,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 807,
+    "n_frames_processed": 807
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": 269,
+    "n_frames_interp_detect": 536,
+    "n_frames_calibrated": 81,
+    "n_frames_interp_calib": 726
+  },
+  "timing": {
+    "detect_wall_sec": 148.9,
+    "camera_wall_sec": 11.1,
+    "calibrate_wall_sec": 184.2,
+    "detect_frame_timing": {
+      "n": 269,
+      "mean_sec": 0.5371647590155052,
+      "median_sec": 0.5339138507843018,
+      "p95_sec": 0.5671594142913818,
+      "max_sec": 0.9774959087371826,
+      "total_sec": 144.4973201751709
+    },
+    "calibrate_frame_timing": {
+      "n": 81,
+      "mean_sec": 2.217739287717843,
+      "median_sec": 2.2116551399230957,
+      "p95_sec": 2.2760372161865234,
+      "max_sec": 2.696483850479126,
+      "total_sec": 179.63688230514526
+    },
+    "enrichment_wall_sec": 0.2,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 9.1,
+    "team_resolve_wall_sec": 3.8,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 0.8,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 1.6
+  },
+  "team": {
+    "cluster_separation": 117.94,
+    "n_player_tracks_total": 70,
+    "n_resolved": 53,
+    "n_unresolved": 17,
+    "resolved_pct": 0.7571,
+    "gray_frame_pct": 0.0216,
+    "n_fallback_assigned": 4,
+    "n_merged_pairs": 12,
+    "n_rejected_merge_candidates": 18,
+    "verdict": "DEGRADED"
+  },
+  "calibration": {
+    "mean_confidence": 0.7567,
+    "median_confidence": 0.7647,
+    "pct_frames_below_70": 0.3259,
+    "verdict": "DEGRADED"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 0.0,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 70,
+    "n_flagged_candidates": 4,
+    "strong_signature": 4,
+    "weak_signature": 0,
+    "strong_signature_per_100_frames": 0.496,
+    "weak_signature_per_100_frames": 0.0,
+    "flagged": [
+      {
+        "pid": 3,
+        "n_samples": 303,
+        "whole_purity": 0.875,
+        "weighted_purity": 0.98,
+        "improvement": 0.106,
+        "split_before_fn": 279,
+        "split_after_fn": 280,
+        "signature": "strong"
+      },
+      {
+        "pid": 4,
+        "n_samples": 459,
+        "whole_purity": 0.852,
+        "weighted_purity": 0.996,
+        "improvement": 0.144,
+        "split_before_fn": 428,
+        "split_after_fn": 430,
+        "signature": "strong"
+      },
+      {
+        "pid": 17,
+        "n_samples": 618,
+        "whole_purity": 0.516,
+        "weighted_purity": 0.966,
+        "improvement": 0.45,
+        "split_before_fn": 408,
+        "split_after_fn": 409,
+        "signature": "strong"
+      },
+      {
+        "pid": 51,
+        "n_samples": 178,
+        "whole_purity": 0.736,
+        "weighted_purity": 1.0,
+        "improvement": 0.264,
+        "split_before_fn": 135,
+        "split_after_fn": 137,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 0,
+    "margin_label": "0/6 \u2014 6 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.1078,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 30,
+    "median_gap_frames": 3.5,
+    "median_gap_sec": 0.14,
+    "p90_gap_frames": 45.2,
+    "p90_gap_sec": 1.81,
+    "max_gap_frames": 236,
+    "max_gap_sec": 9.44,
+    "n_gaps_over_1s": 5,
+    "n_gaps_over_3s": 3,
+    "n_gaps_over_uncertain_threshold": 8,
+    "pct_frames_within_1s_of_real": 0.4511,
+    "pct_frames_within_3s_of_real": 0.7447,
+    "verdict": null
+  },
+  "overall_verdict": "DEGRADED",
+  "rendered": true,
+  "render_dir": "batch_reports\\LiverpoolMadrid_w4960\\render"
+}

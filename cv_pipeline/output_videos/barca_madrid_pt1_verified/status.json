@@ -1,0 +1,16 @@
+{
+  "status": "complete",
+  "stage_num": 19,
+  "total_stages": 19,
+  "started_at": "2026-09-04T21:31:24.607423+00:00",
+  "updated_at": "2026-09-05T02:19:28.487159+00:00",
+  "outputs": {
+    "output1.avi": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\output1.avi",
+    "output2.avi": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\output2.avi",
+    "output3.avi": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\output3.avi",
+    "output4.avi": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\output4.avi",
+    "output5.avi": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\output5.avi",
+    "output6.avi": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\output6.avi"
+  },
+  "stats_file": "C:\\UCLA\\yolo model 2\\output_videos\\barca_madrid_pt1_verified\\stats.json"
+}

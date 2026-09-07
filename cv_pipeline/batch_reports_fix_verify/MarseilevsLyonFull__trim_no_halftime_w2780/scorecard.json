@@ -1,0 +1,233 @@
+{
+  "clip": "MarseilevsLyonFull__trim_no_halftime_w2780",
+  "video_path": "holdout_clips\\MarseilevsLyonFull__trim_no_halftime_w2780.mp4",
+  "timestamp": "2026-07-30T04:35:19",
+  "cache_used": true,
+  "processing_time_sec": 11.7,
+  "video": {
+    "fps": 25.0,
+    "resolution": "1920x1080",
+    "n_frames_total": 1028,
+    "n_frames_processed": 1000
+  },
+  "pipeline": {
+    "detect_every": 3,
+    "calib_every": 10,
+    "n_frames_detected": null,
+    "n_frames_interp_detect": null,
+    "n_frames_calibrated": null,
+    "n_frames_interp_calib": null
+  },
+  "timing": {
+    "detect_wall_sec": 187.0,
+    "camera_wall_sec": 23.8,
+    "calibrate_wall_sec": 232.0,
+    "detect_frame_timing": {
+      "n": 334,
+      "mean_sec": 0.5425799064293593,
+      "median_sec": 0.5342189073562622,
+      "p95_sec": 0.5982151389122009,
+      "max_sec": 0.970259428024292,
+      "total_sec": 181.221688747406
+    },
+    "calibrate_frame_timing": {
+      "n": 100,
+      "mean_sec": 2.263443179130554,
+      "median_sec": 2.2598308324813843,
+      "p95_sec": 2.309611988067627,
+      "max_sec": 2.5334484577178955,
+      "total_sec": 226.34431791305542
+    },
+    "enrichment_wall_sec": 0.4,
+    "ball_wall_sec": 0.0,
+    "team_wall_sec": 11.0,
+    "team_resolve_wall_sec": 3.1,
+    "team_fallback_wall_sec": 0.0,
+    "team_merge_wall_sec": 1.7,
+    "team_id_swap_wall_sec": 0.1,
+    "team_apply_wall_sec": 0.0,
+    "team_frame_access_stats": null,
+    "render_wall_sec": 0.0
+  },
+  "team": {
+    "cluster_separation": 55.0,
+    "n_player_tracks_total": 156,
+    "n_resolved": 141,
+    "n_unresolved": 15,
+    "resolved_pct": 0.9038,
+    "gray_frame_pct": 0.0066,
+    "n_fallback_assigned": 26,
+    "n_merged_pairs": 68,
+    "n_rejected_merge_candidates": 51,
+    "verdict": "PASS"
+  },
+  "calibration": {
+    "mean_confidence": 0.9506,
+    "median_confidence": 1.0,
+    "pct_frames_below_70": 0.02,
+    "verdict": "PASS"
+  },
+  "camera_motion": {
+    "spike_frame_count_over_15px": 0,
+    "max_magnitude_px": 13.51,
+    "sustained_burst_events": 0,
+    "verdict": "PASS"
+  },
+  "identity": {
+    "raw_track_count": 156,
+    "n_flagged_candidates": 12,
+    "strong_signature": 11,
+    "weak_signature": 1,
+    "strong_signature_per_100_frames": 1.1,
+    "weak_signature_per_100_frames": 0.1,
+    "flagged": [
+      {
+        "pid": 85,
+        "n_samples": 73,
+        "whole_purity": 0.658,
+        "weighted_purity": 1.0,
+        "improvement": 0.342,
+        "split_before_fn": 117,
+        "split_after_fn": 123,
+        "signature": "weak"
+      },
+      {
+        "pid": 144,
+        "n_samples": 52,
+        "whole_purity": 0.731,
+        "weighted_purity": 0.981,
+        "improvement": 0.25,
+        "split_before_fn": 129,
+        "split_after_fn": 130,
+        "signature": "strong"
+      },
+      {
+        "pid": 355,
+        "n_samples": 263,
+        "whole_purity": 0.932,
+        "weighted_purity": 0.996,
+        "improvement": 0.065,
+        "split_before_fn": 539,
+        "split_after_fn": 540,
+        "signature": "strong"
+      },
+      {
+        "pid": 379,
+        "n_samples": 97,
+        "whole_purity": 0.753,
+        "weighted_purity": 0.907,
+        "improvement": 0.155,
+        "split_before_fn": 238,
+        "split_after_fn": 239,
+        "signature": "strong"
+      },
+      {
+        "pid": 403,
+        "n_samples": 71,
+        "whole_purity": 0.732,
+        "weighted_purity": 0.915,
+        "improvement": 0.183,
+        "split_before_fn": 242,
+        "split_after_fn": 244,
+        "signature": "strong"
+      },
+      {
+        "pid": 460,
+        "n_samples": 77,
+        "whole_purity": 0.935,
+        "weighted_purity": 1.0,
+        "improvement": 0.065,
+        "split_before_fn": 310,
+        "split_after_fn": 311,
+        "signature": "strong"
+      },
+      {
+        "pid": 471,
+        "n_samples": 110,
+        "whole_purity": 0.918,
+        "weighted_purity": 1.0,
+        "improvement": 0.082,
+        "split_before_fn": 450,
+        "split_after_fn": 451,
+        "signature": "strong"
+      },
+      {
+        "pid": 571,
+        "n_samples": 166,
+        "whole_purity": 0.578,
+        "weighted_purity": 0.94,
+        "improvement": 0.361,
+        "split_before_fn": 537,
+        "split_after_fn": 538,
+        "signature": "strong"
+      },
+      {
+        "pid": 604,
+        "n_samples": 172,
+        "whole_purity": 0.605,
+        "weighted_purity": 0.983,
+        "improvement": 0.378,
+        "split_before_fn": 670,
+        "split_after_fn": 671,
+        "signature": "strong"
+      },
+      {
+        "pid": 628,
+        "n_samples": 373,
+        "whole_purity": 0.898,
+        "weighted_purity": 0.912,
+        "improvement": 0.013,
+        "split_before_fn": 568,
+        "split_after_fn": 569,
+        "signature": "strong"
+      },
+      {
+        "pid": 675,
+        "n_samples": 41,
+        "whole_purity": 0.512,
+        "weighted_purity": 0.951,
+        "improvement": 0.439,
+        "split_before_fn": 660,
+        "split_after_fn": 661,
+        "signature": "strong"
+      },
+      {
+        "pid": 695,
+        "n_samples": 257,
+        "whole_purity": 0.689,
+        "weighted_purity": 0.914,
+        "improvement": 0.226,
+        "split_before_fn": 749,
+        "split_after_fn": 750,
+        "signature": "strong"
+      }
+    ],
+    "verdict": null
+  },
+  "goalkeepers": {
+    "track_count": 1,
+    "expected_max": 6,
+    "margin_label": "1/6 \u2014 5 under limit",
+    "verdict": "PASS"
+  },
+  "ball": {
+    "raw_detection_pct": 0.4731,
+    "post_interpolation_pct": 1.0,
+    "n_gaps": 158,
+    "median_gap_frames": 2.0,
+    "median_gap_sec": 0.08,
+    "p90_gap_frames": 8.0,
+    "p90_gap_sec": 0.32,
+    "max_gap_frames": 107,
+    "max_gap_sec": 4.28,
+    "n_gaps_over_1s": 6,
+    "n_gaps_over_3s": 1,
+    "n_gaps_over_uncertain_threshold": 8,
+    "pct_frames_within_1s_of_real": 0.934,
+    "pct_frames_within_3s_of_real": 1.0,
+    "verdict": null
+  },
+  "overall_verdict": "PASS",
+  "rendered": false,
+  "render_dir": null
+}

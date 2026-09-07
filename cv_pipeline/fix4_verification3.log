@@ -1,0 +1,35 @@
+[team_assigner] excluded 12 goalkeeper detection(s) from team-color clustering
+
+============================================================
+[team_assigner] KMeans fit on 589 samples from frames [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290]
+  Team 1  BGR: B= 84.9  G=108.2  R=170.6
+  Team 2  BGR: B=113.5  G=204.3  R=156.5
+  Centroid separation: 101.3  [OK]
+  Cluster populations: [np.int64(317), np.int64(146), np.int64(126)]
+============================================================
+
+fallback assigned: {np.int64(22): 2, np.int64(23): 2, np.int64(30): 1, np.int64(38): 2}
+
+5 merged, 11 rejected
+
+=== MERGED ===
+  {'a': np.int64(23), 'b': np.int64(38), 'gap': 6, 'dist': 5.701208232778082, 'appearance_dist': 8.538741111755371, 'action': 'already agree (team=2)'}
+  {'a': np.int64(71), 'b': np.int64(88), 'gap': 6, 'dist': 47.90291174990901, 'appearance_dist': 22.068264559569542, 'action': 'propagated A(team=1) -> B'}
+  {'a': np.int64(78), 'b': np.int64(85), 'gap': 12, 'dist': 70.6343995675125, 'appearance_dist': 21.20942821473015, 'action': 'propagated B(team=2) -> A'}
+  {'a': np.int64(85), 'b': np.int64(160), 'gap': 18, 'dist': 26.66355584454632, 'appearance_dist': 32.62316416502895, 'action': 'propagated A(team=2) -> B'}
+  {'a': np.int64(85), 'b': np.int64(162), 'gap': 27, 'dist': 17.665654943958472, 'appearance_dist': 33.25918052460907, 'action': 'propagated A(team=2) -> B'}
+
+=== REJECTED ===
+  {'a': np.int64(3), 'b': np.int64(180), 'gap': 4, 'dist': 23.011525174587685, 'reason': 'appearance mismatch (dist=41.4, threshold=40.0, reliable=True)'}
+  {'a': np.int64(12), 'b': np.int64(82), 'gap': 20, 'dist': 41.97952367096467, 'reason': 'appearance mismatch (dist=59.1, threshold=40.0, reliable=True)'}
+  {'a': np.int64(14), 'b': np.int64(85), 'gap': 12, 'dist': 92.9623601148882, 'reason': 'appearance mismatch (dist=48.6, threshold=40.0, reliable=True)'}
+  {'a': np.int64(22), 'b': np.int64(81), 'gap': 5, 'dist': 12.678527711057278, 'reason': 'appearance mismatch (dist=69.5, threshold=20.0, reliable=False)'}
+  {'a': np.int64(38), 'b': np.int64(48), 'gap': 14, 'dist': 16.60364722441748, 'reason': 'appearance mismatch (dist=53.1, threshold=20.0, reliable=False)'}
+  {'a': np.int64(81), 'b': np.int64(158), 'gap': 20, 'dist': 42.23668114262166, 'reason': 'appearance mismatch (dist=86.5, threshold=40.0, reliable=True)'}
+  {'a': np.int64(81), 'b': np.int64(159), 'gap': 29, 'dist': 57.896738984546715, 'reason': 'appearance mismatch (dist=45.8, threshold=40.0, reliable=True)'}
+  {'a': np.int64(85), 'b': np.int64(163), 'gap': 28, 'dist': 22.587857774647937, 'reason': 'contradictory resolved teams (A=2, B=1)'}
+  {'a': np.int64(158), 'b': np.int64(159), 'gap': 4, 'dist': 16.448426653226175, 'reason': 'appearance mismatch (dist=41.2, threshold=40.0, reliable=True)'}
+  {'a': np.int64(160), 'b': np.int64(162), 'gap': 8, 'dist': 18.291344950216878, 'reason': 'appearance mismatch (dist=51.5, threshold=40.0, reliable=True)'}
+  {'a': np.int64(160), 'b': np.int64(163), 'gap': 9, 'dist': 9.00505005947284, 'reason': 'contradictory resolved teams (A=2, B=1)'}
+
+FINAL unresolved count: 4 of 43
