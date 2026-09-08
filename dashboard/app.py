@@ -1916,6 +1916,39 @@ def _get_active_match_identity():
         return "cache", st.session_state.video_hash
     return None, None
 
+# Curated matches with a committed peak-momentum segment clip (Part 2:
+# Coach Report video playback). NOT the full original match - just the
+# ~1-minute window both Gemini and the CV pipeline actually analyzed. The
+# full source videos (hundreds of MB each) were never committed to this
+# repo, consistent with the consolidation's raw-footage exclusion; adding
+# them is a separate, explicit storage decision, not assumed here. A live
+# upload's source video is deleted right after the initial Gemini
+# extraction (see Step 1's `finally: os.remove(temp_video_path)`) and was
+# never retained, so "cache"-sourced matches have nothing to show either.
+CURATED_SEGMENT_VIDEO_MATCHES = {"liverpool_psg", "barca_madrid_pt1"}
+
+def render_coach_report_video():
+    """Plays the analyzed match segment above the AI report, where a clip is
+    actually available on disk - honest about it being the analyzed window,
+    not the full match, rather than implying more than what's shown."""
+    source, key = _get_active_match_identity()
+    segment_path = None
+    if source == "curated" and key in CURATED_SEGMENT_VIDEO_MATCHES:
+        candidate = CURATED_MATCHES_DIR / key / "peak_momentum_segment.mp4"
+        if candidate.exists():
+            segment_path = candidate
+
+    if segment_path:
+        timestamp = st.session_state.get('cv_segment_timestamp')
+        caption = "The analyzed match segment"
+        if timestamp:
+            caption += f" ({timestamp} of the full match)"
+        caption += " — not the full match video, which isn't included in this deployment."
+        st.video(str(segment_path))
+        st.caption(caption)
+    else:
+        st.info("Original match video not available for this analysis.")
+
 def render_training_plan_tab():
     st.subheader("🏋️ Training Plan")
     st.caption(
@@ -3440,6 +3473,7 @@ elif st.session_state.step == 3:
                     mime='text/csv'
                 )
             with tab_coach:
+                render_coach_report_video()
                 st.header("🤖 In-Depth AI Diagnostic Report")
                 # The stored report has literal {TEAM_A}/{TEAM_B} tokens baked in
                 # instead of real names (see the writing_prompt in Step 3) so a
