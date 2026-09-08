@@ -4,21 +4,21 @@
 # not an optional wrapper. See https://huggingface.co/docs/hub/spaces-sdks-docker
 FROM python:3.11-slim
 
-# libgl1/libglib2.0-0: headless OpenCV's real runtime shared-library needs
-# (opencv-python-headless still links against these at import time).
-# ffmpeg: moviepy's actual video encode/decode backend.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1 libglib2.0-0 ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+# No apt packages needed: confirmed during the Community Cloud deploy that
+# opencv-python-headless is specifically built to not need libgl1/GTK/X11
+# (that's the point of "headless"), and moviepy's imageio-ffmpeg dependency
+# bundles its own portable ffmpeg binary via pip - no system ffmpeg required.
 
 # Non-root user pattern HF's own Docker Space docs specify (required for Dev
 # Mode compatibility and to avoid permission issues on cache/write paths).
 RUN useradd -m -u 1000 user
 WORKDIR /app
 
-COPY --chown=user requirements.txt requirements.txt
+COPY --chown=user dashboard/requirements.txt requirements.txt
 # CPU-only torch build - the default PyPI wheel bundles CUDA binaries that
-# are multi-GB and useless on cpu-basic hardware.
+# are multi-GB and useless on cpu-basic hardware. (requirements.txt's own
+# first line already has this as a directive too - harmless to also pass it
+# here explicitly.)
 RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu \
     -r requirements.txt
 

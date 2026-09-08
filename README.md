@@ -22,13 +22,20 @@ pipeline correctly.
 ## Running on Streamlit Community Cloud (active deployment target)
 
 Deployed directly from this GitHub repo via [share.streamlit.io](https://share.streamlit.io)
-— no Dockerfile involved for this path. Community Cloud reads `requirements.txt`
-(Python deps — one merged file covering both `dashboard/` and `cv_pipeline/`, since
-`run_cv_analysis.py` runs as a subprocess in the same environment) and
-`.streamlit/config.toml` (must live at the repo root whenever the app's main file is in
-a subdirectory, per Streamlit's own docs — a duplicate of
-`dashboard/.streamlit/config.toml`, kept for local `streamlit run` from inside
-`dashboard/`) from the repo root. When deploying, set **Main file path** to
+— no Dockerfile involved for this path. **`dashboard/requirements.txt` (next to the
+entrypoint, not the repo root) is the one Community Cloud actually installs from** —
+confirmed empirically, not from docs: with a requirements.txt at *both* the root and
+next to the entrypoint, Community Cloud's build silently preferred the one next to the
+entrypoint (its own build log: `"More than one requirements file detected... Used: uv
+with .../dashboard/requirements.txt"`), which briefly broke the deploy when a root-only
+merged file existed and the stale `dashboard/`-local one (missing `pypdf` and the whole
+CV-pipeline stack) got used instead. Fixed by keeping exactly one requirements.txt,
+at `dashboard/requirements.txt`, covering both halves (since `run_cv_analysis.py` runs
+as a subprocess in the same environment as the dashboard). `.streamlit/config.toml`
+*does* need to stay at the repo root when the entrypoint is in a subdirectory (per
+Streamlit's docs — confirmed correct, unlike the requirements.txt assumption above) —
+kept as a duplicate of `dashboard/.streamlit/config.toml`, which stays too for local
+`streamlit run` from inside `dashboard/`. When deploying, set **Main file path** to
 `dashboard/app.py`, and paste the Gemini key into the app's **Advanced settings →
 Secrets** as `master_key = "..."` — Community Cloud's native `st.secrets` support means
 `app.py`'s existing `master_key = st.secrets["master_key"]` needs no adapter here.
@@ -73,10 +80,10 @@ video archive of everything ever produced during development.
 
 ## Requirements
 
-The root `requirements.txt` covers both halves (the dashboard's Streamlit/AI stack and
+`dashboard/requirements.txt` covers both halves (the dashboard's Streamlit/AI stack and
 the CV pipeline's tracking/detection stack, traced from `run_cv_analysis.py`'s real
 import graph) — this is what both deployment paths install, and what a local install
-should use too, rather than `dashboard/requirements.txt` alone. A Gemini API key is required
+should use. A Gemini API key is required
 for the dashboard's AI features — set it locally via `dashboard/.env`
 (`GEMINI_API_KEY=...`) or `dashboard/.streamlit/secrets.toml` (`master_key = "..."`),
 neither of which is committed to this repo.
