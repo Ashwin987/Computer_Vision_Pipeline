@@ -52,13 +52,18 @@ were actually for: `opencv-python-headless` is specifically built to not need
 `ffmpeg` needed. Removing `packages.txt` entirely sidesteps the broken apt source with
 no functional loss.
 
-**Live video upload is enabled but not the reliable demo path on this platform's free
-tier specifically**: Community Cloud guarantees only ~1GB RAM per app (bursting to
-~3GB), which the CV pipeline's PyTorch/YOLO/OpenCV stack can exceed on its own before
-even accounting for the multi-hour CPU runtime this project has already measured on
-demanding footage. The in-app notice on the upload flow says so plainly. The two
-curated **Instant Demo** matches (pre-computed, no live compute needed) are the
-reliable, immediate walkthrough.
+**Live video upload is enabled in the UI but does not actually work on this
+deployment** — not just "unreliable," genuinely non-functional. Two compounding
+reasons: (1) Community Cloud guarantees only ~1GB RAM per app (bursting to ~3GB),
+which the CV pipeline's PyTorch/YOLO/OpenCV stack can exceed on its own before even
+accounting for the multi-hour CPU runtime this project has already measured on
+demanding footage; (2) more fundamentally, `dashboard/requirements.txt` deliberately
+excludes the entire CV-pipeline stack (torch, ultralytics, inference, etc.) — see
+"Requirements" below for why. Clicking "Analyze This Match" here will launch the
+subprocess, which will fail fast with an import error and surface as a stuck/failed
+job, not silently hang. The two curated **Instant Demo** matches (pre-computed, no live
+compute needed) are the reliable, immediate walkthrough, and the only fully-working
+path on this deployment.
 
 ### Alternate path: Hugging Face Spaces (Docker SDK) — present but not active
 
@@ -67,7 +72,10 @@ rather than deleted since they're harmless and may be useful if a paid HF plan i
 later (Docker Spaces require one; that's why this repo moved to Community Cloud
 instead). `entrypoint.sh` adapts HF's env-var secret delivery into
 `dashboard/.streamlit/secrets.toml` at container start — that adapter is specific to
-this path and isn't used by the Community Cloud deployment above.
+this path and isn't used by the Community Cloud deployment above. Its `Dockerfile`
+installs both `dashboard/requirements.txt` and `cv_pipeline/requirements.txt` (see
+below) — `python:3.11-slim` doesn't have Community Cloud's Python-3.14 problem, so
+live upload works end-to-end on this path.
 
 ## Scope note
 
@@ -80,10 +88,23 @@ video archive of everything ever produced during development.
 
 ## Requirements
 
-`dashboard/requirements.txt` covers both halves (the dashboard's Streamlit/AI stack and
-the CV pipeline's tracking/detection stack, traced from `run_cv_analysis.py`'s real
-import graph) — this is what both deployment paths install, and what a local install
-should use. A Gemini API key is required
-for the dashboard's AI features — set it locally via `dashboard/.env`
-(`GEMINI_API_KEY=...`) or `dashboard/.streamlit/secrets.toml` (`master_key = "..."`),
-neither of which is committed to this repo.
+`dashboard/requirements.txt` covers only the dashboard's own Streamlit/AI stack — it
+does **not** include the CV pipeline's tracking/detection stack (torch, ultralytics,
+supervision, inference, scikit-learn) anymore. That stack was removed after it broke
+the Community Cloud deploy outright: Community Cloud's default Python (3.14.7, no
+version pin exists in this repo) has no compatible wheel at all for `inference`
+(Roboflow) or its `onnxruntime` dependency, and since a single `pip install -r
+requirements.txt` is all-or-nothing, that one broken package was blocking every other
+package in the file — including unrelated ones like `pypdf` — from installing. The
+dashboard process itself never imports the CV stack directly; it only launches
+`run_cv_analysis.py` as a detached subprocess for live upload, which was already the
+explicitly-not-guaranteed path on this platform's ~1GB RAM free tier. Dropping those
+packages here means that subprocess now fails fast with an import error instead of the
+whole app failing to build — a deliberate trade favoring the guaranteed curated-match
+demo path. To run the CV pipeline for real (locally, or in the `python:3.11-slim`-based
+Docker path above where Python-3.14 isn't an issue), install
+`cv_pipeline/requirements.txt` alongside `dashboard/requirements.txt`.
+
+A Gemini API key is required for the dashboard's AI features — set it locally via
+`dashboard/.env` (`GEMINI_API_KEY=...`) or `dashboard/.streamlit/secrets.toml`
+(`master_key = "..."`), neither of which is committed to this repo.

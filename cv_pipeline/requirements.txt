@@ -1,0 +1,24 @@
+# CV-pipeline-only dependencies, traced from run_cv_analysis.py's real import
+# graph (not a blind grep across the whole folder). Excludes narya_src's stack
+# (tensorflow/mxnet/gluoncv/keras/segmentation_models/gfootball) - confirmed
+# unused by the real runtime path (narya_calibrator.py is never imported by
+# run_cv_analysis.py; pitch_calibrator.py's own custom-trained model is what's
+# actually used). Also excludes the pip package "trackers" - the local
+# cv_pipeline/trackers/ folder shadows it, so it's never actually imported.
+#
+# Pulled out of dashboard/requirements.txt because `inference` (and its
+# onnxruntime dependency) has no published wheel for Python 3.14, which is
+# Streamlit Community Cloud's current default - installing this alongside the
+# dashboard's own deps there broke the whole requirements.txt resolution
+# (pip/uv installs are all-or-nothing). Install this file only in an
+# environment with an older Python (e.g. the Dockerfile's python:3.11-slim,
+# or a local dev venv pinned below 3.13), alongside dashboard/requirements.txt,
+# to run the CV pipeline for real.
+scikit-learn
+ultralytics
+supervision
+tqdm
+inference
+python-dotenv
+torch
+torchvision

@@ -1,14 +1,26 @@
-# CPU-only PyTorch build - the default PyPI wheel bundles multi-GB CUDA
-# binaries useless on Community Cloud's CPU-only free tier. pip itself
-# supports --extra-index-url as a requirements.txt directive (this isn't
-# Streamlit-specific); their docs don't explicitly confirm their build
-# system honors it, so double-check the build log after deploy - if it's
-# ignored, torch's default (CUDA) wheel would still install fine, just
-# larger than needed. Given the free tier's ~1GB RAM ceiling (see README),
-# this alone won't guarantee a real video fits in memory regardless.
---extra-index-url https://download.pytorch.org/whl/cpu
+# Dashboard-only requirements. Community Cloud's default Python is currently
+# 3.14.7 (no version pin exists in this repo), and the CV pipeline's own
+# stack (inference/onnxruntime in particular) has zero published wheels for
+# 3.14 - installing it here made the WHOLE file unresolvable (pip/uv install
+# is all-or-nothing), which was blocking even unrelated packages like pypdf
+# from ever installing. The dashboard process itself never imports any of
+# that stack directly - it only shells out to run_cv_analysis.py as a
+# subprocess for live upload, which is already the explicitly-not-guaranteed
+# path on this platform's free tier. So it's dropped here rather than fighting
+# a Python-version pin: the guaranteed curated-match demo path never touches
+# it, and live upload was already expected to be impractical on ~1GB RAM.
+# (The dormant Dockerfile path uses python:3.11-slim, where this stack WOULD
+# install fine - if that path is ever revived, re-add the CV-pipeline block
+# that used to live below, either back into this file or a separate one.)
+#
+# Also dropped: the --extra-index-url .../whl/cpu line for CPU-only torch.
+# It's gone now anyway since torch/torchvision aren't needed by the dashboard
+# process itself, but worth recording why even if they come back: Community
+# Cloud's build got a 403 Forbidden querying that index, and uv's
+# dependency-confusion protection (first-index-wins across multiple
+# --extra-index-urls) then locked onto a stale package version found there,
+# cascading into an unrelated unsatisfiable-version error.
 
-# Dashboard (simulation/Dashboard -> dashboard/)
 streamlit
 pandas
 matplotlib
@@ -22,19 +34,3 @@ streamlit-autorefresh
 reportlab
 chromadb
 pypdf
-
-# CV pipeline (cv_pipeline/) - traced from run_cv_analysis.py's real import
-# graph, not a blind grep across the whole folder. Excludes narya_src's stack
-# (tensorflow/mxnet/gluoncv/keras/segmentation_models/gfootball) - confirmed
-# unused by the real runtime path (narya_calibrator.py is never imported by
-# run_cv_analysis.py; pitch_calibrator.py's own custom-trained model is what's
-# actually used). Also excludes the pip package "trackers" - the local
-# cv_pipeline/trackers/ folder shadows it, so it's never actually imported.
-scikit-learn
-ultralytics
-supervision
-tqdm
-inference
-python-dotenv
-torch
-torchvision

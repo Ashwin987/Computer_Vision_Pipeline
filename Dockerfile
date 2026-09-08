@@ -15,12 +15,14 @@ RUN useradd -m -u 1000 user
 WORKDIR /app
 
 COPY --chown=user dashboard/requirements.txt requirements.txt
-# CPU-only torch build - the default PyPI wheel bundles CUDA binaries that
-# are multi-GB and useless on cpu-basic hardware. (requirements.txt's own
-# first line already has this as a directive too - harmless to also pass it
-# here explicitly.)
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu \
-    -r requirements.txt
+COPY --chown=user cv_pipeline/requirements.txt requirements-cv.txt
+# Split across two files because Streamlit Community Cloud's default Python
+# (3.14) has no compatible wheel for `inference`/onnxruntime, which broke
+# that deployment's install entirely when both stacks lived in one file
+# (pip/uv installs are all-or-nothing). This Dockerfile pins python:3.11-slim,
+# where the CV stack installs fine, so both files are installed here to keep
+# live upload working in a Docker Space.
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-cv.txt
 
 COPY --chown=user . /app
 
