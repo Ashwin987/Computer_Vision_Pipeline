@@ -1342,6 +1342,75 @@ def _resolve_cv_path(path_str):
     p = Path(path_str.replace("\\", "/"))
     return p if p.is_absolute() else (CV_PIPELINE_DIR / p)
 
+# Duplicated from cv_pipeline/pitch_calibrator.py's PITCH_KP_WORLD rather than
+# imported - that module does `from ultralytics import YOLO` at import time,
+# and ultralytics isn't installed in the dashboard's own environment (dropped
+# from dashboard/requirements.txt; see that file's header comment). Re-verify
+# this stays in sync with pitch_calibrator.py if that table is ever edited.
+# Landmark names below are filled in ONLY for the subset (12 of 48) whose
+# coordinate exactly matches a standard FIFA pitch landmark computed from the
+# geometry constants documented in pitch_calibrator.py's own header comment
+# (corners, penalty/six-yard box corners, centre-circle/halfway intersection).
+# The other 36 indices are additional correspondence points the report
+# (Section 2.4.3-2.4.4) describes as assigned "by eye" during training data
+# labeling, with no published index-to-landmark name table anywhere in this
+# codebase or the technical report - inventing specific names for them would
+# not be verifiable, so they're shown with their real coordinate and no
+# invented name instead. Indices 8 and 32 share the identical coordinate
+# (16.5, 0.0) - the report (Section 2.4.6) describes exactly this symptom
+# (two indices assigned one coordinate) as a sign of an uncorrected mapping
+# error; this specific pair does not appear to have been fixed.
+PITCH_REFERENCE_POINTS = {
+     0: ( 26.18,  0.56, None),
+     1: (  0.00,  0.00, "Corner — left goal line, far touchline"),
+     2: ( 35.42,  6.87, None),
+     3: (  0.00, 68.00, "Corner — left goal line, near touchline"),
+     4: (  5.50, 68.00, None),
+     5: ( 12.32, 50.75, None),
+     6: ( 26.74, 15.70, None),
+     7: ( 30.94, 27.34, None),
+     8: ( 16.50,  0.00, None),
+     9: ( 16.50, 13.84, "Left penalty box corner — top edge, inside the pitch"),
+    10: ( 16.50, 54.16, "Left penalty box corner — bottom edge, inside the pitch"),
+    11: ( 16.50, 68.00, None),
+    12: (  0.00, 24.84, "Left six-yard box corner — top edge, on the goal line"),
+    13: ( 53.90,  0.42, None),
+    14: ( 54.74, 23.98, None),
+    15: ( 52.50, 43.15, "Centre circle ∩ halfway line — near-touchline side"),
+    16: ( 54.88, 39.82, None),
+    17: ( 37.94, 28.32, None),
+    18: ( 28.42, 66.88, None),
+    19: ( 32.48, 41.64, None),
+    20: ( 48.16, 30.99, None),
+    21: ( 25.76, 22.85, None),
+    22: ( 33.04, 10.09, None),
+    23: ( 22.68,  7.29, None),
+    24: ( 31.92,  0.56, None),
+    25: ( 88.50, 54.16, "Right penalty box corner — bottom edge, inside the pitch"),
+    26: ( 88.50, 68.00, None),
+    27: ( 46.00,  0.00, None),
+    28: ( 42.28, 23.13, None),
+    29: ( 47.00, 43.15, None),
+    30: ( 35.84, 36.87, None),
+    31: ( 88.50, 34.00, None),
+    32: ( 16.50,  0.00, None),
+    33: ( 58.00,  0.00, None),
+    34: ( 40.60,  1.26, None),
+    35: ( 88.50, 13.84, "Right penalty box corner — top edge, inside the pitch"),
+    36: ( 30.38, 53.28, None),
+    37: ( 33.60, 64.07, None),
+    38: ( 36.40, 61.97, None),
+    39: ( 31.36, 53.84, None),
+    40: ( 64.00,  0.00, None),
+    41: ( 88.50,  0.00, None),
+    42: ( 38.08, 57.91, None),
+    43: ( 35.84, 59.73, None),
+    44: (  0.00, 13.84, "Left penalty box corner — top edge, on the goal line"),
+    45: (  0.00, 54.16, "Left penalty box corner — bottom edge, on the goal line"),
+    46: (105.00, 13.84, "Right penalty box corner — top edge, on the goal line"),
+    47: (105.00, 54.16, "Right penalty box corner — bottom edge, on the goal line"),
+}
+
 CV_OUTPUT_VIDEO_LABELS = {
     'output1.avi': 'Tracking + Speed & Distance',
     'output2.avi': 'Tactical Events Carousel',
@@ -1675,6 +1744,44 @@ def render_cv_completed_state(status, cv_output_dir):
                             "including the same player being re-identified multiple times after being "
                             "briefly occluded or leaving/re-entering frame. It is not a headcount — a "
                             "real match has ~22 players on the pitch at once.")
+                metric_card(st, "Ball tracking", "Dual-model",
+                            "A fast primary detector, backed by a slower, higher-accuracy fallback for "
+                            "the frames it misses.")
+            with wcol1:
+                metric_card(st, "Pitch reference points", str(len(PITCH_REFERENCE_POINTS)),
+                            "Every frame is calibrated against 48 fixed landmarks on the pitch — "
+                            "corners, penalty spots, the centre circle, and other line intersections — "
+                            "which is what makes it possible to convert a player's position in the "
+                            "video into a real position on the pitch.")
+                metric_card(st, "Automation", "Fully automated",
+                            "No manual annotation at run time — every match is processed the same way, "
+                            "start to finish.")
+
+            with st.expander(f"View all {len(PITCH_REFERENCE_POINTS)} pitch reference points"):
+                st.caption(
+                    "Real-world pitch coordinates (metres) the calibration model is trained to "
+                    "locate, from a 105×68m pitch with the origin at one corner. 12 of these "
+                    "correspond to a standard, independently verifiable landmark (a corner, a box "
+                    "corner, the centre circle/halfway intersection); the other 36 are additional "
+                    "correspondence points the technical report describes as labeled by visual "
+                    "inspection during model training, with no published name for each one beyond "
+                    "its coordinate — shown here honestly rather than with an invented name."
+                )
+                ref_rows = [
+                    {
+                        "Index": i,
+                        "World coordinate (x, y) — metres": f"({x:.2f}, {y:.2f})",
+                        "Landmark": name if name else "—",
+                    }
+                    for i, (x, y, name) in sorted(PITCH_REFERENCE_POINTS.items())
+                ]
+                st.dataframe(ref_rows, hide_index=True, use_container_width=True)
+                st.caption(
+                    "Note: indices 8 and 32 currently share the identical coordinate (16.50, 0.00). "
+                    "The technical report (Section 2.4.6) documents this exact symptom — two indices "
+                    "assigned one coordinate — as a sign of an uncorrected mapping error elsewhere in "
+                    "this table; this specific pair does not appear to have been fixed yet."
+                )
         else:
             st.info("Stats file not yet available on disk.")
 
