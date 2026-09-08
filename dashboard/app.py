@@ -1330,8 +1330,16 @@ def _resolve_cv_path(path_str):
     (e.g. its own default relative 'output_videos') writes paths relative
     to the CV repo's cwd, not this Streamlit app's cwd. Absolute paths pass
     through unchanged; relative ones are resolved against CV_PIPELINE_DIR,
-    the only base directory that makes sense for this cross-repo path."""
-    p = Path(path_str)
+    the only base directory that makes sense for this cross-repo path.
+
+    The curated matches' status.json files were originally written on Windows,
+    where run_cv_analysis.py's output-dir join produced backslash separators
+    (e.g. "output_videos\\liverpool_psg_verified\\output1.avi") - valid as a
+    JSON string, but on Linux (Community Cloud) a backslash is just a regular
+    filename character, not a separator, so Path() treated the whole string
+    as one unresolvable component. Normalizing to forward slashes first fixes
+    both these committed files and any future job run on Windows."""
+    p = Path(path_str.replace("\\", "/"))
     return p if p.is_absolute() else (CV_PIPELINE_DIR / p)
 
 CV_OUTPUT_VIDEO_LABELS = {
