@@ -1,0 +1,30 @@
+# Dashboard (simulation/Dashboard -> dashboard/)
+streamlit
+pandas
+matplotlib
+seaborn
+opencv-python-headless
+google-genai
+numpy
+moviepy
+plotly
+streamlit-autorefresh
+reportlab
+chromadb
+pypdf
+
+# CV pipeline (cv_pipeline/) - traced from run_cv_analysis.py's real import
+# graph, not a blind grep across the whole folder. Excludes narya_src's stack
+# (tensorflow/mxnet/gluoncv/keras/segmentation_models/gfootball) - confirmed
+# unused by the real runtime path (narya_calibrator.py is never imported by
+# run_cv_analysis.py; pitch_calibrator.py's own custom-trained model is what's
+# actually used). Also excludes the pip package "trackers" - the local
+# cv_pipeline/trackers/ folder shadows it, so it's never actually imported.
+scikit-learn
+ultralytics
+supervision
+tqdm
+inference
+python-dotenv
+torch
+torchvision

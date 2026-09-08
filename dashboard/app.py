@@ -2256,6 +2256,15 @@ if st.session_state.step == 1:
         with upload_col:
             with st.container(border=True):
                 st.markdown("##### 📤 Drop a match video, or click to browse")
+                st.warning(
+                    "⏱️ **On this deployment's free CPU hardware, a full analysis run can take several "
+                    "hours** depending on the clip (this pipeline's own measured runtimes on demanding "
+                    "footage run into hours on CPU — see the Methodology page). Keep this browser tab "
+                    "open while it runs: a long-idle or refreshed session isn't guaranteed to survive on "
+                    "shared free infrastructure, and there's no way to resume a run that gets interrupted. "
+                    "For an immediate, complete walkthrough with no wait, use **Instant Demo (Curated "
+                    "Matches)** below instead."
+                )
                 uploaded_video = st.file_uploader(
                     "Choose a video file (Max 2GB)", type=["mp4", "mov", "avi"], label_visibility="collapsed"
                 )
