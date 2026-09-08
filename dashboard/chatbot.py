@@ -123,13 +123,29 @@ def count_tactical_events(stats_json, event_type):
     return counts[event_type], None
 
 
+def _normalize_player_id(raw):
+    """Gemini's function-calling for get_player_stat occasionally returns
+    'player_8'/'player 8'/'p8'/'#8' instead of the bare '8' that actually
+    keys stats['players'] - confirmed via the validation harness recurring
+    inconsistently across runs for the IDENTICAL question (same prompt,
+    different extraction format), so this is a real non-determinism to
+    normalize against, not a one-off fluke. Strips known prefixes only -
+    NOT a blanket non-digit strip - so a genuinely invalid id like '-1'
+    (used by the validation harness's own adversarial check) stays '-1'
+    rather than silently being coerced into the real, different id '1'."""
+    s = str(raw).strip().lower()
+    s = re.sub(r'^(player|p|#)[\s_#-]*', '', s)
+    return s.strip()
+
+
 def get_player_stat(stats_json, player_id, field):
     if not stats_json:
         return None, "No CV analysis is available for this match, so there's no player tracking data."
+    raw_player_id = player_id
     try:
-        player_id = int(player_id)
+        player_id = int(_normalize_player_id(player_id))
     except (TypeError, ValueError):
-        return None, f"'{player_id}' isn't a valid player id."
+        return None, f"'{raw_player_id}' isn't a valid player id."
     players = {p.get("player_id"): p for p in stats_json.get("players", [])}
     if player_id not in players:
         return None, f"Player {player_id} wasn't tracked in this match's analyzed window."
@@ -137,6 +153,40 @@ def get_player_stat(stats_json, player_id, field):
     if field not in p:
         return None, f"'{field}' isn't a tracked field for player {player_id}."
     return p[field], None
+
+
+# Real dotted paths into stats.json - the exact same values the CV Deep
+# Analysis tab's Window Stats cards already display (app.py's
+# stats_json['team_resolution']['resolution_rate_pct'] /
+# ['calibration']['mean_confidence'] / ['ball']['final_detection_rate_pct']),
+# reused here rather than re-derived, so the chatbot's answer can never
+# drift from what's shown on that tab. These three were real, already-
+# computed values with no lookup path at all in Layer 1 (confirmed via the
+# validation harness: a direct question about any of them fell through to
+# an honest but unhelpful "doesn't cover that" every time, since neither
+# get_raw_data_field/get_player_stat/count_tactical_events covers them nor
+# is stats_json's team_resolution/calibration/ball data ever embedded into
+# the Layer 2 semantic index).
+CV_QUALITY_FIELDS = {
+    "team_resolution": ("team_resolution", "resolution_rate_pct"),
+    "calibration_confidence": ("calibration", "mean_confidence"),
+    "ball_detection_rate": ("ball", "final_detection_rate_pct"),
+}
+
+
+def get_cv_quality_stat(stats_json, field):
+    if not stats_json:
+        return None, "No CV analysis is available for this match, so there's no tracking-quality data."
+    if field not in CV_QUALITY_FIELDS:
+        return None, (
+            f"'{field}' isn't a tracked CV-quality field for this match "
+            f"(available: {', '.join(CV_QUALITY_FIELDS)})."
+        )
+    section, key = CV_QUALITY_FIELDS[field]
+    value = stats_json.get(section, {}).get(key)
+    if value is None:
+        return None, f"No value recorded for '{field}' for this match."
+    return value, None
 
 
 def get_tactical_event_highlights(stats_json, event_type=None, top_n=3):
@@ -197,6 +247,28 @@ LOOKUP_TOOLS = [
         },
     ),
     types.FunctionDeclaration(
+        name="get_cv_quality_stat",
+        description=(
+            "Look up one real CV-pipeline tracking-quality metric for this match: "
+            "'team_resolution' (percentage of detected players confidently assigned "
+            "to a team), 'calibration_confidence' (how confidently the pitch-"
+            "calibration model located its reference points), or "
+            "'ball_detection_rate' (percentage of frames the ball was located). "
+            "Use this, not get_raw_data_field, for these three - they are not "
+            "per-minute raw_data columns."
+        ),
+        parameters={
+            "type": "OBJECT",
+            "properties": {
+                "field": {
+                    "type": "STRING",
+                    "description": "One of: team_resolution, calibration_confidence, ball_detection_rate",
+                },
+            },
+            "required": ["field"],
+        },
+    ),
+    types.FunctionDeclaration(
         name="count_tactical_events",
         description="Count how many times one tactical event type (SPRINT, BURST, PRESS, RECOVERY, OVERLAP, SPACE, LATERAL_RUN, DROP, BREAK, ISOLATED) occurred in this match's analyzed CV window.",
         parameters={
@@ -211,7 +283,10 @@ LOOKUP_TOOLS = [
         parameters={
             "type": "OBJECT",
             "properties": {
-                "player_id": {"type": "STRING"},
+                "player_id": {
+                    "type": "STRING",
+                    "description": "The bare numeric player id only, e.g. '16' - NOT 'player 16', 'p16', or '#16'.",
+                },
                 "field": {"type": "STRING"},
             },
             "required": ["player_id", "field"],
@@ -303,6 +378,15 @@ def run_structured_lookup(client, question, df, stats_json, training_plan_draft,
                 f"raw_data · minute {args['minute']}",
             )
         return f"At minute {args['minute']}, {args['field'].replace('_', ' ')} was **{value}**.", f"raw_data · minute {args['minute']}"
+
+    if name == "get_cv_quality_stat":
+        value, err = get_cv_quality_stat(stats_json, args["field"])
+        if err:
+            return err, None
+        return (
+            f"This match's {args['field'].replace('_', ' ')} was **{value}**.",
+            f"cv_quality · {args['field']}",
+        )
 
     if name == "count_tactical_events":
         value, err = count_tactical_events(stats_json, args["event_type"])
