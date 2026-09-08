@@ -1008,7 +1008,15 @@ def _cv_bundle_is_valid(cv_output_dir):
     this project."""
     if not cv_output_dir:
         return False
-    return get_cv_job_status_safe(cv_output_dir).get('status') == 'complete'
+    # Resolved here, once, rather than requiring every caller to remember to
+    # do it - found missing at exactly this call site during the repo
+    # consolidation's fresh-clone check (curated matches' now-relative
+    # cv_output_dir was being used as-is, resolving against the dashboard's
+    # own cwd instead of CV_PIPELINE_DIR, so no curated match ever validated
+    # on a fresh clone). Safe for cache-manifest entries too: their
+    # cv_output_dir is already absolute, and _resolve_cv_path passes
+    # absolute paths through unchanged.
+    return get_cv_job_status_safe(str(_resolve_cv_path(cv_output_dir))).get('status') == 'complete'
 
 def _load_curated_matches():
     """Scans curated_matches/<id>/bundle.json for developer-curated instant-
