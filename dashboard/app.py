@@ -2070,6 +2070,14 @@ def _render_team_plan_subtab(source, key):
 
     st.components.v1.html(tp.render_team_calendar_html(team_plan), height=560, scrolling=True)
 
+    # Same fix as _render_player_plan_subtab's match_prefix: these widget
+    # keys used to be keyed only by day index (i)/drill index (j), with no
+    # match identity at all - switching matches (or a Reset+regenerate)
+    # could leave a text_input showing session-state from a PREVIOUS match's
+    # Monday instead of the freshly-generated one, since Streamlit only
+    # honors a widget's value= the first time that exact key ever appears.
+    match_prefix = f"{source}_{key}"
+
     st.markdown("---")
     st.markdown("**✏️ Edit this week's plan**")
     days = team_plan.get("days", [])
@@ -2077,12 +2085,12 @@ def _render_team_plan_subtab(source, key):
 
     swap_col1, swap_col2, swap_col3 = st.columns([2, 2, 1])
     with swap_col1:
-        swap_a = st.selectbox("Swap day:", day_names, key="tp_swap_a")
+        swap_a = st.selectbox("Swap day:", day_names, key=f"tp_swap_a_{match_prefix}")
     with swap_col2:
-        swap_b = st.selectbox("with day:", day_names, key="tp_swap_b", index=min(1, len(day_names) - 1))
+        swap_b = st.selectbox("with day:", day_names, key=f"tp_swap_b_{match_prefix}", index=min(1, len(day_names) - 1))
     with swap_col3:
         st.write("")
-        if st.button("🔁 Swap", key="tp_swap_btn") and swap_a != swap_b:
+        if st.button("🔁 Swap", key=f"tp_swap_btn_{match_prefix}") and swap_a != swap_b:
             ia, ib = day_names.index(swap_a), day_names.index(swap_b)
             # Swap CONTENT, not list position, so the week always renders
             # Monday-first regardless of which two days were swapped.
@@ -2093,28 +2101,29 @@ def _render_team_plan_subtab(source, key):
             st.rerun()
 
     for i, d in enumerate(days):
+        day_prefix = f"{match_prefix}_{d.get('day', i)}"
         with st.expander(f"Edit {d.get('day', f'Day {i}')}"):
-            d['focus_label'] = st.text_input("Focus label:", value=d.get('focus_label', ''), key=f"tp_focus_{i}")
+            d['focus_label'] = st.text_input("Focus label:", value=d.get('focus_label', ''), key=f"tp_focus_{day_prefix}")
             cats = tp.FOCUS_CATEGORIES
             d['focus_category'] = st.selectbox(
                 "Category:", cats, index=cats.index(d.get('focus_category')) if d.get('focus_category') in cats else 0,
-                key=f"tp_cat_{i}",
+                key=f"tp_cat_{day_prefix}",
             )
-            d['why_stat'] = st.text_area("Why (real stat):", value=d.get('why_stat', ''), key=f"tp_why_{i}", height=68)
+            d['why_stat'] = st.text_area("Why (real stat):", value=d.get('why_stat', ''), key=f"tp_why_{day_prefix}", height=68)
 
             drills = d.get('drills', [])
             remove_idx = None
             for j, dr in enumerate(drills):
                 dc1, dc2, dc3, dc4 = st.columns([3, 1, 4, 1])
-                dr['title'] = dc1.text_input("Drill title", value=dr.get('title', ''), key=f"tp_dt_{i}_{j}", label_visibility="collapsed")
-                dr['duration_min'] = dc2.number_input("min", value=int(dr.get('duration_min', 15) or 15), key=f"tp_dd_{i}_{j}", label_visibility="collapsed", min_value=0, step=5)
-                dr['note'] = dc3.text_input("Note", value=dr.get('note', ''), key=f"tp_dn_{i}_{j}", label_visibility="collapsed")
-                if dc4.button("🗑️", key=f"tp_drm_{i}_{j}"):
+                dr['title'] = dc1.text_input("Drill title", value=dr.get('title', ''), key=f"tp_dt_{day_prefix}_{j}", label_visibility="collapsed")
+                dr['duration_min'] = dc2.number_input("min", value=int(dr.get('duration_min', 15) or 15), key=f"tp_dd_{day_prefix}_{j}", label_visibility="collapsed", min_value=0, step=5)
+                dr['note'] = dc3.text_input("Note", value=dr.get('note', ''), key=f"tp_dn_{day_prefix}_{j}", label_visibility="collapsed")
+                if dc4.button("🗑️", key=f"tp_drm_{day_prefix}_{j}"):
                     remove_idx = j
             if remove_idx is not None:
                 drills.pop(remove_idx)
                 st.rerun()
-            if st.button("+ Add drill", key=f"tp_dadd_{i}"):
+            if st.button("+ Add drill", key=f"tp_dadd_{day_prefix}"):
                 drills.append({"title": "New drill", "duration_min": 15, "note": ""})
                 st.rerun()
             d['drills'] = drills
@@ -2144,10 +2153,25 @@ def _render_player_plan_subtab(source, key):
         st.info("No players with sufficient tracking confidence in this window.")
         return
 
+    # match_prefix scopes every widget key below to this specific match, not
+    # just this render - without it, switching matches (or a player landing
+    # at the same list position as a previously-viewed player in another
+    # match) could show a text_input/text_area's STALE session-state value
+    # from a completely different player instead of this one's real,
+    # freshly-generated title/note/tag. Streamlit only uses a widget's
+    # value= argument the very first time that key appears; once a key has
+    # session-state, value= is ignored on every later rerun.
+    match_prefix = f"{source}_{key}"
+
     labels = [f"P{p['player_id']} ({p.get('team_label', '?')})" for p in players]
-    chosen_label = st.selectbox("Choose a player:", labels, key="tp_player_select")
+    chosen_label = st.selectbox("Choose a player:", labels, key=f"tp_player_select_{match_prefix}")
     chosen_idx = labels.index(chosen_label)
     player = players[chosen_idx]
+    # Player identity for widget keys - NOT chosen_idx (list position), since
+    # that's the same staleness risk one level up: the player at a given
+    # position can differ between generations/matches even though the index
+    # doesn't change.
+    player_prefix = f"{match_prefix}_{player['player_id']}"
 
     st.components.v1.html(tp.render_player_card_html(player), height=440, scrolling=True)
 
@@ -2156,16 +2180,23 @@ def _render_player_plan_subtab(source, key):
     sessions = player.get('sessions', [])
     remove_idx = None
     for j, s in enumerate(sessions):
+        # Keyed by day, not just j: removing an earlier session shifts every
+        # later session's list position (j) down by one, which would
+        # otherwise make it inherit the widget state left behind by whatever
+        # used to occupy that position. j is kept only as a tiebreaker for
+        # the rare case of two sessions sharing a day (e.g. "+ Add session"'s
+        # hardcoded "Mon" default alongside an existing Monday session).
+        session_key = f"{player_prefix}_{s.get('day', 'session')}_{j}"
         with st.expander(f"Edit {s.get('day', f'Session {j}')}"):
-            s['title'] = st.text_input("Title:", value=s.get('title', ''), key=f"tp_ps_title_{chosen_idx}_{j}")
-            s['note'] = st.text_area("Note:", value=s.get('note', ''), key=f"tp_ps_note_{chosen_idx}_{j}", height=68)
-            s['tag'] = st.text_input("Tag:", value=s.get('tag', ''), key=f"tp_ps_tag_{chosen_idx}_{j}")
-            if st.button("🗑️ Remove this session", key=f"tp_ps_rm_{chosen_idx}_{j}"):
+            s['title'] = st.text_input("Title:", value=s.get('title', ''), key=f"tp_ps_title_{session_key}")
+            s['note'] = st.text_area("Note:", value=s.get('note', ''), key=f"tp_ps_note_{session_key}", height=68)
+            s['tag'] = st.text_input("Tag:", value=s.get('tag', ''), key=f"tp_ps_tag_{session_key}")
+            if st.button("🗑️ Remove this session", key=f"tp_ps_rm_{session_key}"):
                 remove_idx = j
     if remove_idx is not None:
         sessions.pop(remove_idx)
         st.rerun()
-    if st.button("+ Add session", key=f"tp_ps_add_{chosen_idx}"):
+    if st.button("+ Add session", key=f"tp_ps_add_{player_prefix}"):
         sessions.append({"day": "Mon", "title": "New session", "note": "", "tag": ""})
         st.rerun()
 
