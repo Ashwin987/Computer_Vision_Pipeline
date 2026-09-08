@@ -1083,7 +1083,15 @@ def _activate_match_bundle(bundle, source=None, key=None):
     st.session_state.color_a = bundle["color_a"]
     st.session_state.color_b = bundle["color_b"]
     st.session_state.ai_report = bundle["ai_report"]
-    st.session_state.cv_job_output_dir = bundle.get("cv_output_dir")
+    # Found during the repo-consolidation fresh-clone check: curated bundle.json
+    # files shipped in this repo store cv_output_dir as a path relative to
+    # CV_PIPELINE_DIR (e.g. "output_videos/liverpool_psg_verified"), not an
+    # absolute one - a stale absolute path here would silently only work on
+    # the machine it was curated on. _resolve_cv_path already exists for
+    # exactly this (absolute passes through unchanged, relative resolves
+    # against CV_PIPELINE_DIR), so route through it here too.
+    _bundle_cv_dir = bundle.get("cv_output_dir")
+    st.session_state.cv_job_output_dir = str(_resolve_cv_path(_bundle_cv_dir)) if _bundle_cv_dir else None
     st.session_state.cv_segment_timestamp = bundle.get("cv_segment_timestamp")
     st.session_state.cv_segment_momentum_score = bundle.get("cv_segment_momentum_score")
     st.session_state.cv_team_mapping = bundle.get("cv_team_mapping")
