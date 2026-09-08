@@ -441,17 +441,33 @@ def render_player_card_html(player):
 # PERSISTENCE (separate from bundle.json - see module docstring)
 # ==========================================
 
+# cache_dir is expected to already be a genuinely writable location (app.py's
+# CACHE_DIR points at the system temp dir, not the git-cloned source tree -
+# see that file's own comment for why: Streamlit Community Cloud mounts the
+# cloned repo read-only, which crashed writes here the same way it crashed
+# ChromaDB). A "curated" match's plan therefore also saves under cache_dir,
+# not curated_matches_dir/<key>/ as it originally did - that path lives
+# inside the same read-only-on-deploy source tree. load_training_plan still
+# checks the legacy curated_matches_dir location as a fallback, purely so a
+# training_plan.json ever committed there directly (or saved during local
+# dev before this fix) still loads; save/delete never write there anymore.
 def get_training_plan_path(source, key, curated_matches_dir, cache_dir):
     if source == "curated":
-        return curated_matches_dir / key / "training_plan.json"
+        return cache_dir / "curated_training_plans" / f"{key}.json"
     plans_dir = cache_dir / "training_plans"
     return plans_dir / f"{key}.json"
+
+
+def _legacy_curated_training_plan_path(key, curated_matches_dir):
+    return curated_matches_dir / key / "training_plan.json"
 
 
 def load_training_plan(source, key, curated_matches_dir, cache_dir):
     if not source or not key:
         return None
     path = get_training_plan_path(source, key, curated_matches_dir, cache_dir)
+    if not path.exists() and source == "curated":
+        path = _legacy_curated_training_plan_path(key, curated_matches_dir)
     if not path.exists():
         return None
     try:
@@ -476,8 +492,11 @@ def save_training_plan(source, key, plan, curated_matches_dir, cache_dir):
 def delete_training_plan(source, key, curated_matches_dir, cache_dir):
     if not source or not key:
         return
-    path = get_training_plan_path(source, key, curated_matches_dir, cache_dir)
-    try:
-        path.unlink()
-    except OSError:
-        pass
+    paths = [get_training_plan_path(source, key, curated_matches_dir, cache_dir)]
+    if source == "curated":
+        paths.append(_legacy_curated_training_plan_path(key, curated_matches_dir))
+    for path in paths:
+        try:
+            path.unlink()
+        except OSError:
+            pass

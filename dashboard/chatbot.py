@@ -20,6 +20,7 @@ Two Gemini models are used throughout:
 import copy
 import json
 import re
+import tempfile
 import time
 from pathlib import Path
 
@@ -33,7 +34,18 @@ from google.genai import types
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 ROUTING_MODEL = "gemini-2.5-flash"
 
-CHROMA_DIR = Path(__file__).parent / ".cache" / "chroma"
+# Was Path(__file__).parent / ".cache" / "chroma" - inside the app's own
+# source directory. Confirmed via a live traceback that Streamlit Community
+# Cloud mounts the cloned repo read-only, so the moment ChromaDB tried to
+# actually write a collection there, it failed with "attempt to write a
+# readonly database" - blocking Training Plan and Ask the Assistant
+# entirely. Redirected to the system temp dir, which is writable in
+# essentially any hosting environment. Collections become ephemeral (rebuilt
+# on first use after a container restart) rather than persisting
+# indefinitely, which is fine: every collection is already built behind a
+# `collection.count() > 0` guard specifically so on-demand rebuilding is a
+# no-op once built, not a repeated cost.
+CHROMA_DIR = Path(tempfile.gettempdir()) / "tactical_scout_chroma"
 
 TEAM_DAY_EDITABLE_FIELDS = ["focus_label", "focus_category", "why_stat"]
 PLAYER_SESSION_EDITABLE_FIELDS = ["title", "note", "tag"]

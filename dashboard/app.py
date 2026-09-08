@@ -796,7 +796,20 @@ CV_PIPELINE_SCRIPT = CV_PIPELINE_DIR / "run_cv_analysis.py"
 
 # --- Instant Demo (curated matches) + processing cache (repeat uploads) ---
 CURATED_MATCHES_DIR = Path(__file__).parent / "curated_matches"
-CACHE_DIR = Path(__file__).parent / ".cache"
+# CACHE_DIR used to live under the app's own source directory
+# (Path(__file__).parent / ".cache") - that works for local dev, but
+# Streamlit Community Cloud mounts the cloned repo read-only, so every write
+# through here (the processing cache manifest below, active_jobs.json,
+# cache-sourced training plans) crashed with "attempt to write a readonly
+# database"/OSError in production, the same failure mode diagnosed for
+# ChromaDB (see chatbot.py's CHROMA_DIR). Redirected to the system temp dir,
+# which is writable in effectively any hosting environment. This makes all
+# of this data ephemeral (cleared on a container restart) rather than
+# persisting indefinitely - acceptable here since every consumer already
+# either rebuilds on demand (chroma collections, the CV job registry) or is
+# genuinely disposable (the repeat-upload cache); it's the same tradeoff
+# already accepted for ChromaDB, just applied consistently.
+CACHE_DIR = Path(tempfile.gettempdir()) / "tactical_scout_dashboard_cache"
 CACHE_MANIFEST_PATH = CACHE_DIR / "processing_cache.json"
 # Lightweight in-flight-job registry (video_hash -> {pid, output_dir, ...}).
 # Stopgap per the orphaned-subprocess investigation: no real job database
@@ -1037,8 +1050,38 @@ def _load_curated_matches():
             continue
         if not _cv_bundle_is_valid(bundle.get("cv_output_dir")):
             continue
+        _apply_curated_override(bundle)
         matches.append(bundle)
     return matches
+
+# Field edits to a curated match (rename, Part 3's CV team-mapping
+# confirmation) used to write straight back into curated_matches/<id>/
+# bundle.json via _update_match_fields - that path lives inside the
+# git-cloned source tree, which Streamlit Community Cloud mounts read-only
+# (the same failure mode diagnosed for ChromaDB/CACHE_DIR), so any edit to
+# a curated match would fail there. Edits now write to a small per-match
+# override file under the writable CACHE_DIR instead, merged on top of the
+# shipped bundle.json at read time - the shipped file itself is never
+# touched. Like the rest of CACHE_DIR, this is ephemeral: an edit made on
+# a deployed container doesn't survive a restart, same tradeoff already
+# accepted for ChromaDB and the processing cache.
+CURATED_OVERRIDES_DIR = CACHE_DIR / "curated_overrides"
+
+def _curated_override_path(key):
+    return CURATED_OVERRIDES_DIR / f"{key}.json"
+
+def _apply_curated_override(bundle):
+    """Merges a curated match's writable override file (if any) on top of
+    its shipped bundle dict, in place."""
+    override_path = _curated_override_path(bundle.get("id"))
+    if not override_path.exists():
+        return
+    try:
+        with open(override_path, "r", encoding="utf-8") as f:
+            overrides = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return
+    bundle.update(overrides)
 
 def _load_cache_manifest():
     if not CACHE_MANIFEST_PATH.exists():
@@ -1158,13 +1201,20 @@ def _update_match_fields(item, **fields):
         bundle_path = CURATED_MATCHES_DIR / item["key"] / "bundle.json"
         if not bundle_path.exists():
             return
-        with open(bundle_path, "r", encoding="utf-8") as f:
-            bundle = json.load(f)
-        bundle.update(fields)
-        tmp = str(bundle_path) + ".tmp"
+        override_path = _curated_override_path(item["key"])
+        override_path.parent.mkdir(parents=True, exist_ok=True)
+        overrides = {}
+        if override_path.exists():
+            try:
+                with open(override_path, "r", encoding="utf-8") as f:
+                    overrides = json.load(f)
+            except (json.JSONDecodeError, OSError):
+                overrides = {}
+        overrides.update(fields)
+        tmp = str(override_path) + ".tmp"
         with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(bundle, f, indent=2)
-        os.replace(tmp, bundle_path)
+            json.dump(overrides, f, indent=2)
+        os.replace(tmp, override_path)
     else:
         _cache_upsert(item["key"], **fields)
 
@@ -1309,13 +1359,32 @@ def _render_admin_panel():
 
 # run_cv_analysis.py's save_video() writes XVID-in-.avi, which browsers do not
 # decode natively - st.video() would silently show a blank/broken player.
-# Transcode once to H.264/.mp4 (cached alongside the source) before displaying.
+# Transcode once to H.264/.mp4 before displaying.
 def _ensure_browser_playable_video(avi_path):
     avi_path = Path(avi_path)
-    mp4_path = avi_path.with_name(avi_path.stem + "_web.mp4")
+    # Curated matches ship a pre-transcoded sibling next to the .avi (e.g.
+    # output1_web.mp4 next to output1.avi) - use it directly, no transcode.
+    shipped_mp4 = avi_path.with_name(avi_path.stem + "_web.mp4")
+    if shipped_mp4.exists():
+        return shipped_mp4
+
+    # Fallback for outputs with no pre-shipped web.mp4 (e.g. barca_madrid_pt1
+    # is only missing outputs 2/4/5/6). This used to cache the transcode next
+    # to the source .avi via avi_path.with_name(...) - that path lives under
+    # cv_pipeline/output_videos/ inside the git-cloned source tree, which
+    # Streamlit Community Cloud mounts read-only (the same failure mode
+    # diagnosed for ChromaDB/CACHE_DIR: a write into the source tree raises
+    # OSError there). It silently degraded to the "download raw file"
+    # fallback instead of crashing, which is why this went unnoticed until
+    # now. Cached under the writable CACHE_DIR instead, namespaced by the
+    # source directory's name since every match's output dir reuses the same
+    # output1.avi..output6.avi filenames.
+    cache_dir = CACHE_DIR / "web_video_cache" / avi_path.parent.name
+    mp4_path = cache_dir / shipped_mp4.name
     if mp4_path.exists():
         return mp4_path
     try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
         with VideoFileClip(str(avi_path)) as clip:
             clip.write_videofile(str(mp4_path), codec="libx264", audio=False, logger=None)
         return mp4_path
@@ -2195,11 +2264,18 @@ def extract_video_segment(source_path, start_sec, end_sec, output_path):
         if result.returncode != 0:
             raise RuntimeError(f"ffmpeg slicing failed: {result.stderr[-1000:]}")
 
-def process_single_minute(start_min, duration_sec, temp_video_path, api_key, master_team_a_color, master_team_b_color):
+def process_single_minute(start_min, duration_sec, temp_video_path, api_key, master_team_a_color, master_team_b_color, chunk_dir):
     client = genai.Client(api_key=api_key)
     end_min = min(start_min + 1, duration_sec / 60.0)
 
-    chunk_path = f"temp_chunk_{start_min}.mp4"
+    # Was the bare relative filename f"temp_chunk_{start_min}.mp4" - written
+    # to the process's current working directory. On Streamlit Community
+    # Cloud that's the git-cloned repo root, which is mounted read-only (the
+    # same failure mode diagnosed for ChromaDB/CACHE_DIR), so this write
+    # would fail on every single live upload attempt, from the very first
+    # minute - independent of anything else broken in that flow. chunk_dir
+    # is a writable, per-video temp directory the caller creates once.
+    chunk_path = str(chunk_dir / f"temp_chunk_{start_min}.mp4")
     try:
         extract_video_segment(temp_video_path, start_min * 60, end_min * 60, chunk_path)
     except Exception as e:
@@ -2642,7 +2718,10 @@ if st.session_state.step == 1:
                     master_team_a_color = None
                     master_team_b_color = None
 
-                    first_min_data = process_single_minute(0, duration_sec, temp_video_path, valid_keys[0], None, None)
+                    chunk_dir = Path(tempfile.gettempdir()) / "tactical_scout_chunks" / st.session_state.video_hash
+                    chunk_dir.mkdir(parents=True, exist_ok=True)
+
+                    first_min_data = process_single_minute(0, duration_sec, temp_video_path, valid_keys[0], None, None, chunk_dir)
 
                     if "error" not in first_min_data:
                         master_team_a_color = first_min_data.get("team_a_color", "Team A")
@@ -2666,7 +2745,7 @@ if st.session_state.step == 1:
                         max_workers = 3
 
                         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                            futures = [executor.submit(process_single_minute, start_min, duration_sec, temp_video_path, valid_keys[0], master_team_a_color, master_team_b_color) for start_min in range(1, TOTAL_MINUTES)]
+                            futures = [executor.submit(process_single_minute, start_min, duration_sec, temp_video_path, valid_keys[0], master_team_a_color, master_team_b_color, chunk_dir) for start_min in range(1, TOTAL_MINUTES)]
 
                             for future in concurrent.futures.as_completed(futures):
                                 result = future.result()
