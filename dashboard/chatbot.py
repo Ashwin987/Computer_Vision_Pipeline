@@ -181,6 +181,17 @@ LOOKUP_TOOLS = [
             "properties": {
                 "minute": {"type": "INTEGER", "description": "0-based minute index"},
                 "field": {"type": "STRING", "description": "e.g. smoothed_net_momentum, team_a_pressing_intensity, ball_zone"},
+                "interpretation": {
+                    "type": "STRING",
+                    "description": (
+                        "Only meaningful when field is a momentum field (smoothed_net_momentum "
+                        "or net_momentum). Set to 'team' if the question asks WHICH TEAM had the "
+                        "advantage/dominance/edge/was on top at that minute (the answer should "
+                        "name a team, not just state the number). Set to 'value' if the question "
+                        "asks for the raw momentum score/number itself. Ignored for every other "
+                        "field - omit or set to 'value' for those."
+                    ),
+                },
             },
             "required": ["minute", "field"],
         },
@@ -234,7 +245,32 @@ LOOKUP_TOOLS = [
 ]
 
 
-def run_structured_lookup(client, question, df, stats_json, training_plan_draft):
+# Fields whose sign has a real team meaning - hardcoded from
+# compute_dashboard_df's actual calculation in app.py
+# (df['net_momentum'] = df['team_a_raw_threat'] - df['team_b_raw_threat'],
+# and smoothed_net_momentum is just its rolling mean, same sign convention):
+# positive favors team_a, negative favors team_b. Reused as-is by the
+# momentum tooltip in app.py (MOMENTUM_SCORE_HELP) so the two can never
+# silently disagree - this is the one place the mapping is decided.
+MOMENTUM_FIELDS = {"smoothed_net_momentum", "net_momentum"}
+
+
+def _momentum_team_sentence(minute, value, field, team_a, team_b):
+    """Deterministic, zero-LLM sentence naming which team a momentum value
+    favors - see MOMENTUM_FIELDS' comment for the hardcoded sign convention.
+    Uses the same {TEAM_A}/{TEAM_B} token + substitute_team_tokens pattern
+    already used everywhere else in this app, rather than a new one."""
+    if value > 0:
+        team_token = "{TEAM_A}"
+    elif value < 0:
+        team_token = "{TEAM_B}"
+    else:
+        return f"At minute {minute}, the momentum was exactly even (**{value}**) — neither team had the advantage."
+    templated = f"At minute {minute}, {team_token} had the advantage (momentum: **{value}**)."
+    return substitute_team_tokens(templated, team_a, team_b)
+
+
+def run_structured_lookup(client, question, df, stats_json, training_plan_draft, team_a, team_b):
     """Stage B for the STRUCTURED route: one function-calling call maps the
     question to exactly one read-only lookup, which then runs as plain
     Python (no LLM). Returns (answer_text, source_tag) or (None, None) if
@@ -261,6 +297,11 @@ def run_structured_lookup(client, question, df, stats_json, training_plan_draft)
         value, err = get_raw_data_field(df, args["minute"], args["field"])
         if err:
             return err, None
+        if args["field"] in MOMENTUM_FIELDS and args.get("interpretation") == "team":
+            return (
+                _momentum_team_sentence(args["minute"], value, args["field"], team_a, team_b),
+                f"raw_data · minute {args['minute']}",
+            )
         return f"At minute {args['minute']}, {args['field'].replace('_', ' ')} was **{value}**.", f"raw_data · minute {args['minute']}"
 
     if name == "count_tactical_events":
@@ -602,7 +643,14 @@ EDIT_TOOLS = [
     ),
     types.FunctionDeclaration(
         name="modify_session",
-        description="Propose changing one field of an existing day's plan.",
+        description=(
+            "Propose changing one field of an existing day's plan. IMPORTANT: which "
+            "field names are valid depends on the target. When target is \"team\", "
+            f"field must be one of {TEAM_DAY_EDITABLE_FIELDS} - use \"why_stat\" for "
+            "the day's justification/reasoning text, NOT \"note\" (that field only "
+            "exists on player sessions). When target is a player id, field must be "
+            f"one of {PLAYER_SESSION_EDITABLE_FIELDS}."
+        ),
         parameters={
             "type": "OBJECT",
             "properties": {
@@ -774,7 +822,16 @@ def describe_proposal(name, args):
 
 
 def apply_edit(training_plan_draft, name, args):
-    """Mutates training_plan_draft in place with 'confirmed via chat' provenance."""
+    """Mutates training_plan_draft in place with 'confirmed via chat' provenance.
+
+    Returns (ok, reason): reason is None on success, else a short user-facing
+    string explaining WHY the edit was rejected. This matters because Gemini
+    occasionally calls modify_session with field="note" for a team target
+    (that field only exists on player sessions - the valid team-day fields
+    are TEAM_DAY_EDITABLE_FIELDS) - that's a distinct, narrow failure from the
+    target/day genuinely not existing, and the two used to be reported to the
+    user identically ("target/day not found"), which pointed them at the
+    wrong problem."""
     team_plan = training_plan_draft.get("team_plan") or {}
     player_plan = training_plan_draft.get("player_plan") or {}
 
@@ -784,7 +841,7 @@ def apply_edit(training_plan_draft, name, args):
         ia = _find_day_index([d.get("day", "") for d in days], args["day_a"])
         ib = _find_day_index([d.get("day", "") for d in days], args["day_b"])
         if ia is None or ib is None:
-            return False
+            return False, "one of those days wasn't found in the team plan"
         fields = ["focus_label", "focus_category", "drills", "why_stat"]
         for f in fields:
             days[ia][f], days[ib][f] = days[ib][f], days[ia][f]
@@ -792,7 +849,7 @@ def apply_edit(training_plan_draft, name, args):
             _rebase_and_mark(days[ia], original_days[ia], fields)
         if ib < len(original_days):
             _rebase_and_mark(days[ib], original_days[ib], fields)
-        return True
+        return True, None
 
     target = args["target"]
     if str(target).lower() == "team":
@@ -800,7 +857,7 @@ def apply_edit(training_plan_draft, name, args):
         original_days = team_plan.get("_original_days", [])
         idx = _find_day_index([d.get("day", "") for d in days], args["day"])
         if idx is None:
-            return False
+            return False, f"day '{args['day']}' wasn't found in the team plan"
         original = original_days[idx] if idx < len(original_days) else {}
 
         if name == "add_session":
@@ -814,19 +871,22 @@ def apply_edit(training_plan_draft, name, args):
         elif name == "modify_session":
             field = args["field"]
             if field not in TEAM_DAY_EDITABLE_FIELDS:
-                return False
+                return False, (
+                    f"'{field}' isn't a valid field for a team-level day - valid "
+                    f"fields are {', '.join(TEAM_DAY_EDITABLE_FIELDS)}"
+                )
             days[idx][field] = args["new_value"]
             _rebase_and_mark(days[idx], original, [field])
         else:
-            return False
-        return True
+            return False, f"unknown edit type '{name}'"
+        return True, None
 
     # player target
     players = player_plan.get("players", [])
     original_players = player_plan.get("_original_players", [])
     p_idx = next((i for i, p in enumerate(players) if str(p.get("player_id")) == str(target)), None)
     if p_idx is None:
-        return False
+        return False, f"player '{target}' wasn't found in this match's player plan"
     sessions = players[p_idx].setdefault("sessions", [])
     orig_sessions = (original_players[p_idx].get("sessions", []) if p_idx < len(original_players) else [])
 
@@ -839,23 +899,26 @@ def apply_edit(training_plan_draft, name, args):
     elif name == "remove_session":
         s_idx = _find_day_index([s.get("day", "") for s in sessions], args["day"])
         if s_idx is None:
-            return False
+            return False, f"day '{args['day']}' wasn't found in this player's sessions"
         sessions.pop(s_idx)
         if s_idx < len(orig_sessions):
             orig_sessions.pop(s_idx)
     elif name == "modify_session":
         s_idx = _find_day_index([s.get("day", "") for s in sessions], args["day"])
         if s_idx is None:
-            return False
+            return False, f"day '{args['day']}' wasn't found in this player's sessions"
         field = args["field"]
         if field not in PLAYER_SESSION_EDITABLE_FIELDS:
-            return False
+            return False, (
+                f"'{field}' isn't a valid field for a player session - valid "
+                f"fields are {', '.join(PLAYER_SESSION_EDITABLE_FIELDS)}"
+            )
         sessions[s_idx][field] = args["new_value"]
         original = orig_sessions[s_idx] if s_idx < len(orig_sessions) else {}
         _rebase_and_mark(sessions[s_idx], original, [field])
     else:
-        return False
-    return True
+        return False, f"unknown edit type '{name}'"
+    return True, None
 
 
 # ==========================================
@@ -961,12 +1024,15 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
                 if c1.button("✅ Confirm", key="chat_edit_confirm", use_container_width=True):
                     draft = st.session_state.get("training_plan_draft")
                     with st.spinner("Saving to training plan…"):
-                        ok = bool(draft) and apply_edit(draft, pending["name"], pending["args"])
+                        if draft:
+                            ok, reason = apply_edit(draft, pending["name"], pending["args"])
+                        else:
+                            ok, reason = False, "no active training plan to edit"
                         if ok:
                             st.session_state.training_plan_draft = draft
                             if source != "session":
                                 save_training_plan_fn(source, key, draft)
-                    note = "✅ Applied to the training plan." if ok else "⚠️ Couldn't apply that edit (target/day not found)."
+                    note = "✅ Applied to the training plan." if ok else f"⚠️ Couldn't apply that edit — {reason}."
                     st.session_state.chatbot_history.append({"role": "assistant", "content": note, "tags": []})
                     st.session_state.chatbot_pending_edit = None
                     st.rerun()
@@ -1002,7 +1068,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
                             answer = "Here's what I'd change — see the proposal below."
                 elif route == "STRUCTURED":
                     status.update(label="Looking up the answer…")
-                    answer, tag = run_structured_lookup(client, question, df, stats_json, st.session_state.get("training_plan_draft"))
+                    answer, tag = run_structured_lookup(client, question, df, stats_json, st.session_state.get("training_plan_draft"), team_a, team_b)
                     if answer is None:
                         route = "SEMANTIC"
                     else:

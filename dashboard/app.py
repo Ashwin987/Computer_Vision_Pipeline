@@ -387,12 +387,20 @@ def metric_card(container, label, value, help_text):
 
 # Shared verbatim everywhere momentum score appears (home screen, dashboard,
 # CV tab) - Part 2.3 requires identical wording in every location, not
-# slightly different explanations per view.
+# slightly different explanations per view. Uses the same {TEAM_A}/{TEAM_B}
+# token + cb.substitute_team_tokens pattern used everywhere else (coach
+# report, chatbot answers) - resolve at render time, don't hardcode names
+# here. The sign convention named below (positive=team_a, negative=team_b)
+# is the same hardcoded mapping chatbot.py's MOMENTUM_FIELDS/
+# _momentum_team_sentence uses for "which team had the advantage" chat
+# answers - both trace back to compute_dashboard_df's real calculation
+# (net_momentum = team_a_raw_threat - team_b_raw_threat), not derived twice.
 MOMENTUM_SCORE_HELP = (
     "Momentum score measures which minute of the match had the most attacking intensity "
     "and pressure, combining possession, territory, and pressing events. This window (the "
     "single highest-scoring minute) is what gets the full computer-vision breakdown below "
-    "— not the whole match."
+    "— not the whole match. A positive score favors {TEAM_A}; a negative score favors "
+    "{TEAM_B}."
 )
 
 # Consistent category colors across BOTH teams' pies (Part 1.2) - keyed by the
@@ -1917,7 +1925,10 @@ def render_cv_deep_analysis_tab():
             unsafe_allow_html=True,
         )
     with banner_col2:
-        metric_card(st, "Momentum Score", seg_score if seg_score is not None else "N/A", MOMENTUM_SCORE_HELP)
+        momentum_help = cb.substitute_team_tokens(
+            MOMENTUM_SCORE_HELP, st.session_state.get('team_a', 'Team A'), st.session_state.get('team_b', 'Team B')
+        )
+        metric_card(st, "Momentum Score", seg_score if seg_score is not None else "N/A", momentum_help)
 
     st.caption(
         "This window was chosen because it's the match's highest-momentum minute — the CV pipeline "
@@ -1984,39 +1995,6 @@ def _get_active_match_identity():
     if st.session_state.get('video_hash'):
         return "cache", st.session_state.video_hash
     return None, None
-
-# Curated matches with a committed peak-momentum segment clip (Part 2:
-# Coach Report video playback). NOT the full original match - just the
-# ~1-minute window both Gemini and the CV pipeline actually analyzed. The
-# full source videos (hundreds of MB each) were never committed to this
-# repo, consistent with the consolidation's raw-footage exclusion; adding
-# them is a separate, explicit storage decision, not assumed here. A live
-# upload's source video is deleted right after the initial Gemini
-# extraction (see Step 1's `finally: os.remove(temp_video_path)`) and was
-# never retained, so "cache"-sourced matches have nothing to show either.
-CURATED_SEGMENT_VIDEO_MATCHES = {"liverpool_psg", "barca_madrid_pt1"}
-
-def render_coach_report_video():
-    """Plays the analyzed match segment above the AI report, where a clip is
-    actually available on disk - honest about it being the analyzed window,
-    not the full match, rather than implying more than what's shown."""
-    source, key = _get_active_match_identity()
-    segment_path = None
-    if source == "curated" and key in CURATED_SEGMENT_VIDEO_MATCHES:
-        candidate = CURATED_MATCHES_DIR / key / "peak_momentum_segment.mp4"
-        if candidate.exists():
-            segment_path = candidate
-
-    if segment_path:
-        timestamp = st.session_state.get('cv_segment_timestamp')
-        caption = "The analyzed match segment"
-        if timestamp:
-            caption += f" ({timestamp} of the full match)"
-        caption += " — not the full match video, which isn't included in this deployment."
-        st.video(str(segment_path))
-        st.caption(caption)
-    else:
-        st.info("Original match video not available for this analysis.")
 
 def render_training_plan_tab():
     st.subheader("🏋️ Training Plan")
@@ -3552,7 +3530,6 @@ elif st.session_state.step == 3:
                     mime='text/csv'
                 )
             with tab_coach:
-                render_coach_report_video()
                 st.header("🤖 In-Depth AI Diagnostic Report")
                 # The stored report has literal {TEAM_A}/{TEAM_B} tokens baked in
                 # instead of real names (see the writing_prompt in Step 3) so a
