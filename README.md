@@ -1,13 +1,3 @@
----
-title: AI Tactical Coach
-emoji: ⚽
-colorFrom: blue
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # Football Tactics — CV Pipeline + Dashboard
 
 See [LICENSE](LICENSE) for usage terms — all rights reserved.
@@ -29,20 +19,37 @@ This repository combines two previously separate codebases into one:
 stay siblings under the same repo root for the dashboard to find and launch the
 pipeline correctly.
 
-## Running as a Hugging Face Space
+## Running on Streamlit Community Cloud (active deployment target)
 
-Streamlit is no longer a native Spaces SDK, so this repo ships a `Dockerfile` +
-`entrypoint.sh` that installs `requirements.txt` and runs `streamlit run
-dashboard/app.py` directly. Set one Space **Secret** named `GEMINI_API_KEY` via the
-Space's Settings UI — `entrypoint.sh` materializes it into
-`dashboard/.streamlit/secrets.toml` at container start (Streamlit's own secrets
-mechanism, which `app.py` already reads via `st.secrets`), so no code change was needed
-for the deployed environment specifically.
+Deployed directly from this GitHub repo via [share.streamlit.io](https://share.streamlit.io)
+— no Dockerfile involved for this path. Community Cloud reads three files, all at the
+repo root: `requirements.txt` (Python deps — one merged file covering both `dashboard/`
+and `cv_pipeline/`, since `run_cv_analysis.py` runs as a subprocess in the same
+environment), `packages.txt` (apt-level deps: `libgl1`/`libglib2.0-0` for headless
+OpenCV, `ffmpeg` for moviepy), and `.streamlit/config.toml` (must live at the repo root
+whenever the app's main file is in a subdirectory, per Streamlit's own docs — a
+duplicate of `dashboard/.streamlit/config.toml`, kept for local `streamlit run` from
+inside `dashboard/`). When deploying, set **Main file path** to `dashboard/app.py`, and
+paste the Gemini key into the app's **Advanced settings → Secrets** as
+`master_key = "..."` — Community Cloud's native `st.secrets` support means `app.py`'s
+existing `master_key = st.secrets["master_key"]` needs no adapter here.
 
-Live video upload works on this deployment but is not the guaranteed demo path: this
-pipeline's own measured runtimes mean a full analysis on free CPU hardware can take
-several hours. The two curated **Instant Demo** matches (pre-computed, no live compute
-needed) are the reliable, immediate walkthrough.
+**Live video upload is enabled but not the reliable demo path on this platform's free
+tier specifically**: Community Cloud guarantees only ~1GB RAM per app (bursting to
+~3GB), which the CV pipeline's PyTorch/YOLO/OpenCV stack can exceed on its own before
+even accounting for the multi-hour CPU runtime this project has already measured on
+demanding footage. The in-app notice on the upload flow says so plainly. The two
+curated **Instant Demo** matches (pre-computed, no live compute needed) are the
+reliable, immediate walkthrough.
+
+### Alternate path: Hugging Face Spaces (Docker SDK) — present but not active
+
+`Dockerfile` + `entrypoint.sh` still ship in this repo for a Docker-based Space, kept
+rather than deleted since they're harmless and may be useful if a paid HF plan is used
+later (Docker Spaces require one; that's why this repo moved to Community Cloud
+instead). `entrypoint.sh` adapts HF's env-var secret delivery into
+`dashboard/.streamlit/secrets.toml` at container start — that adapter is specific to
+this path and isn't used by the Community Cloud deployment above.
 
 ## Scope note
 
@@ -57,8 +64,8 @@ video archive of everything ever produced during development.
 
 The root `requirements.txt` covers both halves (the dashboard's Streamlit/AI stack and
 the CV pipeline's tracking/detection stack, traced from `run_cv_analysis.py`'s real
-import graph) — this is what the Dockerfile installs, and what a local install should
-use too, rather than `dashboard/requirements.txt` alone. A Gemini API key is required
+import graph) — this is what both deployment paths install, and what a local install
+should use too, rather than `dashboard/requirements.txt` alone. A Gemini API key is required
 for the dashboard's AI features — set it locally via `dashboard/.env`
 (`GEMINI_API_KEY=...`) or `dashboard/.streamlit/secrets.toml` (`master_key = "..."`),
 neither of which is committed to this repo.

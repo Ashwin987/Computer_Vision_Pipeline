@@ -1,0 +1,15 @@
+[server]
+maxUploadSize = 2000
+# Was originally needed for Hugging Face Spaces' iframe embedding (cookie-based
+# XSRF breaks st.file_uploader there unless disabled) - kept as-is for Streamlit
+# Community Cloud too rather than re-litigating security posture as a side
+# effect of a hosting-platform switch; revisit if this app is ever embedded
+# elsewhere and the underlying reason no longer applies.
+enableXsrfProtection = false
+
+[theme]
+base = "dark"
+primaryColor = "#4f8cff"
+backgroundColor = "#0b0e14"
+secondaryBackgroundColor = "#12161f"
+textColor = "#e6e9f0"

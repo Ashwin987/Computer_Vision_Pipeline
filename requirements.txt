@@ -1,3 +1,13 @@
+# CPU-only PyTorch build - the default PyPI wheel bundles multi-GB CUDA
+# binaries useless on Community Cloud's CPU-only free tier. pip itself
+# supports --extra-index-url as a requirements.txt directive (this isn't
+# Streamlit-specific); their docs don't explicitly confirm their build
+# system honors it, so double-check the build log after deploy - if it's
+# ignored, torch's default (CUDA) wheel would still install fine, just
+# larger than needed. Given the free tier's ~1GB RAM ceiling (see README),
+# this alone won't guarantee a real video fits in memory regardless.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 # Dashboard (simulation/Dashboard -> dashboard/)
 streamlit
 pandas
