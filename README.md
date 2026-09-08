@@ -22,17 +22,28 @@ pipeline correctly.
 ## Running on Streamlit Community Cloud (active deployment target)
 
 Deployed directly from this GitHub repo via [share.streamlit.io](https://share.streamlit.io)
-— no Dockerfile involved for this path. Community Cloud reads three files, all at the
-repo root: `requirements.txt` (Python deps — one merged file covering both `dashboard/`
-and `cv_pipeline/`, since `run_cv_analysis.py` runs as a subprocess in the same
-environment), `packages.txt` (apt-level deps: `libgl1`/`libglib2.0-0` for headless
-OpenCV, `ffmpeg` for moviepy), and `.streamlit/config.toml` (must live at the repo root
-whenever the app's main file is in a subdirectory, per Streamlit's own docs — a
-duplicate of `dashboard/.streamlit/config.toml`, kept for local `streamlit run` from
-inside `dashboard/`). When deploying, set **Main file path** to `dashboard/app.py`, and
-paste the Gemini key into the app's **Advanced settings → Secrets** as
-`master_key = "..."` — Community Cloud's native `st.secrets` support means `app.py`'s
-existing `master_key = st.secrets["master_key"]` needs no adapter here.
+— no Dockerfile involved for this path. Community Cloud reads `requirements.txt`
+(Python deps — one merged file covering both `dashboard/` and `cv_pipeline/`, since
+`run_cv_analysis.py` runs as a subprocess in the same environment) and
+`.streamlit/config.toml` (must live at the repo root whenever the app's main file is in
+a subdirectory, per Streamlit's own docs — a duplicate of
+`dashboard/.streamlit/config.toml`, kept for local `streamlit run` from inside
+`dashboard/`) from the repo root. When deploying, set **Main file path** to
+`dashboard/app.py`, and paste the Gemini key into the app's **Advanced settings →
+Secrets** as `master_key = "..."` — Community Cloud's native `st.secrets` support means
+`app.py`'s existing `master_key = st.secrets["master_key"]` needs no adapter here.
+
+**No `packages.txt`, deliberately**: an earlier version of this repo had one
+(`libgl1`/`libglib2.0-0`/`ffmpeg`), but it turned out unnecessary and was actively
+harmful — its mere presence triggers Community Cloud's apt-get step, which hit a
+platform-wide bug (Debian's `bullseye-security` release file expired on Streamlit's own
+base image, breaking `apt-get update` entirely, confirmed as a currently-active,
+widely-reported issue, not anything specific to this repo). Checked what those packages
+were actually for: `opencv-python-headless` is specifically built to not need
+`libgl1`/GTK/X11 (that's the point of the "headless" variant), and `moviepy` depends on
+`imageio-ffmpeg`, which bundles its own portable ffmpeg binary via pip — no system
+`ffmpeg` needed. Removing `packages.txt` entirely sidesteps the broken apt source with
+no functional loss.
 
 **Live video upload is enabled but not the reliable demo path on this platform's free
 tier specifically**: Community Cloud guarantees only ~1GB RAM per app (bursting to
