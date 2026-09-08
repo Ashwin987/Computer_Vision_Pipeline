@@ -2034,6 +2034,7 @@ def render_training_plan_tab():
                         st.session_state.team_a, st.session_state.team_b, valid_keys[0],
                     )
                     player_plan = None
+                    cv_insights = None
                     cv_output_dir = st.session_state.get('cv_job_output_dir')
                     if cv_output_dir:
                         cv_status = get_cv_job_status_safe(cv_output_dir)
@@ -2046,10 +2047,21 @@ def render_training_plan_tab():
                                     stats_json, st.session_state.team_a, st.session_state.team_b,
                                     st.session_state.get('cv_team_mapping'), _cv_team_label, valid_keys[0],
                                 )
+                                # Second, additive layer (grounded in tactical-event
+                                # highlights + tracking-coverage - see
+                                # generate_cv_insights' docstring for why only these
+                                # two of five originally-considered CV signals are
+                                # used) - never replaces player_plan above.
+                                if player_plan:
+                                    cv_insights = tp.generate_cv_insights(
+                                        stats_json, st.session_state.team_a, st.session_state.team_b,
+                                        st.session_state.get('cv_team_mapping'), _cv_team_label,
+                                        player_plan['players'], valid_keys[0],
+                                    )
                 if team_plan is None:
                     st.error("Failed to generate the team plan after multiple attempts. Please try again.")
                 else:
-                    new_plan = {"team_plan": team_plan, "player_plan": player_plan}
+                    new_plan = {"team_plan": team_plan, "player_plan": player_plan, "cv_insights": cv_insights}
                     st.session_state.training_plan_draft = new_plan
                     if source:
                         tp.save_training_plan(source, key, new_plan, CURATED_MATCHES_DIR, CACHE_DIR)
@@ -2068,7 +2080,11 @@ def _render_team_plan_subtab(source, key):
         st.info("No team plan available.")
         return
 
-    st.components.v1.html(tp.render_team_calendar_html(team_plan), height=560, scrolling=True)
+    cv_insights = st.session_state.training_plan_draft.get("cv_insights") or {}
+    team_insights = cv_insights.get("team_insights") or []
+    st.components.v1.html(
+        tp.render_team_calendar_html(team_plan, team_insights), height=560 + (170 * len(team_insights)), scrolling=True
+    )
 
     # Same fix as _render_player_plan_subtab's match_prefix: these widget
     # keys used to be keyed only by day index (i)/drill index (j), with no
@@ -2173,7 +2189,11 @@ def _render_player_plan_subtab(source, key):
     # doesn't change.
     player_prefix = f"{match_prefix}_{player['player_id']}"
 
-    st.components.v1.html(tp.render_player_card_html(player), height=440, scrolling=True)
+    cv_insights = st.session_state.training_plan_draft.get("cv_insights") or {}
+    player_insights = (cv_insights.get("player_insights") or {}).get(str(player['player_id'])) or []
+    st.components.v1.html(
+        tp.render_player_card_html(player, player_insights), height=440 + (170 * len(player_insights)), scrolling=True
+    )
 
     st.markdown("---")
     st.markdown(f"**✏️ Edit {chosen_label}'s plan**")

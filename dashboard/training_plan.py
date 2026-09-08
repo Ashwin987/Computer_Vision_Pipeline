@@ -197,6 +197,11 @@ def _player_stat_cards(stats_json, team_a, team_b, team_mapping, cv_team_label_f
             "avg_speed_kmh": p.get('avg_speed_kmh'),
             "total_distance_m": p.get('total_distance_m'),
             "confidence": p.get('top_speed_confidence'),
+            # Not shown on the existing stat card (render_player_card_html
+            # doesn't read it) - carried through only for generate_cv_insights'
+            # tracking-coverage signal below. Adding it here doesn't change
+            # anything about the existing card's displayed content.
+            "frames_tracked": p.get('frames_tracked'),
         })
     cards.sort(key=lambda x: x.get('total_distance_m') or 0, reverse=True)
     return cards[:limit]
@@ -254,6 +259,207 @@ Return ONLY a JSON object mapping each player_id (as a string) to an object with
                     "players": player_cards,
                     "_original_players": copy.deepcopy(player_cards),
                     "scope_note": PLAYER_PLAN_SCOPE_NOTE,
+                    "generated_at": datetime.now(timezone.utc).isoformat(),
+                }
+        except Exception:
+            time.sleep(3)
+    return None
+
+
+# ==========================================
+# ADDITIVE CV-SIGNAL INSIGHTS LAYER
+#
+# A second, separate layer of training content alongside (never replacing)
+# the speed/distance-based plan above. Investigated five candidate CV
+# signals before building this; only two actually have real per-player data
+# persisted in stats.json (confirmed against run_cv_analysis.py's
+# _build_player_stats, the only function that populates players[] - space
+# control, movement trails, and stamina are each computed transiently
+# during video RENDERING elsewhere in the pipeline but never written to
+# stats.json, so using them here would require a CV pipeline change, out of
+# scope for this dashboard-side layer):
+#   - tactical_events.highlights: a sparse top-10 sample of the highest-
+#     scoring moments across the WHOLE match window, for all players
+#     combined - not a full per-player event count. Every use below frames
+#     it as "recorded among this window's standout moments," never as a
+#     count of occurrences.
+#   - tracking coverage: frames_tracked against the window's total frame
+#     count (video.n_frames) - a more granular reliability signal than the
+#     single top_speed_confidence label already shown on the existing card.
+# On-pitch position is deliberately never used, per product decision - a
+# single ~30s window's position has no baseline to compare against.
+# ==========================================
+
+# Duplicated verbatim from app.py's TACTICAL_EVENT_GLOSSARY - training_plan.py
+# has no import path to app.py (app.py imports this module, not the other
+# way around), and these ten definitions are short and stable enough that
+# duplicating them here is simpler than restructuring the module graph.
+TACTICAL_EVENT_GLOSSARY = {
+    'BREAK': "A player carrying the ball at high speed away from defensive pressure, into space.",
+    'SPRINT': "A high-speed sprint off the ball — one of the fastest movements tracked in this window.",
+    'BURST': "A sudden jump in speed — an explosive change of pace rather than a sustained sprint.",
+    'PRESS': "Multiple defenders closing down the ball carrier together.",
+    'RECOVERY': "A fast sprint back into defensive position after losing the ball or being caught upfield.",
+    'OVERLAP': "An overlapping run past a teammate to create width or an extra passing option.",
+    'SPACE': "A player receiving the ball with significantly more open space around them than average.",
+    'LATERAL_RUN': "A significant sideways run across the pitch, often to stretch the opponent's shape.",
+    'DROP': "A player dropping deep (backward) to receive the ball and help build play.",
+    'ISOLATED': "A player caught far from any teammate, with little immediate support.",
+}
+
+# Below this tracking-coverage threshold (or an explicit non-"high"
+# confidence label), a player's data-reliability signal is considered
+# notable enough to surface. Chosen so a player tracked through most of the
+# window - the common case - never gets a manufactured "your data is fine"
+# insight, which would just recreate the same repetitive-padding problem
+# this layer exists to fix.
+NOTABLE_COVERAGE_PCT_THRESHOLD = 70
+
+
+def _player_cv_signals(stats_json, player_cards):
+    """Real, honestly-scoped per-player signals for generate_cv_insights.
+    Returns {player_id: {...}} - only for players who actually have
+    something notable (a recorded highlight, or a real coverage/confidence
+    caveat), not one entry per player regardless of content."""
+    n_frames = (stats_json.get('video') or {}).get('n_frames') or 0
+    highlights = stats_json.get('tactical_events', {}).get('highlights', [])
+    by_player_highlights = {}
+    for h in highlights:
+        by_player_highlights.setdefault(h.get('player_id'), []).append(h)
+
+    signals = {}
+    for card in player_cards:
+        pid = card['player_id']
+        entry = {}
+        h_list = by_player_highlights.get(pid)
+        if h_list:
+            entry['highlights'] = [
+                {"type": h.get('type'), "metric": h.get('metric'), "score": h.get('score')}
+                for h in h_list
+            ]
+        frames_tracked = card.get('frames_tracked') or 0
+        coverage_pct = round(frames_tracked / n_frames * 100, 1) if n_frames else None
+        if coverage_pct is not None and (
+            coverage_pct < NOTABLE_COVERAGE_PCT_THRESHOLD or card.get('confidence') not in ('high', None)
+        ):
+            entry['coverage_pct'] = coverage_pct
+            entry['confidence'] = card.get('confidence')
+        if entry:
+            signals[pid] = entry
+    return signals
+
+
+def _team_cv_signals(stats_json, player_cards, team_a, team_b, team_mapping, cv_team_label_fn):
+    """Team-level aggregates computed directly from the same real data as
+    _player_cv_signals - never a separate, second derivation of the sign/
+    split, consistent with this project's rule of computing a fact once and
+    reusing it everywhere. tactical_events has no real per-team breakdown
+    (only a whole-match total), so highlight_counts is explicitly a share of
+    the same sparse top-10 sample, by team - framed as such in the prompt,
+    never as a full event count."""
+    n_frames = (stats_json.get('video') or {}).get('n_frames') or 0
+    highlights = stats_json.get('tactical_events', {}).get('highlights', [])
+    player_team = {p.get('player_id'): p.get('team') for p in stats_json.get('players', [])}
+
+    highlight_counts = {}
+    for h in highlights:
+        label = cv_team_label_fn(player_team.get(h.get('player_id')), team_a, team_b, team_mapping)
+        highlight_counts[label] = highlight_counts.get(label, 0) + 1
+
+    coverage_by_team = {}
+    for card in player_cards:
+        if not n_frames:
+            continue
+        coverage_by_team.setdefault(card['team_label'], []).append(
+            (card.get('frames_tracked') or 0) / n_frames * 100
+        )
+    avg_coverage_pct = {
+        label: round(sum(vals) / len(vals), 1) for label, vals in coverage_by_team.items() if vals
+    }
+
+    return {
+        "highlight_counts_of_top_10_sample": highlight_counts,
+        "highlight_sample_size": len(highlights),
+        "avg_tracking_coverage_pct": avg_coverage_pct,
+    }
+
+
+def generate_cv_insights(stats_json, team_a, team_b, team_mapping, cv_team_label_fn, player_cards, api_key):
+    """Second, ADDITIVE layer alongside generate_team_plan/generate_player_plan
+    - never replaces or is read in place of them. Returns None when neither
+    a team nor any player has a qualifying signal (nothing genuine to say is
+    a valid, honest outcome, not something to force)."""
+    player_signals = _player_cv_signals(stats_json, player_cards)
+    team_signals = _team_cv_signals(stats_json, player_cards, team_a, team_b, team_mapping, cv_team_label_fn)
+    if not player_signals and not team_signals.get("highlight_counts_of_top_10_sample"):
+        return None
+
+    payload = json.dumps({
+        "team_signals": team_signals,
+        "player_signals": {str(pid): sig for pid, sig in player_signals.items()},
+        "event_type_meanings": TACTICAL_EVENT_GLOSSARY,
+    }, indent=2)
+
+    prompt = f"""
+You are an elite soccer performance analyst. Below is REAL data from a computer-vision
+analysis of a single ~30-second peak-momentum window of a match (NOT the full match).
+
+{payload}
+
+IMPORTANT ABOUT THIS DATA - read carefully before writing anything:
+- Every entry under "highlights" (player-level) or "highlight_counts_of_top_10_sample"
+  (team-level) comes from a SAMPLE of only the top 10 highest-scoring tactical moments
+  across the ENTIRE match window, for ALL players combined - NOT a full count of how many
+  times something happened. NEVER claim a player or team "did X N times" or "led in Y" -
+  only that they were recorded among this window's standout moments for that event type.
+- "coverage_pct" / "avg_tracking_coverage_pct" is the percentage of this window's frames
+  the tracker held identity on - a DATA-RELIABILITY signal, not a performance signal.
+  Frame it as how certain the underlying data is, never as something the player or team
+  did wrong.
+- Use the numbers given above exactly as given - never recompute, round differently, or
+  invent a number not present in the data.
+
+For EACH entry under "team_signals" and EACH entry under "player_signals" above, write
+exactly one insight with three distinct parts (skip anything with no entry above -
+never invent a signal for a team/player that isn't listed):
+1. "observation": state the real, measured fact plainly, citing the real number(s).
+2. "so_what": a grounded interpretation of what that fact suggests - a strength, a
+   weakness, or a genuine data caveat. No unsupported leaps beyond what the fact
+   actually shows.
+3. "training_implication": one concrete, specific training addition that follows
+   directly from the interpretation - not a generic platitude.
+
+CRITICAL RULES:
+- Never mention on-pitch position, a full match, "90 minutes", or a fatigue/stamina
+  curve - this data measures none of those.
+- Never invent an event count, a stat, or a confidence level not given above.
+- Each of the three parts must be genuinely distinct prose, not the same sentence
+  restated three times.
+
+Return ONLY a JSON object of exactly this shape:
+{{
+  "team_insights": [
+    {{"team": "<team label from the data above>", "observation": "...", "so_what": "...", "training_implication": "..."}}
+  ],
+  "player_insights": {{
+    "<player_id as given above>": [
+      {{"observation": "...", "so_what": "...", "training_implication": "..."}}
+    ]
+  }}
+}}
+"""
+    client = genai.Client(api_key=api_key)
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.5-flash', contents=prompt,
+                config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0.3),
+            )
+            result = json.loads(response.text)
+            if isinstance(result, dict):
+                return {
+                    "team_insights": result.get("team_insights") or [],
+                    "player_insights": result.get("player_insights") or {},
                     "generated_at": datetime.now(timezone.utc).isoformat(),
                 }
         except Exception:
@@ -329,8 +535,49 @@ _BASE_CSS = """
   .plan-item .content p{margin:0;font-size:13px;color:var(--muted);}
   .plan-item .content .tag{display:inline-block;margin-top:7px;font-size:11px;padding:3px 8px;border-radius:6px;
     background:rgba(245,166,35,.12);color:#f5b95a;font-weight:600;}
+  /* Additive CV-insights layer (generate_cv_insights) - deliberately a
+     distinct visual identity (blue-accented card on --panel-raised, dashed
+     separator above) from the existing amber/plain plan-item and why
+     blocks above it, so it reads as an addition alongside them, never a
+     replacement or a variant of the same content. */
+  .cv-insights-section{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line);}
+  .cv-insights-heading{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;
+    letter-spacing:.6px;margin-bottom:12px;}
+  .cv-insight-card{background:var(--panel-raised);border:1px solid rgba(79,140,255,.35);
+    border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+  .cv-insight-card:last-child{margin-bottom:0;}
+  .cv-insight-team{font-size:11px;font-weight:700;color:#8fb4ff;margin-bottom:8px;}
+  .cv-insight-row{margin-bottom:8px;}
+  .cv-insight-row:last-child{margin-bottom:0;}
+  .cv-insight-label{font-size:10px;color:#8fb4ff;font-weight:700;text-transform:uppercase;
+    letter-spacing:.5px;display:block;margin-bottom:3px;}
+  .cv-insight-row p{margin:0;font-size:13px;color:var(--text);line-height:1.5;}
 </style>
 """
+
+
+def render_cv_insights_html(insights, heading="📊 Additional insights from tactical tracking data"):
+    """Renders generate_cv_insights' observation/so_what/training_implication
+    entries as a visually distinct additive section - see _BASE_CSS's
+    cv-insight-* rules for why. Returns "" (no section rendered at all) when
+    insights is empty - nothing genuine to say is a valid, honest outcome,
+    never padded with a manufactured entry."""
+    if not insights:
+        return ""
+    cards = []
+    for i in insights:
+        team_badge = f'<div class="cv-insight-team">{_esc(i.get("team"))}</div>' if i.get("team") else ""
+        cards.append(
+            '<div class="cv-insight-card">' + team_badge
+            + f'<div class="cv-insight-row"><span class="cv-insight-label">Observation</span>'
+              f'<p>{_esc(i.get("observation", ""))}</p></div>'
+            + f'<div class="cv-insight-row"><span class="cv-insight-label">So what</span>'
+              f'<p>{_esc(i.get("so_what", ""))}</p></div>'
+            + f'<div class="cv-insight-row"><span class="cv-insight-label">Training implication</span>'
+              f'<p>{_esc(i.get("training_implication", ""))}</p></div>'
+            + '</div>'
+        )
+    return f'<div class="cv-insights-section"><div class="cv-insights-heading">{_esc(heading)}</div>{"".join(cards)}</div>'
 
 
 def _src_pill(is_edited, is_chat_confirmed=False):
@@ -349,7 +596,7 @@ def _src_pill(is_edited, is_chat_confirmed=False):
     return '<div class="src-pill grounded"><div class="d"></div> Grounded in match data</div>'
 
 
-def render_team_calendar_html(team_plan):
+def render_team_calendar_html(team_plan, team_insights=None):
     days = team_plan.get("days", [])
     day_divs, why_divs = [], []
     for d in days:
@@ -388,6 +635,7 @@ def render_team_calendar_html(team_plan):
         + f'<div class="source-strip"><div class="dot"></div>{_esc(source_note)}</div>'
         + f'<div class="week-grid">{"".join(day_divs)}</div>'
         + f'<div class="why-row">{"".join(why_divs[:3])}</div>'
+        + render_cv_insights_html(team_insights)
     )
 
 
@@ -411,7 +659,7 @@ def _render_session_item(s):
     )
 
 
-def render_player_card_html(player):
+def render_player_card_html(player, player_insights=None):
     sessions_html = "".join(_render_session_item(s) for s in player.get("sessions", []))
     conf = player.get("confidence", "high")
     conf_badge = "✅ high confidence" if conf == "high" else f"⚠️ {_esc(conf)} confidence"
@@ -434,6 +682,7 @@ def render_player_card_html(player):
            f'<div class="lbl">Distance covered (this window)</div><div class="big">{dist:.0f} m</div></div>')
         + '</div>'
         + f'<div class="plan-list">{sessions_html}</div>'
+        + render_cv_insights_html(player_insights)
     )
 
 
