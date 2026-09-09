@@ -22,9 +22,11 @@ Storage: marks are written to CACHE_DIR (the writable system-temp location
 the repo read-only), same ephemeral-across-restarts tradeoff already
 accepted for training plans and curated-match renames. Never bundle.json.
 """
+import colorsys
 import json
 import math
 import os
+from collections import defaultdict, deque
 from pathlib import Path
 
 import re
@@ -224,12 +226,51 @@ def _goal_line_x(positions):
     return 0.0 if mean_x < PITCH_LENGTH_M / 2 else PITCH_LENGTH_M
 
 
+# Real penalty-box dimensions, same numbers _pitch_base() already draws the
+# box outline with (cv2.rectangle(pt(0, 13.84), pt(16.5, 54.16), ...)) -
+# not a separate/invented definition.
+_BOX_DEPTH_M = 16.5
+_BOX_Y_MIN_M = 13.84
+_BOX_Y_MAX_M = 54.16
+# Found necessary by direct inspection: without any zone filter,
+# last-defender-distance and compactness were being averaged across EVERY
+# tracked outfield player on a team, including ones nowhere near the
+# corner setup (e.g. an out-ball outlet left near halfway) - producing
+# nonsensical numbers like "PSG's last defender is 37.41m from goal" for a
+# corner, where every genuine defender is clustered near their own goal.
+# This buffer is deliberately modest: wide enough to keep a real edge-of-
+# box defender or near-post zonal marker who is standing just outside the
+# box line, not wide enough to pull in a player who is clearly out of the
+# play (e.g. 30-50m away near the halfway line).
+_BOX_BUFFER_M = 5.0
+
+
+def _in_box_zone(x, y, goal_x):
+    """goal_x is the end (0.0 or 105.0) the corner is being played at -
+    the SAME end for both teams, since a corner-kick setup only exists
+    relative to one goal. Both teams' players are scoped to this same
+    zone: the attacking team also only has some players actually up for
+    the corner, with others potentially held back for a counter-attack."""
+    if goal_x <= PITCH_LENGTH_M / 2:
+        x_ok = x <= _BOX_DEPTH_M + _BOX_BUFFER_M
+    else:
+        x_ok = x >= PITCH_LENGTH_M - _BOX_DEPTH_M - _BOX_BUFFER_M
+    return x_ok and (_BOX_Y_MIN_M - _BOX_BUFFER_M) <= y <= (_BOX_Y_MAX_M + _BOX_BUFFER_M)
+
+
 def compute_corner_metrics(positions_data, team_mapping, attacking_team_token, defending_team_token):
     """Every value is averaged across every frame with resolved data for
     both the relevant team(s), rather than picked from one 'moment of
     delivery' frame - more robust to single-frame tracking noise, and
     honestly labeled as a window average rather than asserting a specific
-    instant this data can't reliably pin down on its own."""
+    instant this data can't reliably pin down on its own.
+
+    All three metrics (last-defender distance, compactness, marking
+    distance) are scoped to players in/near the penalty box for that
+    frame (_in_box_zone) BEFORE any distance is computed - a team's full
+    outfield complement, wherever they happen to be on the pitch, is not
+    what "how deep is the defense" or "how tight is this team's shape at
+    the corner" is supposed to mean."""
     attacking_num = _team_num_for(team_mapping, attacking_team_token)
     defending_num = _team_num_for(team_mapping, defending_team_token)
 
@@ -237,12 +278,18 @@ def compute_corner_metrics(positions_data, team_mapping, attacking_team_token, d
     marking_by_pid = {}
 
     for frame in positions_data["frames"]:
-        att = _outfield(frame, attacking_num)
-        def_with_ids = _outfield_with_ids(frame, defending_num)
+        att_full = _outfield(frame, attacking_num)
+        def_full_with_ids = _outfield_with_ids(frame, defending_num)
+        def_full = [pos for _, pos in def_full_with_ids]
+        if not def_full:
+            continue  # no defenders tracked this frame - can't tell which goal is in play
+
+        goal_x = _goal_line_x(def_full)
+        att = [pos for pos in att_full if _in_box_zone(pos[0], pos[1], goal_x)]
+        def_with_ids = [(pid, pos) for pid, pos in def_full_with_ids if _in_box_zone(pos[0], pos[1], goal_x)]
         defn = [pos for _, pos in def_with_ids]
 
         if defn:
-            goal_x = _goal_line_x(defn)
             last_defender_vals.append(min(abs(x - goal_x) for x, _ in defn))
         if len(att) >= 2:
             att_compact_vals.append(_compactness(att))
@@ -333,6 +380,102 @@ def render_team_shape_video(positions_data, team_mapping, attacking_team_token, 
                     cv2.polylines(img, [hull], isClosed=True, color=color, thickness=2)
                 elif len(pts) == 2:
                     cv2.line(img, pts[0], pts[1], color, 2)
+
+            cv2.putText(img, f"{attacking_label} (attacking)", (10, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.55, attacking_color, 2)
+            cv2.putText(img, f"{defending_label} (defending)", (10, 46), cv2.FONT_HERSHEY_SIMPLEX, 0.55, defending_color, 2)
+            writer.write(img)
+    finally:
+        writer.release()
+
+
+# ==========================================
+# TRAILS-ONLY VIDEO — clean-pitch movement trails, no player markers, no
+# footage underneath. Same real position_transformed data the team-shape
+# video already uses (not the CV pipeline's own render_output6.py, which
+# operates on raw camera-pixel coordinates with its own camera-movement
+# compensation - unnecessary here since position_transformed is already in
+# real, camera-motion-independent pitch meters). Same fading-trail concept
+# (short history, fades oldest-to-newest) as render_output6, re-expressed
+# against this feature's own already-available data instead of importing
+# cv_pipeline code the dashboard environment (no ultralytics/torch) can't
+# run anyway.
+# ==========================================
+
+_TRAIL_SECONDS = 3.0   # matches render_output6.py's own trail-history window
+_VARIANT_BUCKETS = 7   # small per-player hue/value jitter so two teammates
+                        # whose trails cross don't read as one indistinct line
+# Found necessary by direct visual inspection of a real rendered clip: without
+# this, a tracker-id gap or reassignment (the same fragmentation issue
+# render_output6.py's own RECORD_JUMP_PX/TRAIL_EXPIRE_FRAMES guard against)
+# produced dead-straight lines connecting two totally unrelated pitch
+# locations, since a raw tracker id can reappear later at a real player's
+# CURRENT position with nothing recorded in between. Well above any plausible
+# single real movement at 25fps (sprinting is ~0.4m/frame) but far below a
+# near-pitch-length artifact.
+_MAX_FRAME_GAP = 25     # ~1 real second - a longer absence means "different sighting"
+_MAX_JUMP_M = 5.0
+
+
+def _variant_color(base_bgr, seed):
+    b, g, r = base_bgr
+    h, s, v = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
+    hue_bucket = int(seed) % _VARIANT_BUCKETS
+    val_bucket = (int(seed) * 3) % _VARIANT_BUCKETS
+    half = (_VARIANT_BUCKETS - 1) / 2.0
+    h2 = (h + ((hue_bucket - half) / half) * 0.05) % 1.0
+    v2 = min(1.0, max(0.55, v + ((val_bucket - half) / half) * 0.18))
+    r2, g2, b2 = colorsys.hsv_to_rgb(h2, s, v2)
+    return (int(round(b2 * 255)), int(round(g2 * 255)), int(round(r2 * 255)))
+
+
+def render_trails_only_video(positions_data, team_mapping, attacking_team_token, defending_team_token,
+                              attacking_label, defending_label, out_path, fps=25.0):
+    """Same out_path/XVID/_ensure_browser_playable_video convention as
+    render_team_shape_video - see that function's docstring."""
+    attacking_num = _team_num_for(team_mapping, attacking_team_token)
+    defending_num = _team_num_for(team_mapping, defending_team_token)
+    attacking_color = (0, 140, 255)   # orange, BGR - same convention as team-shape
+    defending_color = (60, 60, 230)   # red, BGR
+
+    base_img, px_per_m = _pitch_base()
+    h, w = base_img.shape[:2]
+
+    def pt(x, y):
+        return (int(x * px_per_m), int(y * px_per_m))
+
+    trail_len = max(2, int(round(fps * _TRAIL_SECONDS)))
+    trails = defaultdict(lambda: deque(maxlen=trail_len))  # (team_num, player_id) -> deque[(x,y)]
+    last_point = {}  # (team_num, player_id) -> (frame_num, x, y), for gap/jump detection
+
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    writer = cv2.VideoWriter(str(out_path), fourcc, fps, (w, h))
+    try:
+        for frame_num, frame in enumerate(positions_data["frames"]):
+            img = base_img.copy()
+            for team_num, color in ((attacking_num, attacking_color), (defending_num, defending_color)):
+                for pid, (x, y) in _outfield_with_ids(frame, team_num):
+                    key = (team_num, pid)
+                    prev = last_point.get(key)
+                    if prev is not None:
+                        prev_fn, px, py = prev
+                        if (frame_num - prev_fn > _MAX_FRAME_GAP
+                                or math.hypot(x - px, y - py) > _MAX_JUMP_M):
+                            trails[key].clear()   # different sighting - start this trail fresh
+                    trails[key].append((x, y))
+                    last_point[key] = (frame_num, x, y)
+
+            for (team_num, pid), history in trails.items():
+                if len(history) < 2:
+                    continue
+                color = attacking_color if team_num == attacking_num else defending_color
+                variant = _variant_color(color, pid)
+                pts = [pt(x, y) for x, y in history]
+                n = len(pts)
+                for i in range(1, n):
+                    t = i / n
+                    alpha = 0.20 + 0.80 * t   # oldest 20% opacity -> newest 100%, same fade as render_output6
+                    seg_color = tuple(int(c * alpha) for c in variant)
+                    cv2.line(img, pts[i - 1], pts[i], seg_color, 2, cv2.LINE_AA)
 
             cv2.putText(img, f"{attacking_label} (attacking)", (10, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.55, attacking_color, 2)
             cv2.putText(img, f"{defending_label} (defending)", (10, 46), cv2.FONT_HERSHEY_SIMPLEX, 0.55, defending_color, 2)

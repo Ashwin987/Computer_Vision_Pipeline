@@ -31,7 +31,61 @@ import os
 import pickle
 import sys
 
+import cv2
 import numpy as np
+
+
+def _render_tactical_map_overlay(video_frames, tracks_players, team_colors_bgr, fps, out_path):
+    """Per-frame dot on each real player (at their real bbox foot
+    position - same (x_center, y2) anchor tracker.draw_ellipse already
+    uses for output1.avi's own player markers) plus a convex-hull polyline
+    connecting each team's dots, drawn directly onto the actual broadcast
+    frames. NOT the same thing as render_team_shape_video (corner_kicks.py)
+    - that draws an abstract top-down diagram on a blank pitch and stays
+    as its own separate output; this is a real-video overlay, using raw
+    pixel-space bbox positions (not position_transformed pitch meters,
+    which can't be drawn back onto a panning/zooming camera frame without
+    re-inverting a per-frame homography this script has no need to do).
+
+    Team colors are each team's own real, locked jersey-cluster color
+    (team_assigner.locked_colors) - attacking/defending is a per-mark
+    concept decided later in the dashboard, not known at this offline
+    reconstruction stage, so this can't bake in an attacking/defending
+    color convention the way the top-down diagram does."""
+    if not video_frames:
+        return
+    h, w = video_frames[0].shape[:2]
+    colors = {1: tuple(int(c) for c in team_colors_bgr.get(1, (0, 0, 255))),
+              2: tuple(int(c) for c in team_colors_bgr.get(2, (0, 255, 0)))}
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    writer = cv2.VideoWriter(str(out_path), fourcc, fps, (w, h))
+    try:
+        n = min(len(video_frames), len(tracks_players))
+        for fn in range(n):
+            img = video_frames[fn].copy()
+            frame_players = tracks_players[fn]
+            pts_by_team = {1: [], 2: []}
+            for pid, info in frame_players.items():
+                team = info.get('team', 0)
+                if team not in (1, 2):
+                    continue
+                bbox = info.get('bbox')
+                if bbox is None:
+                    continue
+                pts_by_team[team].append((int((bbox[0] + bbox[2]) / 2), int(bbox[3])))
+
+            for team, pts in pts_by_team.items():
+                color = colors[team]
+                for p in pts:
+                    cv2.circle(img, p, 6, color, -1, cv2.LINE_AA)
+                if len(pts) >= 3:
+                    hull = cv2.convexHull(np.array(pts, dtype=np.int32))
+                    cv2.polylines(img, [hull], isClosed=True, color=color, thickness=2, lineType=cv2.LINE_AA)
+                elif len(pts) == 2:
+                    cv2.line(img, pts[0], pts[1], color, 2, cv2.LINE_AA)
+            writer.write(img)
+    finally:
+        writer.release()
 
 
 def reconstruct(match_name, video_path, output_dir):
@@ -134,6 +188,14 @@ def reconstruct(match_name, video_path, output_dir):
         json.dump(payload, f)
     n_with_data = sum(1 for fr in frames_out if fr)
     print(f"Wrote {out_path} - {n_with_data}/{n_frames} frames have resolved (team 1/2) player positions.")
+
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+    cap.release()
+    tactical_map_path = os.path.join(output_dir, match_name, 'tactical_map.avi')
+    print(f"Rendering real-video tactical-map overlay to {tactical_map_path}...")
+    _render_tactical_map_overlay(video_frames, tracks['players'], team_assigner.locked_colors, fps, tactical_map_path)
+    print(f"Wrote {tactical_map_path}")
 
 
 def main():

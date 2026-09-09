@@ -77,6 +77,12 @@ installs both `dashboard/requirements.txt` and `cv_pipeline/requirements.txt` (s
 below) — `python:3.11-slim` doesn't have Community Cloud's Python-3.14 problem, so
 live upload works end-to-end on this path.
 
+## Known issues
+
+See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for tracked, understood-but-not-yet-fixed
+problems — currently: calibration confidence doesn't reliably predict correct
+homography under tight/zoomed camera framing.
+
 ## Scope note
 
 This repo intentionally excludes bulk raw/dev video footage that isn't needed to run
