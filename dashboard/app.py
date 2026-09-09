@@ -15,6 +15,7 @@ from google.genai import types
 from streamlit_autorefresh import st_autorefresh
 import training_plan as tp
 import chatbot as cb
+import corner_kicks as ck
 import numpy as np
 import random
 import io
@@ -1891,6 +1892,174 @@ def render_cv_completed_state(status, cv_output_dir):
                     st.write(f"- {obs}")
         else:
             st.caption("No tactical events detected in this window.")
+
+    _render_corner_kicks_section(stats)
+
+def _render_corner_kicks_section(reference_stats):
+    """Manual corner-kick marking + team-shape/metrics, reusing the CURRENT
+    match's own already-confirmed team_resolution.team_colors_bgr as the
+    reference for resolving each corner's independently-clustered team1/
+    team2 labels back to team_a/team_b (see
+    corner_kicks.resolve_corner_team_mapping's docstring for why this
+    can't be assumed constant across separate CV runs - confirmed to
+    actually flip on one of the three real corners this feature was built
+    and verified against).
+
+    A mark here only has a real team-shape/metrics render once its window
+    has been through BOTH run_cv_analysis.py (with --no-ball-fallback,
+    since none of this needs ball position - see that flag's own
+    docstring) AND reconstruct_positions.py (see that script's docstring
+    for why a second, offline step is needed at all). Marking a corner
+    here does NOT trigger either of those - this only records/reads
+    metadata and renders from data that already exists on disk. A mark
+    with no player_positions.json yet shows an honest "not processed yet"
+    message, never a broken render."""
+    st.markdown("---")
+    st.markdown("**⚽ Corner Kicks**")
+    st.caption(
+        "Manually mark a corner-kick window within this match and see each team's real tracked "
+        "shape (never a role/marking assignment - just measured positions and honest geometry)."
+    )
+
+    source, key = _get_active_match_identity()
+    if not source:
+        st.info("This match doesn't have a saved identity yet, so corner marks can't be saved across reloads.")
+        return
+
+    marks = ck.load_marks(CACHE_DIR, key, CURATED_MATCHES_DIR)
+    team_a = st.session_state.get('team_a', 'Team A')
+    team_b = st.session_state.get('team_b', 'Team B')
+    team_name = {"team_a": team_a, "team_b": team_b}
+
+    if marks:
+        labels = [
+            f"{m['timestamp_label']} — {team_name.get(m['attacking_team'], m['attacking_team'])} attacking"
+            for m in marks
+        ]
+        chosen_label = st.selectbox("Marked corners:", labels, key="corner_kick_select")
+        mark = marks[labels.index(chosen_label)]
+
+        positions = ck.load_player_positions(CV_PIPELINE_DIR, mark.get("cv_output_dir"))
+        if positions is None:
+            st.warning(
+                f"'{mark['timestamp_label']}' is marked but not processed yet — its CV output "
+                "folder hasn't been attached, or hasn't been through reconstruct_positions.py. "
+                "No render to show until that's done."
+            )
+        else:
+            reference_colors = (reference_stats or {}).get('team_resolution', {}).get('team_colors_bgr')
+            if not reference_colors:
+                st.warning("This match's own team colors aren't available, so this corner's team1/team2 can't be reliably matched to the real teams.")
+            else:
+                corner_mapping = ck.resolve_corner_team_mapping(positions, reference_colors)
+                attacking_label = team_name.get(mark["attacking_team"], mark["attacking_team"])
+                defending_label = team_name.get(mark["defending_team"], mark["defending_team"])
+
+                shape_dir = CACHE_DIR / "corner_shapes"
+                shape_dir.mkdir(parents=True, exist_ok=True)
+                # .avi (XVID), not .mp4 - same reason every other CV-rendered
+                # video in this app needs _ensure_browser_playable_video's
+                # transcode: confirmed live that cv2.VideoWriter's raw output
+                # isn't reliably playable by st.video() directly.
+                shape_path = shape_dir / f"{ck.safe_filename_part(key)}_{ck.safe_filename_part(mark['id'])}.avi"
+                if not shape_path.exists():
+                    with st.spinner("Rendering team-shape video (one-time, cached after this)..."):
+                        ck.render_team_shape_video(
+                            positions, corner_mapping, mark["attacking_team"], mark["defending_team"],
+                            attacking_label, defending_label, shape_path,
+                        )
+                playable_shape_path = _ensure_browser_playable_video(shape_path)
+                if playable_shape_path and playable_shape_path.exists():
+                    st.video(str(playable_shape_path))
+                else:
+                    st.warning("Couldn't prepare the team-shape video for in-browser playback.")
+                st.caption(
+                    f"Top-down view, real tracked positions only. {attacking_label} (orange, attacking) "
+                    f"and {defending_label} (red, defending) are each connected by a convex hull — the "
+                    "simplest non-crossing outline around that team's outfield players, not a tactical "
+                    "role assignment of any kind."
+                )
+
+                metrics = ck.compute_corner_metrics(positions, corner_mapping, mark["attacking_team"], mark["defending_team"])
+                mcol1, mcol2, mcol3 = st.columns(3)
+                with mcol1:
+                    metric_card(st, f"{defending_label}'s last defender", f"{metrics['last_defender_distance_m']} m",
+                                "Average, across every tracked frame of this window, of the distance from "
+                                "the deepest defender to their own goal line — how high or deep the "
+                                "defensive line was set. This is a window average, not a single freeze-"
+                                "frame at the instant of delivery: this window's ball isn't tracked "
+                                "closely enough (ball detection was intentionally skipped here — none of "
+                                "this feature uses it) to isolate that exact moment, so it also reflects "
+                                "the moments just before and after delivery.")
+                with mcol2:
+                    metric_card(st, "Compactness (both teams)",
+                                f"{attacking_label} {metrics['attacking_compactness_m']} m / {defending_label} {metrics['defending_compactness_m']} m",
+                                "Average pairwise distance between a team's own outfield players — how "
+                                "spread out (higher) or tight (lower) their shape was, averaged the same "
+                                "way as the last-defender distance above.")
+                with mcol3:
+                    if metrics['marking_distances']:
+                        closest = metrics['marking_distances'][0]
+                        metric_card(st, "Closest marking distance", f"P{closest['player_id']}: {closest['distance_m']} m",
+                                    "For every defender, the average distance (across this window) to "
+                                    "their nearest attacker — a real nearest-neighbor calculation, not a "
+                                    "claim about who is tactically assigned to mark whom. Showing the "
+                                    "closest pairing here; see the full per-defender list below.")
+                with st.expander(f"All {len(metrics['marking_distances'])} defenders' marking distances"):
+                    st.dataframe(
+                        [{"Defender": f"P{d['player_id']}", "Distance to nearest attacker (m, avg)": d['distance_m']}
+                         for d in metrics['marking_distances']],
+                        hide_index=True, use_container_width=True,
+                    )
+
+                st.markdown("**This corner's own rendered outputs**")
+                st.caption(
+                    "Movement trails and per-player space control, already computed for this exact "
+                    "window by the same CV pipeline (reused as-is, not recomputed here)."
+                )
+                other_col1, other_col2 = st.columns(2)
+                for col, fname, label in ((other_col1, 'output6.avi', 'Movement Trails'), (other_col2, 'output3.avi', 'Per-Player Tactical Map (Voronoi)')):
+                    with col:
+                        st.caption(label)
+                        vid_path = CV_PIPELINE_DIR / "output_videos" / mark["cv_output_dir"] / fname
+                        if vid_path.exists():
+                            playable = _ensure_browser_playable_video(vid_path)
+                            if playable and playable.exists():
+                                st.video(str(playable))
+                            else:
+                                st.caption("Couldn't prepare this render for in-browser playback.")
+                        else:
+                            st.caption("Not available for this corner.")
+
+        if st.button("🗑️ Delete this mark", key="corner_kick_delete"):
+            ck.delete_mark(CACHE_DIR, key, mark["id"])
+            st.rerun()
+
+    with st.expander("+ Mark a new corner"):
+        st.caption(
+            "Records the mark's metadata only — it does not launch CV processing. A newly-marked "
+            "corner needs its window run through the CV pipeline (with --no-ball-fallback) and then "
+            "reconstruct_positions.py before a team-shape render or metrics can appear here; until "
+            "then it will honestly show as not yet processed."
+        )
+        new_label = st.text_input("Timestamp label (e.g. '3:06-3:15'):", key="corner_new_label")
+        new_attacking = st.selectbox("Attacking team:", [team_a, team_b], key="corner_new_attacking")
+        new_output_dir = st.text_input(
+            "CV output folder name (optional — leave blank until processed):",
+            key="corner_new_output_dir",
+            help="The folder name under cv_pipeline/output_videos/ for this corner's already-completed CV + reconstruction run, if it exists yet.",
+        )
+        if st.button("Save mark", key="corner_new_save"):
+            if not new_label.strip():
+                st.error("Enter a timestamp label first.")
+            else:
+                attacking_token = "team_a" if new_attacking == team_a else "team_b"
+                defending_token = "team_b" if attacking_token == "team_a" else "team_a"
+                mark_id = ck.safe_filename_part(new_label.strip())
+                ck.upsert_mark(CACHE_DIR, key, mark_id, new_label.strip(), attacking_token, defending_token,
+                                new_output_dir.strip() or None)
+                st.success(f"Saved mark '{new_label.strip()}'.")
+                st.rerun()
 
 def render_cv_deep_analysis_tab():
     st.subheader("🎬 CV Deep Analysis")

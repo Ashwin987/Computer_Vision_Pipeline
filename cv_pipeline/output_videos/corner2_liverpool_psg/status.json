@@ -1,0 +1,16 @@
+{
+  "status": "complete",
+  "stage_num": 19,
+  "total_stages": 19,
+  "started_at": "2026-09-08T23:28:15.515910+00:00",
+  "updated_at": "2026-09-08T23:37:14.305137+00:00",
+  "outputs": {
+    "output1.avi": "output_videos\\corner2_liverpool_psg\\output1.avi",
+    "output2.avi": "output_videos\\corner2_liverpool_psg\\output2.avi",
+    "output3.avi": "output_videos\\corner2_liverpool_psg\\output3.avi",
+    "output4.avi": "output_videos\\corner2_liverpool_psg\\output4.avi",
+    "output5.avi": "output_videos\\corner2_liverpool_psg\\output5.avi",
+    "output6.avi": "output_videos\\corner2_liverpool_psg\\output6.avi"
+  },
+  "stats_file": "output_videos\\corner2_liverpool_psg\\stats.json"
+}

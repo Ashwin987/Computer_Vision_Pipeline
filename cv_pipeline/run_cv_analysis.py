@@ -401,7 +401,7 @@ def build_stats(*, match_name, video_path, n_frames, fps,
 
 # ── pipeline ─────────────────────────────────────────────────────────────
 
-def run_pipeline(video_path, final_dir, match_name, status):
+def run_pipeline(video_path, final_dir, match_name, status, use_ball_fallback=True):
     from utils import read_video, save_video
     from trackers import Tracker
     from team_assigner import TeamAssigner
@@ -459,14 +459,17 @@ def run_pipeline(video_path, final_dir, match_name, status):
         for fn, h in homography_per_frame.items()
     }
 
-    # ── tracking (+ mandatory tiled ball-fallback) ───────────────────────────
+    # ── tracking (+ tiled ball-fallback, unless disabled) ────────────────────
     status.start_stage('tracking')
-    # use_ball_fallback=True + read_from_stub=False (always, regardless of
-    # whether TRACK_STUB already exists from a prior run of this same
-    # video/match_name) -- the fallback call site inside get_object_tracks
-    # only ever runs in the fresh-detection branch, so reading from a stub
-    # would silently skip the stage this function exists to guarantee.
-    tracker = Tracker(MODEL_PATH, use_ball_fallback=True)
+    # read_from_stub=False always (regardless of whether TRACK_STUB already
+    # exists from a prior run of this same video/match_name) -- the fallback
+    # call site inside get_object_tracks only ever runs in the fresh-detection
+    # branch, so reading from a stub would silently skip the stage this
+    # function exists to guarantee. use_ball_fallback defaults True (the
+    # normal app-launched path, where ball-detection-rate is itself a
+    # reported CV-quality stat) but can be disabled by a caller that only
+    # needs player positions - see --no-ball-fallback's docstring above.
+    tracker = Tracker(MODEL_PATH, use_ball_fallback=use_ball_fallback)
 
     def _tracking_progress(frame_num, total_frames):
         fb = tracker.ball_fallback
@@ -655,6 +658,15 @@ def main():
                              'inside it, per output_videos/README.txt (default: output_videos)')
     parser.add_argument('--match-name', default=None,
                         help='Folder-safe match name; derived from the video filename if omitted')
+    parser.add_argument('--no-ball-fallback', action='store_true',
+                        help='Skip the secondary/tiled ball-fallback detector (10-25x slower per '
+                             'triggered frame - see trackers/tracker.py). Primary ball detection '
+                             'still runs (free, part of the same YOLO pass as player detection), '
+                             'so tracks["ball"] is not empty, just lower-coverage. Safe for any '
+                             'analysis that only needs player positions (team shape, trails, '
+                             'Voronoi) - default is unchanged (fallback ON) for the normal '
+                             'app-launched path, where ball-detection-rate is itself a reported '
+                             'CV-quality stat.')
     args = parser.parse_args()
 
     match_name = args.match_name or slugify(args.video)
@@ -670,7 +682,10 @@ def main():
 
     try:
         t0 = time.time()
-        outputs, stats_path = run_pipeline(args.video, final_dir, match_name, status)
+        outputs, stats_path = run_pipeline(
+            args.video, final_dir, match_name, status,
+            use_ball_fallback=not args.no_ball_fallback,
+        )
         status.complete(outputs, stats_path)
         print(f"[run_cv_analysis] done in {time.time() - t0:.1f}s -> {final_dir}")
     except Exception as e:
