@@ -1,0 +1,4 @@
+{
+  "reliable": false,
+  "note": "Verified unreliable via real-coordinate back-projection. An early frame checked out correctly (box corners and near-box landmarks lined up), but a later frame in the same window - after the corner's own delivery/clearance phase, once the camera view changes - showed multiple box-corner reference points collapsing onto nearly the same pixel location, the same self-consistent-but-wrong-cluster failure found on the Liverpool/PSG corners. Only 24/275 frames (8.7%) had a defender tracked inside the real penalty-box zone across the whole window. See KNOWN_ISSUES.md."
+}

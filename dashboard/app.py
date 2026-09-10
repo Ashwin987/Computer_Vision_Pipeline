@@ -915,14 +915,14 @@ I am a Master’s student in **Applied Statistics and Data Science at UCLA** and
 """
 
 def get_pdf_download_button():
-    pdf_path = str(CV_PIPELINE_DIR / "Real-Time_Soccer_Analytics_Pipeline_v3.pdf")
+    pdf_path = str(CV_PIPELINE_DIR / "Real-Time_Soccer_Analytics_Pipeline_v4.pdf")
     if os.path.exists(pdf_path):
         with open(pdf_path, "rb") as pdf_file:
             pdf_bytes = pdf_file.read()
         return st.download_button(
             label="📄 Download Full Project Report (PDF)",
             data=pdf_bytes,
-            file_name="Real-Time_Soccer_Analytics_Pipeline_v3.pdf",
+            file_name="Real-Time_Soccer_Analytics_Pipeline_v4.pdf",
             mime="application/pdf",
         )
     else:
@@ -1893,9 +1893,7 @@ def render_cv_completed_state(status, cv_output_dir):
         else:
             st.caption("No tactical events detected in this window.")
 
-    _render_corner_kicks_section(stats)
-
-def _render_corner_kicks_section(reference_stats):
+def render_corner_kicks_tab():
     """Manual corner-kick marking + team-shape/metrics, reusing the CURRENT
     match's own already-confirmed team_resolution.team_colors_bgr as the
     reference for resolving each corner's independently-clustered team1/
@@ -1913,13 +1911,44 @@ def _render_corner_kicks_section(reference_stats):
     here does NOT trigger either of those - this only records/reads
     metadata and renders from data that already exists on disk. A mark
     with no player_positions.json yet shows an honest "not processed yet"
-    message, never a broken render."""
-    st.markdown("---")
-    st.markdown("**⚽ Corner Kicks**")
+    message, never a broken render.
+
+    Its own top-level tab now (not a section nested inside CV Deep
+    Analysis), so it independently resolves this match's own CV stats the
+    same way that tab does, rather than receiving them as a parameter."""
+    st.subheader("⚽ Corner Kicks")
     st.caption(
         "Manually mark a corner-kick window within this match and see each team's real tracked "
         "shape (never a role/marking assignment - just measured positions and honest geometry)."
     )
+
+    cv_output_dir = st.session_state.get('cv_job_output_dir')
+    if not cv_output_dir:
+        st.info(
+            "This match doesn't have a CV analysis window yet, so corner kicks - which depends on "
+            "that same CV job's real tracked positions - has nothing to show yet."
+        )
+        return
+
+    status = get_cv_job_status_safe(cv_output_dir)
+    if status.get('status') != 'complete':
+        st.info(
+            "This match's CV analysis hasn't finished yet, so there's no reference team-color data "
+            "to resolve corner-kick identities against - check the CV Deep Analysis tab for "
+            "progress, then come back here."
+        )
+        return
+
+    reference_stats = None
+    stats_file = status.get('stats_file')
+    if stats_file:
+        resolved_stats_path = _resolve_cv_path(stats_file)
+        if resolved_stats_path.exists():
+            try:
+                with open(resolved_stats_path, 'r') as f:
+                    reference_stats = json.load(f)
+            except (json.JSONDecodeError, OSError) as e:
+                st.error(f"Could not read stats file: {e}")
 
     source, key = _get_active_match_identity()
     if not source:
@@ -1951,7 +1980,8 @@ def _render_corner_kicks_section(reference_stats):
             if not reference_colors:
                 st.warning("This match's own team colors aren't available, so this corner's team1/team2 can't be reliably matched to the real teams.")
             else:
-                corner_mapping = ck.resolve_corner_team_mapping(positions, reference_colors)
+                corner_mapping = ck.resolve_corner_team_mapping(
+                    positions, reference_colors, mark.get("reference_team1_is_team_a", True))
                 attacking_label = team_name.get(mark["attacking_team"], mark["attacking_team"])
                 defending_label = team_name.get(mark["defending_team"], mark["defending_team"])
 
@@ -1960,9 +1990,15 @@ def _render_corner_kicks_section(reference_stats):
                 cv_out_dir = CV_PIPELINE_DIR / "output_videos" / mark["cv_output_dir"]
                 tactical_map_path = cv_out_dir / "tactical_map.avi"
 
-                viz_options = ["Team Shape (Diagram)", "Movement Trails (Clean Pitch)"]
+                # "Team Shape (Diagram)" now IS the real-video overlay (dots +
+                # convex hull drawn directly on broadcast footage, built in
+                # reconstruct_positions.py) - the earlier standalone abstract
+                # top-down diagram has been removed outright, not kept
+                # alongside this one under a different name.
+                viz_options = []
                 if tactical_map_path.exists():
-                    viz_options.append("Per-Player Tactical Map")
+                    viz_options.append("Team Shape (Diagram)")
+                viz_options.append("Movement Trails (Clean Pitch)")
                 viz_choice = st.radio("Visualization:", viz_options, key="corner_viz_choice", horizontal=True)
 
                 # .avi (XVID), not .mp4 - same reason every other CV-rendered
@@ -1970,25 +2006,18 @@ def _render_corner_kicks_section(reference_stats):
                 # transcode: confirmed live that cv2.VideoWriter's raw output
                 # isn't reliably playable by st.video() directly.
                 if viz_choice == "Team Shape (Diagram)":
-                    shape_path = shape_dir / f"{ck.safe_filename_part(key)}_{ck.safe_filename_part(mark['id'])}.avi"
-                    if not shape_path.exists():
-                        with st.spinner("Rendering team-shape video (one-time, cached after this)..."):
-                            ck.render_team_shape_video(
-                                positions, corner_mapping, mark["attacking_team"], mark["defending_team"],
-                                attacking_label, defending_label, shape_path,
-                            )
-                    playable_shape_path = _ensure_browser_playable_video(shape_path)
-                    if playable_shape_path and playable_shape_path.exists():
-                        st.video(str(playable_shape_path))
+                    playable_tactical_map = _ensure_browser_playable_video(tactical_map_path)
+                    if playable_tactical_map and playable_tactical_map.exists():
+                        st.video(str(playable_tactical_map))
                     else:
                         st.warning("Couldn't prepare the team-shape video for in-browser playback.")
                     st.caption(
-                        f"Top-down view, real tracked positions only. {attacking_label} (orange, attacking) "
-                        f"and {defending_label} (red, defending) are each connected by a convex hull — the "
-                        "simplest non-crossing outline around that team's outfield players, not a tactical "
-                        "role assignment of any kind."
+                        "Real broadcast footage: a dot on each real tracked player plus a convex hull "
+                        "connecting each team's own players, drawn directly on the actual video — each "
+                        "team in its own real jersey color (attacking/defending isn't distinguished here, "
+                        "since this render is shared across every mark on this window)."
                     )
-                elif viz_choice == "Movement Trails (Clean Pitch)":
+                else:
                     trails_path = shape_dir / f"{ck.safe_filename_part(key)}_{ck.safe_filename_part(mark['id'])}_trails.avi"
                     if not trails_path.exists():
                         with st.spinner("Rendering trails video (one-time, cached after this)..."):
@@ -2006,40 +2035,40 @@ def _render_corner_kicks_section(reference_stats):
                         f"(orange) and {defending_label} (red), each player's own recent ~3 seconds of real "
                         "tracked movement, fading oldest to newest."
                     )
-                else:
-                    playable_tactical_map = _ensure_browser_playable_video(tactical_map_path)
-                    if playable_tactical_map and playable_tactical_map.exists():
-                        st.video(str(playable_tactical_map))
-                    else:
-                        st.warning("Couldn't prepare the tactical-map video for in-browser playback.")
-                    st.caption(
-                        "Real broadcast footage: a dot on each real tracked player plus a convex hull "
-                        "connecting each team's own players, drawn directly on the actual video — each "
-                        "team in its own real jersey color (attacking/defending isn't distinguished here, "
-                        "since this render is shared across every mark on this window)."
-                    )
 
                 metrics = ck.compute_corner_metrics(positions, corner_mapping, mark["attacking_team"], mark["defending_team"])
-                # Found while verifying this feature: for some corner clips, the CV
-                # pipeline's own homography fit is confidently self-consistent
-                # (high reported "calibration confidence") but scaled wrong in an
-                # absolute sense - confirmed by hand on this exact clip by
-                # projecting the real box's known coordinates back into camera
-                # pixel space and finding they land in open midfield instead of on
-                # the visible box. When that happens here, almost no player ever
-                # falls inside the real penalty-box zone, and these metrics can't
-                # be trusted - shown honestly rather than as a misleadingly precise
-                # number computed from too few (or zero) box-scoped frames.
+                calibration_status = ck.load_calibration_status(CV_PIPELINE_DIR, mark["cv_output_dir"])
+                # Two independent reasons a corner's box-scoped numbers can't be
+                # trusted, checked together:
+                #  1. Too few box-tracked frames to average over (frame-count
+                #     check) - a real signal on its own regardless of WHY.
+                #  2. This exact segment's calibration has already been
+                #     verified (by hand, via real-coordinate back-projection -
+                #     see KNOWN_ISSUES.md) to be wrong. This is the check the
+                #     frame-count alone can't make: a wrong-but-internally-
+                #     consistent homography can still land plenty of players
+                #     inside nominal pitch bounds (confirmed on corner1/corner2
+                #     specifically), so passing check #1 does NOT by itself
+                #     prove the underlying positions are trustworthy.
                 min_box_frames = max(5, round(0.1 * metrics['n_frames_total']))
-                box_data_ok = metrics['n_frames_with_data'] >= min_box_frames
+                enough_frames = metrics['n_frames_with_data'] >= min_box_frames
+                box_data_ok = enough_frames and calibration_status["reliable"]
                 if not box_data_ok:
+                    if not calibration_status["reliable"]:
+                        reason = (calibration_status.get("note") or
+                                   "this segment's calibration has been verified unreliable for a real-"
+                                   "coordinate check like this one (see KNOWN_ISSUES.md) — a wrong-but-"
+                                   "internally-consistent homography can still place plenty of players "
+                                   "inside nominal pitch bounds, so this isn't something a frame-count "
+                                   "alone would catch.")
+                    else:
+                        reason = (f"only {metrics['n_frames_with_data']}/{metrics['n_frames_total']} frames had "
+                                   "a defender tracked inside the real penalty-box zone for this corner — too "
+                                   "little to trust a box-scoped number here.")
                     st.warning(
-                        f"Only {metrics['n_frames_with_data']}/{metrics['n_frames_total']} frames had a "
-                        "defender tracked inside the real penalty-box zone for this corner — too little to "
-                        "trust a box-scoped distance/compactness number here. This points to this specific "
-                        "clip's own calibration being scaled off (a known risk for tightly-framed corner "
-                        "footage — see the technical report's calibration-accuracy notes), not a bug in how "
-                        "these metrics are computed."
+                        f"Not enough reliable position data to trust a box-scoped distance/compactness/"
+                        f"marking number for this corner: {reason} Not a bug in how these metrics are "
+                        "computed — the underlying position data itself can't be trusted here."
                     )
                 mcol1, mcol2, mcol3 = st.columns(3)
                 with mcol1:
@@ -2053,12 +2082,11 @@ def _render_corner_kicks_section(reference_stats):
                                 "(ball detection was intentionally skipped here) to isolate that exact "
                                 "moment.")
                 with mcol2:
-                    metric_card(st, "Compactness (both teams, in-box)",
-                                (f"{attacking_label} {metrics['attacking_compactness_m']} m / "
-                                 f"{defending_label} {metrics['defending_compactness_m']} m") if box_data_ok else "—",
-                                "Average pairwise distance between a team's own IN-BOX outfield players — "
-                                "how spread out (higher) or tight (lower) their shape was at the corner "
-                                "itself, not diluted by players elsewhere on the pitch.")
+                    metric_card(st, "Compactness (Defending Team)",
+                                f"{defending_label}: {metrics['defending_compactness_m']} m" if box_data_ok else "—",
+                                f"Average pairwise distance between {defending_label}'s own IN-BOX outfield "
+                                "players — how spread out (higher) or tight (lower) their defensive shape "
+                                "was at the corner itself, not diluted by players elsewhere on the pitch.")
                 with mcol3:
                     if box_data_ok and metrics['marking_distances']:
                         closest = metrics['marking_distances'][0]
@@ -3628,8 +3656,8 @@ elif st.session_state.step == 3:
 
             st.header("Match Segment Overview")
 
-            tab_dashboard, tab_coach, tab_cv, tab_training, tab_chat = st.tabs(
-                ["📊 Data Dashboard", "🎯 Coach Report", "🎬 CV Deep Analysis", "🏋️ Training Plan", "💬 Ask the Assistant"])
+            tab_dashboard, tab_coach, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
+                ["📊 Data Dashboard", "🎯 Coach Report", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
                 st.subheader("Global Control")
@@ -3856,6 +3884,9 @@ elif st.session_state.step == 3:
 
             with tab_cv:
                 render_cv_deep_analysis_tab()
+
+            with tab_corners:
+                render_corner_kicks_tab()
 
             with tab_training:
                 render_training_plan_tab()

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "4:45-4:55",
+    "timestamp_label": "4:45-4:55",
+    "attacking_team": "team_b",
+    "defending_team": "team_a",
+    "cv_output_dir": "corner1_barca_madrid",
+    "reference_team1_is_team_a": false
+  },
+  {
+    "id": "16:17-16:26",
+    "timestamp_label": "16:17-16:26",
+    "attacking_team": "team_b",
+    "defending_team": "team_a",
+    "cv_output_dir": "corner2_barca_madrid",
+    "reference_team1_is_team_a": false
+  },
+  {
+    "id": "20:50-21:01",
+    "timestamp_label": "20:50-21:01",
+    "attacking_team": "team_a",
+    "defending_team": "team_b",
+    "cv_output_dir": "corner3_barca_madrid",
+    "reference_team1_is_team_a": false
+  }
+]

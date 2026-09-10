@@ -97,12 +97,20 @@ def save_marks(cache_dir, match_key, marks):
     os.replace(tmp, path)
 
 
-def upsert_mark(cache_dir, match_key, mark_id, timestamp_label, attacking_team, defending_team, cv_output_dir=None):
+def upsert_mark(cache_dir, match_key, mark_id, timestamp_label, attacking_team, defending_team, cv_output_dir=None,
+                 reference_team1_is_team_a=True):
     """attacking_team/defending_team are 'team_a'/'team_b' tokens (the same
     stable convention cv_team_mapping already uses), never a raw color or a
     literal team name - a rename must never orphan an existing mark.
     cv_output_dir is the folder name under cv_pipeline/output_videos/ once
-    that window has actually been processed - None until then."""
+    that window has actually been processed - None until then.
+
+    reference_team1_is_team_a: whether THIS match's own main-window
+    team_resolution.team_colors_bgr["team1"] is real team_a - see
+    resolve_corner_team_mapping's docstring for why this can't be assumed
+    (True only holds by coincidence, not by rule) and must be resolved
+    once, per match, and carried on the mark rather than re-guessed from
+    color at render time."""
     marks = [m for m in load_marks(cache_dir, match_key) if m["id"] != mark_id]
     marks.append({
         "id": mark_id,
@@ -110,6 +118,7 @@ def upsert_mark(cache_dir, match_key, mark_id, timestamp_label, attacking_team, 
         "attacking_team": attacking_team,
         "defending_team": defending_team,
         "cv_output_dir": cv_output_dir,
+        "reference_team1_is_team_a": reference_team1_is_team_a,
     })
     marks.sort(key=lambda m: m["id"])
     save_marks(cache_dir, match_key, marks)
@@ -142,7 +151,37 @@ def load_player_positions(cv_pipeline_dir, cv_output_dir):
         return None
 
 
-def resolve_corner_team_mapping(positions_data, reference_team_colors_bgr):
+def load_calibration_status(cv_pipeline_dir, cv_output_dir):
+    """Whether this corner's own calibration has been verified reliable, per
+    the real-coordinate back-projection spot-check (see KNOWN_ISSUES.md) -
+    NOT something derivable from the pipeline's own reported confidence
+    number, which is exactly what that investigation found doesn't
+    reliably predict correct homography (a wrong-but-internally-consistent
+    RANSAC fit can score 0.92-1.00 while being severely wrong). This is a
+    human-verified determination, written once per processed segment
+    alongside player_positions.json - not a formula computed here.
+
+    Defaults to reliable=True when no status file exists yet (e.g. a
+    freshly-marked corner nobody has checked) - the frame-count check in
+    compute_corner_metrics's caller is a real, independent signal on its
+    own and still applies regardless of this flag; this flag exists to
+    catch the specific failure mode (bad calibration that still produces
+    plenty of in-bounds-looking positions) that a frame-count alone cannot
+    detect, not to replace that check."""
+    if not cv_output_dir:
+        return {"reliable": True, "note": None}
+    path = Path(cv_pipeline_dir) / "output_videos" / cv_output_dir / "calibration_status.json"
+    if not path.exists():
+        return {"reliable": True, "note": None}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return {"reliable": bool(data.get("reliable", True)), "note": data.get("note")}
+    except (json.JSONDecodeError, OSError):
+        return {"reliable": True, "note": None}
+
+
+def resolve_corner_team_mapping(positions_data, reference_team_colors_bgr, reference_team1_is_team_a=True):
     """Which of THIS corner's own team-1/team-2 jersey-color clusters is
     team_a vs team_b. Each corner is its own independent CV run with its
     own from-scratch K-means color clustering, so team1/team2 are NOT
@@ -152,15 +191,29 @@ def resolve_corner_team_mapping(positions_data, reference_team_colors_bgr):
     (cost ratio of ~20x between the two possible mappings - not a close
     call, genuinely swapped). Resolved by nearest-color match against the
     match's own already-confirmed reference colors (its main analyzed
-    window's team_resolution.team_colors_bgr + cv_team_mapping), never
-    assumed to be index-stable across separate runs."""
+    window's team_resolution.team_colors_bgr), never assumed to be
+    index-stable across separate runs.
+
+    reference_team1_is_team_a: whether the REFERENCE match's own "team1"
+    (not this corner's team1) is real team_a. Defaults to True (the
+    original assumption) - correct for liverpool_psg by coincidence, since
+    its own cv_team_mapping happens to be {"1":"team_a","2":"team_b"} - but
+    genuinely FALSE for other matches (found on barca_madrid_pt1: team1's
+    reference color is dark/Maroon, i.e. team_b, not team_a's White -
+    confirmed via jersey brightness and on-screen team labels, not
+    assumed). This must never be re-derived from color alone here (that's
+    exactly the ambiguous judgment call the app's own one-time swatch
+    confirmation exists to make for the main dashboard) - it's a per-mark,
+    already-resolved fact the caller passes in."""
     def dist(a, b):
         return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
 
     c1 = positions_data["team_colors_bgr"]["1"]
     c2 = positions_data["team_colors_bgr"]["2"]
-    ref_a = reference_team_colors_bgr["team1"]
-    ref_b = reference_team_colors_bgr["team2"]
+    if reference_team1_is_team_a:
+        ref_a, ref_b = reference_team_colors_bgr["team1"], reference_team_colors_bgr["team2"]
+    else:
+        ref_a, ref_b = reference_team_colors_bgr["team2"], reference_team_colors_bgr["team1"]
     cost_a = dist(c1, ref_a) + dist(c2, ref_b)
     cost_b = dist(c1, ref_b) + dist(c2, ref_a)
     return {"1": "team_a", "2": "team_b"} if cost_a <= cost_b else {"1": "team_b", "2": "team_a"}
@@ -318,9 +371,13 @@ def compute_corner_metrics(positions_data, team_mapping, attacking_team_token, d
 
 
 # ==========================================
-# TEAM-SHAPE VIDEO — top-down pitch diagram, real positions, convex-hull
-# outline (a purely geometric "connect the outermost players" shape - never
-# a tactical-role assignment).
+# _pitch_base: shared blank-pitch background, used by the trails-only video
+# below. The standalone top-down team-shape diagram that used to be built
+# here (render_team_shape_video) has been removed - the real-video overlay
+# tactical map (built in reconstruct_positions.py, cv_pipeline side) now
+# carries the "Team Shape (Diagram)" name and does the same convex-hull
+# shape job directly on real broadcast footage instead of an abstract
+# pitch drawing.
 # ==========================================
 
 def _pitch_base(px_per_m=10):
@@ -340,52 +397,6 @@ def _pitch_base(px_per_m=10):
     cv2.rectangle(img, pt(99.5, 24.84), pt(105, 43.16), line, 2)
     return img, px_per_m
 
-
-def render_team_shape_video(positions_data, team_mapping, attacking_team_token, defending_team_token,
-                             attacking_label, defending_label, out_path, fps=25.0):
-    """out_path should end in .avi - written XVID, same convention
-    run_cv_analysis.py's save_video() already uses for every other
-    rendered output in this app. NOT written directly as a browser-
-    playable mp4: confirmed live that cv2.VideoWriter's mp4v output isn't
-    reliably playable by Streamlit's st.video() (MediaFileStorageError).
-    The caller must run this through app.py's existing
-    _ensure_browser_playable_video (the same moviepy-based transcode
-    every other CV-rendered video already goes through) rather than
-    displaying it directly - reusing that fix, not re-solving it here."""
-    attacking_num = _team_num_for(team_mapping, attacking_team_token)
-    defending_num = _team_num_for(team_mapping, defending_team_token)
-    attacking_color = (0, 140, 255)   # orange, BGR
-    defending_color = (60, 60, 230)   # red, BGR
-
-    base_img, px_per_m = _pitch_base()
-    h, w = base_img.shape[:2]
-
-    def pt(x, y):
-        return (int(x * px_per_m), int(y * px_per_m))
-
-    fourcc = cv2.VideoWriter_fourcc(*"XVID")
-    writer = cv2.VideoWriter(str(out_path), fourcc, fps, (w, h))
-    try:
-        for frame in positions_data["frames"]:
-            img = base_img.copy()
-            att = _outfield(frame, attacking_num)
-            defn = _outfield(frame, defending_num)
-
-            for positions, color in ((att, attacking_color), (defn, defending_color)):
-                pts = [pt(x, y) for x, y in positions]
-                for p in pts:
-                    cv2.circle(img, p, 6, color, -1)
-                if len(pts) >= 3:
-                    hull = cv2.convexHull(np.array(pts, dtype=np.int32))
-                    cv2.polylines(img, [hull], isClosed=True, color=color, thickness=2)
-                elif len(pts) == 2:
-                    cv2.line(img, pts[0], pts[1], color, 2)
-
-            cv2.putText(img, f"{attacking_label} (attacking)", (10, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.55, attacking_color, 2)
-            cv2.putText(img, f"{defending_label} (defending)", (10, 46), cv2.FONT_HERSHEY_SIMPLEX, 0.55, defending_color, 2)
-            writer.write(img)
-    finally:
-        writer.release()
 
 
 # ==========================================
@@ -430,8 +441,15 @@ def _variant_color(base_bgr, seed):
 
 def render_trails_only_video(positions_data, team_mapping, attacking_team_token, defending_team_token,
                               attacking_label, defending_label, out_path, fps=25.0):
-    """Same out_path/XVID/_ensure_browser_playable_video convention as
-    render_team_shape_video - see that function's docstring."""
+    """out_path should end in .avi - written XVID, same convention
+    run_cv_analysis.py's save_video() already uses for every other
+    rendered output in this app. NOT written directly as a browser-
+    playable mp4: confirmed live that cv2.VideoWriter's mp4v output isn't
+    reliably playable by Streamlit's st.video() (MediaFileStorageError).
+    The caller must run this through app.py's existing
+    _ensure_browser_playable_video (the same moviepy-based transcode
+    every other CV-rendered video already goes through) rather than
+    displaying it directly."""
     attacking_num = _team_num_for(team_mapping, attacking_team_token)
     defending_num = _team_num_for(team_mapping, defending_team_token)
     attacking_color = (0, 140, 255)   # orange, BGR - same convention as team-shape

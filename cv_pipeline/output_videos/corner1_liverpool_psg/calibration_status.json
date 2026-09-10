@@ -1,0 +1,4 @@
+{
+  "reliable": false,
+  "note": "Verified unreliable via real-coordinate back-projection (10/10 sampled frames wrong) - the pose-keypoint model confused this tight corner shot's D-arc for the center circle, producing a self-consistent-but-wrong homography that still passes RANSAC and reports 0.999 confidence. See KNOWN_ISSUES.md."
+}

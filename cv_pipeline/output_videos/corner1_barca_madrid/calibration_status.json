@@ -1,0 +1,4 @@
+{
+  "reliable": true,
+  "note": "Real-coordinate back-projection found the same pose-model D-arc/center-circle confusion seen on the Liverpool/PSG corners (the center circle projects into the visible box, a far-field extrapolation error), but - unlike those - the NEAR-FIELD calibration (the box region the metrics actually use) checks out: 80% of frames have a defender tracked inside the real penalty-box zone (vs. 0-1.3% on the unreliable Liverpool/PSG corners), and the in-box positions plotted on the pitch land sensibly right at the box edge, not scattered. The far landmark being wrong doesn't appear to corrupt the near-box positions these metrics depend on. See KNOWN_ISSUES.md."
+}

@@ -55,3 +55,31 @@ just inlier count) plus correcting the reprojection-threshold units bug above.
 Validating any fix requires re-running calibration (not full detection/tracking) for
 every already-shipped match/segment and re-verifying every downstream metric that
 depends on `position_transformed` data — a real but bounded cost, not a quick patch.
+
+**Update — `barca_madrid_pt1`'s 3 new corner segments** (same real-coordinate
+back-projection method, same per-segment `calibration_status.json` sidecar the
+corner-kicks feature now reads): `corner1_barca_madrid` (4:45–4:55) is reliable for
+the near-box positions its metrics actually use (80% of frames have a defender
+tracked inside the real penalty box) despite the same far-field D-arc/center-circle
+confusion also showing up there — a useful nuance this investigation hadn't seen
+before: the bug's *far-field extrapolation* being wrong doesn't necessarily mean the
+*near-field* positions a corner-kick metric depends on are also wrong; check the
+box-zone frame count directly rather than assuming one implies the other.
+`corner2_barca_madrid` (16:17–16:26, 9.3% box-tracked) and `corner3_barca_madrid`
+(20:50–21:01, 8.7% box-tracked, degrading partway through its own window) are both
+unreliable, matching the `corner1/2_liverpool_psg` pattern.
+
+## Corner-kicks feature: `resolve_corner_team_mapping` assumed reference team1 = team_a
+
+**Status:** fixed. `dashboard/corner_kicks.py`'s `resolve_corner_team_mapping`
+hardcoded that a match's own main-window `team_resolution.team_colors_bgr["team1"]`
+is always real `team_a` — true for `liverpool_psg` only by coincidence (its
+`cv_team_mapping` happens to be `{"1":"team_a","2":"team_b"}`), but false for
+`barca_madrid_pt1` (whose `cv_team_mapping` was never confirmed via the main
+dashboard's one-time swatch-confirmation UI, and whose own team1 color is the darker
+Maroon/Barcelona kit, i.e. team_b, not team_a's White). Found while adding
+`barca_madrid_pt1`'s 3 corner marks: metrics would have silently labeled Real
+Madrid's numbers as Barcelona's and vice versa. Fixed by adding an explicit
+`reference_team1_is_team_a` flag, resolved once per match (from real jersey/on-screen
+evidence, not guessed) and stored on each mark itself — never touches `bundle.json`,
+never hardcodes a team name in the metric-display code.

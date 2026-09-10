@@ -1,0 +1,4 @@
+{
+  "reliable": true,
+  "note": "Verified reliable via real-coordinate back-projection (majority of sampled frames correct, matching the 168/175 real-box-tracked-frame finding). Lower reported confidence (0.788) here comes from an unrelated, already-mitigated wild-outlier class (a small number of frames with extreme out-of-bounds positions, filtered by the existing bounds check), not the D-arc/center-circle confusion bug. See KNOWN_ISSUES.md."
+}

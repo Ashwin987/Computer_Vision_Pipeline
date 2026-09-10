@@ -1,0 +1,621 @@
+{
+  "match_name": "corner3_barca_madrid",
+  "video_path": "corner_3_barca_madrid.mp4",
+  "generated_at": "2026-09-10T01:36:39.678205+00:00",
+  "video": {
+    "n_frames": 275,
+    "fps": 25.0,
+    "duration_sec": 11.0
+  },
+  "calibration": {
+    "frames": 275,
+    "mean_confidence": 0.8937,
+    "frames_high": 183,
+    "frames_medium": 85,
+    "frames_low": 7,
+    "pct_high": 66.5,
+    "pct_medium": 30.9,
+    "pct_low": 2.5
+  },
+  "ball": {
+    "n_frames": 275,
+    "primary_hits": 36,
+    "primary_detection_rate_pct": 13.1,
+    "fallback_triggered": 0,
+    "fallback_recovered": 0,
+    "fallback_recovery_rate_pct": null,
+    "fallback_total_sec": 0.0,
+    "final_hits_combined": 36,
+    "final_detection_rate_pct": 13.1,
+    "still_missed_after_fallback": 239
+  },
+  "team_resolution": {
+    "total_tracked_players": 51,
+    "resolved_team1": 31,
+    "resolved_team2": 19,
+    "goalkeepers": 1,
+    "unresolved": 0,
+    "resolution_rate_pct": 100.0,
+    "fallback_assigned_count": 2,
+    "merged_fragment_pairs": 37,
+    "team_colors_bgr": {
+      "team1": [
+        61.7,
+        84.6,
+        99.9
+      ],
+      "team2": [
+        149.2,
+        196.3,
+        180.4
+      ]
+    }
+  },
+  "players": [
+    {
+      "player_id": 26,
+      "team": 1,
+      "top_speed_kmh": 35.44,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 16.0,
+      "total_distance_m": 16.6,
+      "frames_tracked": 172
+    },
+    {
+      "player_id": 52,
+      "team": 1,
+      "top_speed_kmh": 35.27,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 17.09,
+      "total_distance_m": 12.0,
+      "frames_tracked": 140
+    },
+    {
+      "player_id": 13,
+      "team": 1,
+      "top_speed_kmh": 35.18,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 11.74,
+      "total_distance_m": 20.9,
+      "frames_tracked": 267
+    },
+    {
+      "player_id": 4,
+      "team": 1,
+      "top_speed_kmh": 35.02,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 11.4,
+      "total_distance_m": 16.8,
+      "frames_tracked": 222
+    },
+    {
+      "player_id": 9,
+      "team": 1,
+      "top_speed_kmh": 34.96,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 11.98,
+      "total_distance_m": 21.7,
+      "frames_tracked": 275
+    },
+    {
+      "player_id": 21,
+      "team": 1,
+      "top_speed_kmh": 34.66,
+      "top_speed_confidence": "low",
+      "avg_speed_kmh": 14.6,
+      "total_distance_m": 20.6,
+      "frames_tracked": 230
+    },
+    {
+      "player_id": 11,
+      "team": 2,
+      "top_speed_kmh": 34.31,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 13.64,
+      "total_distance_m": 23.4,
+      "frames_tracked": 254
+    },
+    {
+      "player_id": 75,
+      "team": 2,
+      "top_speed_kmh": 33.74,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 15.7,
+      "total_distance_m": 4.3,
+      "frames_tracked": 51
+    },
+    {
+      "player_id": 94,
+      "team": 1,
+      "top_speed_kmh": 33.72,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 21.52,
+      "total_distance_m": 8.9,
+      "frames_tracked": 76
+    },
+    {
+      "player_id": 114,
+      "team": 1,
+      "top_speed_kmh": 33.51,
+      "top_speed_confidence": "low",
+      "avg_speed_kmh": 23.29,
+      "total_distance_m": 0.9,
+      "frames_tracked": 18
+    },
+    {
+      "player_id": 29,
+      "team": 2,
+      "top_speed_kmh": 33.2,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 19.48,
+      "total_distance_m": 11.1,
+      "frames_tracked": 151
+    },
+    {
+      "player_id": 44,
+      "team": 2,
+      "top_speed_kmh": 33.13,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 7.22,
+      "total_distance_m": 3.3,
+      "frames_tracked": 93
+    },
+    {
+      "player_id": 15,
+      "team": 2,
+      "top_speed_kmh": 32.79,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 12.57,
+      "total_distance_m": 24.1,
+      "frames_tracked": 251
+    },
+    {
+      "player_id": 41,
+      "team": 1,
+      "top_speed_kmh": 32.26,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 23.73,
+      "total_distance_m": 3.5,
+      "frames_tracked": 26
+    },
+    {
+      "player_id": 2,
+      "team": 1,
+      "top_speed_kmh": 31.56,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 9.94,
+      "total_distance_m": 23.4,
+      "frames_tracked": 274
+    },
+    {
+      "player_id": 120,
+      "team": 1,
+      "top_speed_kmh": 31.2,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 13.31,
+      "total_distance_m": 4.4,
+      "frames_tracked": 42
+    },
+    {
+      "player_id": 62,
+      "team": 1,
+      "top_speed_kmh": 30.1,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 13.64,
+      "total_distance_m": 2.6,
+      "frames_tracked": 53
+    },
+    {
+      "player_id": 134,
+      "team": 2,
+      "top_speed_kmh": 28.44,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 13.27,
+      "total_distance_m": 2.6,
+      "frames_tracked": 32
+    },
+    {
+      "player_id": 83,
+      "team": 1,
+      "top_speed_kmh": 28.39,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 15.82,
+      "total_distance_m": 2.6,
+      "frames_tracked": 45
+    },
+    {
+      "player_id": 42,
+      "team": 2,
+      "top_speed_kmh": 27.46,
+      "top_speed_confidence": "low",
+      "avg_speed_kmh": 13.55,
+      "total_distance_m": 5.7,
+      "frames_tracked": 107
+    },
+    {
+      "player_id": 17,
+      "team": 2,
+      "top_speed_kmh": 27.35,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 13.96,
+      "total_distance_m": 18.4,
+      "frames_tracked": 257
+    },
+    {
+      "player_id": 109,
+      "team": 1,
+      "top_speed_kmh": 26.9,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 12.05,
+      "total_distance_m": 4.3,
+      "frames_tracked": 46
+    },
+    {
+      "player_id": 131,
+      "team": 2,
+      "top_speed_kmh": 26.3,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 17.97,
+      "total_distance_m": 2.7,
+      "frames_tracked": 18
+    },
+    {
+      "player_id": 6,
+      "team": 3,
+      "top_speed_kmh": 25.35,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 8.21,
+      "total_distance_m": 8.2,
+      "frames_tracked": 274
+    },
+    {
+      "player_id": 3,
+      "team": 2,
+      "top_speed_kmh": 25.06,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 7.22,
+      "total_distance_m": 13.2,
+      "frames_tracked": 268
+    },
+    {
+      "player_id": 1,
+      "team": 2,
+      "top_speed_kmh": 24.42,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 7.46,
+      "total_distance_m": 16.9,
+      "frames_tracked": 275
+    },
+    {
+      "player_id": 33,
+      "team": 1,
+      "top_speed_kmh": 24.0,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 15.63,
+      "total_distance_m": 3.0,
+      "frames_tracked": 86
+    },
+    {
+      "player_id": 12,
+      "team": 1,
+      "top_speed_kmh": 23.47,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 8.46,
+      "total_distance_m": 10.9,
+      "frames_tracked": 154
+    },
+    {
+      "player_id": 105,
+      "team": 2,
+      "top_speed_kmh": 22.12,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 13.34,
+      "total_distance_m": 5.4,
+      "frames_tracked": 55
+    },
+    {
+      "player_id": 16,
+      "team": 1,
+      "top_speed_kmh": 22.1,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 7.68,
+      "total_distance_m": 0.5,
+      "frames_tracked": 12
+    },
+    {
+      "player_id": 98,
+      "team": 2,
+      "top_speed_kmh": 21.56,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 11.45,
+      "total_distance_m": 0.8,
+      "frames_tracked": 10
+    },
+    {
+      "player_id": 18,
+      "team": 1,
+      "top_speed_kmh": 21.51,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 8.23,
+      "total_distance_m": 6.2,
+      "frames_tracked": 73
+    },
+    {
+      "player_id": 144,
+      "team": 1,
+      "top_speed_kmh": 21.02,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 8.5,
+      "total_distance_m": 0.8,
+      "frames_tracked": 8
+    },
+    {
+      "player_id": 36,
+      "team": 2,
+      "top_speed_kmh": 19.54,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 9.77,
+      "total_distance_m": 0.2,
+      "frames_tracked": 4
+    },
+    {
+      "player_id": 71,
+      "team": 1,
+      "top_speed_kmh": 19.28,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 10.63,
+      "total_distance_m": 0.4,
+      "frames_tracked": 7
+    },
+    {
+      "player_id": 14,
+      "team": 1,
+      "top_speed_kmh": 18.9,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 7.44,
+      "total_distance_m": 3.7,
+      "frames_tracked": 55
+    },
+    {
+      "player_id": 10,
+      "team": 2,
+      "top_speed_kmh": 18.12,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 4.91,
+      "total_distance_m": 5.4,
+      "frames_tracked": 104
+    },
+    {
+      "player_id": 32,
+      "team": 1,
+      "top_speed_kmh": 18.12,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 6.95,
+      "total_distance_m": 1.2,
+      "frames_tracked": 16
+    },
+    {
+      "player_id": 28,
+      "team": 1,
+      "top_speed_kmh": 16.41,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 8.76,
+      "total_distance_m": 0.7,
+      "frames_tracked": 7
+    },
+    {
+      "player_id": 27,
+      "team": 1,
+      "top_speed_kmh": 16.2,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 10.29,
+      "total_distance_m": 0.7,
+      "frames_tracked": 10
+    },
+    {
+      "player_id": 111,
+      "team": 2,
+      "top_speed_kmh": 14.55,
+      "top_speed_confidence": "medium",
+      "avg_speed_kmh": 8.13,
+      "total_distance_m": 0.6,
+      "frames_tracked": 12
+    },
+    {
+      "player_id": 139,
+      "team": 1,
+      "top_speed_kmh": 11.22,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 8.25,
+      "total_distance_m": 0.4,
+      "frames_tracked": 10
+    },
+    {
+      "player_id": 8,
+      "team": 2,
+      "top_speed_kmh": 10.96,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 2.95,
+      "total_distance_m": 4.0,
+      "frames_tracked": 128
+    },
+    {
+      "player_id": 58,
+      "team": 1,
+      "top_speed_kmh": 7.79,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 4.55,
+      "total_distance_m": 0.3,
+      "frames_tracked": 5
+    },
+    {
+      "player_id": 7,
+      "team": 1,
+      "top_speed_kmh": 3.43,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.61,
+      "total_distance_m": 0.1,
+      "frames_tracked": 66
+    },
+    {
+      "player_id": 40,
+      "team": 1,
+      "top_speed_kmh": 0.0,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.0,
+      "total_distance_m": 0.0,
+      "frames_tracked": 1
+    },
+    {
+      "player_id": 47,
+      "team": 2,
+      "top_speed_kmh": 0.0,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.0,
+      "total_distance_m": 0.0,
+      "frames_tracked": 2
+    },
+    {
+      "player_id": 87,
+      "team": 1,
+      "top_speed_kmh": 0.0,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.0,
+      "total_distance_m": 0.0,
+      "frames_tracked": 2
+    },
+    {
+      "player_id": 119,
+      "team": 1,
+      "top_speed_kmh": 0.0,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.0,
+      "total_distance_m": 0.0,
+      "frames_tracked": 1
+    },
+    {
+      "player_id": 137,
+      "team": 2,
+      "top_speed_kmh": 0.0,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.0,
+      "total_distance_m": 0.0,
+      "frames_tracked": 19
+    },
+    {
+      "player_id": 140,
+      "team": 1,
+      "top_speed_kmh": 0.0,
+      "top_speed_confidence": "high",
+      "avg_speed_kmh": 0.0,
+      "total_distance_m": 0.0,
+      "frames_tracked": 1
+    }
+  ],
+  "match_events": {
+    "counts": {
+      "INTERCEPTION": 20,
+      "PASS": 14
+    },
+    "total": 34
+  },
+  "tactical_events": {
+    "counts": {
+      "SPACE": 11,
+      "PRESS": 34,
+      "ISOLATED": 7,
+      "BURST": 4,
+      "OVERLAP": 14,
+      "RECOVERY": 5,
+      "LATERAL_RUN": 10,
+      "DROP": 3,
+      "BREAK": 1
+    },
+    "total": 89,
+    "highlights": [
+      {
+        "type": "ISOLATED",
+        "player_id": 2,
+        "window": 0,
+        "score": 14.0,
+        "intensity": 5.0,
+        "metric": "49.3m to nearest teammate"
+      },
+      {
+        "type": "BREAK",
+        "player_id": 17,
+        "window": 0,
+        "score": 13.13,
+        "intensity": 3.13,
+        "metric": "24.4 km/h"
+      },
+      {
+        "type": "PRESS",
+        "player_id": 18,
+        "window": 0,
+        "score": 13.0,
+        "intensity": 5.0,
+        "metric": "0.1m closed, 2 pressers"
+      },
+      {
+        "type": "SPACE",
+        "player_id": 9,
+        "window": 0,
+        "score": 13.0,
+        "intensity": 5.0,
+        "metric": "4.85x avg space"
+      },
+      {
+        "type": "PRESS",
+        "player_id": 32,
+        "window": 0,
+        "score": 13.0,
+        "intensity": 5.0,
+        "metric": "0.5m closed, 3 pressers"
+      },
+      {
+        "type": "PRESS",
+        "player_id": 29,
+        "window": 0,
+        "score": 13.0,
+        "intensity": 5.0,
+        "metric": "0.2m closed, 2 pressers"
+      },
+      {
+        "type": "SPACE",
+        "player_id": 1,
+        "window": 0,
+        "score": 12.9,
+        "intensity": 4.9,
+        "metric": "3.94x avg space"
+      },
+      {
+        "type": "ISOLATED",
+        "player_id": 13,
+        "window": 0,
+        "score": 12.41,
+        "intensity": 3.41,
+        "metric": "38.7m to nearest teammate"
+      },
+      {
+        "type": "OVERLAP",
+        "player_id": 29,
+        "window": 0,
+        "score": 12.0,
+        "intensity": 5.0,
+        "metric": "25.0 km/h run"
+      },
+      {
+        "type": "OVERLAP",
+        "player_id": 26,
+        "window": 0,
+        "score": 12.0,
+        "intensity": 5.0,
+        "metric": "27.3 km/h run"
+      }
+    ]
+  },
+  "transitions": {
+    "count": 20
+  }
+}

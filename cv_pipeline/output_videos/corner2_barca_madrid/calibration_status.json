@@ -1,0 +1,4 @@
+{
+  "reliable": false,
+  "note": "Verified unreliable via real-coordinate back-projection - the same pose-keypoint D-arc/center-circle confusion found on the Liverpool/PSG corners. Only 21/225 frames (9.3%) had a defender tracked inside the real penalty-box zone, well below the frame-count threshold - consistent with the wrong-but-internally-consistent homography also corrupting near-box positions here, unlike corner1_barca_madrid. See KNOWN_ISSUES.md."
+}
