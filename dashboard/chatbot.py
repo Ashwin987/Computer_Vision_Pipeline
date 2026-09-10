@@ -58,7 +58,7 @@ PROJECT_INFO_COLLECTION_NAME = "project_technical_report"
 # consolidation (app.py had two, one already routed through CV_PIPELINE_DIR
 # and one that wasn't) - all three now resolve the same relative way.
 TECHNICAL_REPORT_PDF_PATH = (
-    Path(__file__).resolve().parent.parent / "cv_pipeline" / "Real-Time_Soccer_Analytics_Pipeline_v3.pdf"
+    Path(__file__).resolve().parent.parent / "cv_pipeline" / "Real-Time_Soccer_Analytics_Pipeline_v4.pdf"
 )
 
 
@@ -576,7 +576,17 @@ Answer in 2-4 sentences.
 # ==========================================
 
 _REPORT_HEADER_RE = re.compile(
-    r"(?<=[\.\?\!\s])(\d{1,2}(?:\.\d{1,2}){0,2})\s+([A-Z][A-Za-z0-9,:\-' ]{6,90}?)(?=\s+[A-Z][a-z]{2,}|\s+\d)"
+    # Widened for v4: several of its new section titles end with a
+    # parenthetical "(New in this revision)" annotation v3's titles never
+    # had - confirmed by direct extraction that the original character
+    # class (no parens/newlines) and 90-char cap silently dropped 2.4.8 and
+    # 10.8's real header match entirely (their content still existed, just
+    # merged wholesale - and partly truncated by the 1500-char chunk cap -
+    # into the PRECEDING section's chunk instead of getting their own
+    # citable label). 150 chars comfortably covers the longest real title
+    # tested (113 chars) with headroom, without being so large it risks
+    # matching across an unrelated paragraph boundary.
+    r"(?<=[\.\?\!\s])(\d{1,2}(?:\.\d{1,2}){0,2})\s+([A-Z][A-Za-z0-9,:\-'()\s]{6,150}?)(?=\s+[A-Z][a-z]{2,}|\s+\d)"
 )
 
 

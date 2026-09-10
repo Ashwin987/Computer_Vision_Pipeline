@@ -7,7 +7,7 @@ This repository combines two previously separate codebases into one:
 - **`cv_pipeline/`** — the computer-vision pipeline (`run_cv_analysis.py`, pitch
   calibration, player/ball tracking, tactical-event detection, and the trained model
   weights it depends on). See `cv_pipeline/README.md` for details on that pipeline
-  specifically, and `Real-Time_Soccer_Analytics_Pipeline_v3.pdf` at its root for the
+  specifically, and `Real-Time_Soccer_Analytics_Pipeline_v4.pdf` at its root for the
   full technical writeup.
 - **`dashboard/`** — the Streamlit app (`app.py`) that drives the CV pipeline as a
   subprocess, renders the resulting tactical analysis, generates an AI coach report
