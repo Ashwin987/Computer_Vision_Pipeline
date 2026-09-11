@@ -123,6 +123,13 @@ class SoccerNetCalibrator:
         self.min_keypoints = min_keypoints
         self.ransac_reproj = ransac_reproj_threshold
         self.imgsz = imgsz
+        # Set by _solve_homography on every call - None on success, else a
+        # short string naming why this frame's calibration was rejected
+        # (e.g. 'ambiguous_cluster'). Not part of the public return value
+        # (which stays a plain (H, H_inv)-or-None tuple everywhere in this
+        # codebase already expects) - a side channel for callers that want
+        # to know WHY, like calibrate_video's own diagnostic print line.
+        self.last_reject_reason = None
 
         print(f"SoccerNetCalibrator: loading model from {model_path} ...")
         self._model = YOLO(model_path)
@@ -201,8 +208,8 @@ class SoccerNetCalibrator:
             if frame_num % sample_every_n_frames == 0:
                 sampled[frame_num] = self.calibrate_frame(frame)
                 sampled_done += 1
-                print(f"  frame {frame_num}/{total}  H={'ok' if sampled[frame_num] else 'None'}",
-                      flush=True)
+                status = 'ok' if sampled[frame_num] else f'None ({self.last_reject_reason})'
+                print(f"  frame {frame_num}/{total}  H={status}", flush=True)
                 if progress_callback is not None:
                     progress_callback(sampled_done, sampled_total)
             frame_num += 1
@@ -270,23 +277,78 @@ class SoccerNetCalibrator:
         Compute H (pixel→world) via RANSAC and validate it.
         Returns (H, H_inv) or None.
         """
-        H, mask = cv2.findHomography(
-            kp_pixel, kp_world,
+        self.last_reject_reason = None
+
+        # Fit world->pixel (not pixel->world) so RANSAC's reprojection
+        # threshold is measured in PIXEL space, matching this class's own
+        # documented intent ("RANSAC reprojection threshold in pixels").
+        # cv2.findHomography's ransacReprojThreshold is always applied in
+        # the DESTINATION array's units - fitting pixel->world directly
+        # (as this used to) silently applied it in world-space METRES
+        # instead, an 8.0 "pixel" tolerance that was actually an 8-metre
+        # one: on a 105x68m pitch, over 7% of the pitch length, permissive
+        # enough to accept a badly wrong correspondence as an inlier.
+        H_inv, mask = cv2.findHomography(
+            kp_world, kp_pixel,
             cv2.RANSAC, self.ransac_reproj,
         )
-        if H is None:
+        if H_inv is None:
+            self.last_reject_reason = 'no_homography'
             return None
 
         inliers = int(mask.sum()) if mask is not None else 0
         if inliers < self.min_keypoints:
+            self.last_reject_reason = 'too_few_inliers'
             return None
 
+        if self._is_ambiguous_cluster(kp_pixel, kp_world, mask):
+            # The specific D-arc/center-circle confusion failure mode
+            # (KNOWN_ISSUES.md): the pose model's rejected ("outlier")
+            # points ALSO fit their own clean homography independently -
+            # two internally-consistent but mutually-disagreeing
+            # interpretations of the same frame, not genuine scattered
+            # noise (real noise doesn't re-fit into a second good
+            # homography). Neither cluster can be trusted over the other
+            # from this evidence alone, so this frame is treated the same
+            # as any other calibration failure - fall back, don't guess.
+            self.last_reject_reason = 'ambiguous_cluster'
+            return None
+
+        H = np.linalg.inv(H_inv)
         if not self._validate(H, frame_shape):
+            self.last_reject_reason = 'out_of_bounds'
             return None
 
         H     = H.astype(np.float32)
-        H_inv = np.linalg.inv(H).astype(np.float32)
+        H_inv = H_inv.astype(np.float32)
         return H, H_inv
+
+    def _is_ambiguous_cluster(self, kp_pixel, kp_world, mask) -> bool:
+        """True if the points RANSAC rejected as outliers also form their
+        own clean, well-supported homography on their own - the signature
+        of two competing self-consistent clusters (e.g. D-arc points
+        mistaken for center-circle points, or vice versa) rather than
+        ordinary scattered detection noise, which does not cleanly re-fit
+        a second homography."""
+        outlier_idx = np.where(mask.ravel() == 0)[0]
+        if len(outlier_idx) < self.min_keypoints:
+            return False   # too few rejected points to form a competing cluster at all
+
+        out_pixel = kp_pixel[outlier_idx]
+        out_world = kp_world[outlier_idx]
+        H2_inv, mask2 = cv2.findHomography(
+            out_world, out_pixel,
+            cv2.RANSAC, self.ransac_reproj,
+        )
+        if H2_inv is None:
+            return False
+
+        inliers2 = int(mask2.sum()) if mask2 is not None else 0
+        # Ambiguous only if the rejected set's own fit is BOTH large enough
+        # to be a real competing interpretation (not 4 coincidental points)
+        # and internally consistent enough (most of it agrees with itself,
+        # not just barely clearing min_keypoints).
+        return inliers2 >= self.min_keypoints and (inliers2 / len(outlier_idx)) >= 0.6
 
     def _validate(self, H: np.ndarray, frame_shape: tuple) -> bool:
         """

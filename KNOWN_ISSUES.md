@@ -49,12 +49,54 @@ directly (block-height/zone classification, space-control heatmaps, the corner-k
 feature's box-scoped metrics) are the most exposed, since "which part of the pitch"
 is exactly what this bug gets wrong.
 
-**Fix, not yet implemented:** a contained change to `pitch_calibrator.py` /
-`view_transformer.py` — likely RANSAC inlier residual/spread checking (rather than
-just inlier count) plus correcting the reprojection-threshold units bug above.
-Validating any fix requires re-running calibration (not full detection/tracking) for
-every already-shipped match/segment and re-verifying every downstream metric that
-depends on `position_transformed` data — a real but bounded cost, not a quick patch.
+**Fix — implemented, partial.** `pitch_calibrator.py`'s `_solve_homography` now: (1)
+fits world→pixel with RANSAC (not pixel→world) so the reprojection threshold is
+genuinely applied in pixel space as documented, instead of silently being an 8-*metre*
+tolerance; (2) after RANSAC accepts an inlier cluster, re-fits a homography restricted
+to just the rejected ("outlier") points — if that rejected set ALSO fits its own clean
+homography (`inliers2 >= min_keypoints` and `inliers2/len(outliers) >= 0.6`), the frame
+is flagged `'ambiguous_cluster'` and rejected outright (falls back to the nearest
+calibrated neighbor, the same existing fallback every other calibration failure already
+uses) rather than confidently accepting one of two indistinguishable interpretations.
+
+**Scope of this fix, verified by real-coordinate back-projection (not by trusting the
+new logic's own report) across multiple frames per segment — only corner-kick segments
+were touched; `liverpool_psg_verified`/`barca_madrid_pt1_verified` are untouched and
+checksum-verified identical before/after:**
+- `corner3_barca_madrid`: genuinely fixed. Box corners, goal posts, and the center
+  circle now land in visually correct positions across every checked frame.
+  Box-tracked frames: 8.7% → 72.4%. **Adopted** — its shipped `player_positions.json`
+  and homography stub now reflect the recalibrated data, `calibration_status.json`
+  flipped to `reliable: true`.
+- `corner1_liverpool_psg`: improved but inconsistent — 2 of 3 manually-checked frames
+  now project correctly, 1 does not. Box-tracked frames rose from 0% to 36% (passes
+  the frame-count gate), but this is not confirmed reliable to the same bar as
+  `corner3_barca_madrid`. **Not adopted** — left flagged `reliable: false`, pending a
+  more thorough per-frame check than this pass had time for.
+- `corner2_liverpool_psg`: still wrong on every manually-checked frame (box corners
+  project onto open midfield grass, nowhere near the actual box). **Not adopted** —
+  unchanged, still `reliable: false`.
+- `corner2_barca_madrid`: still wrong on the checked frame, same failure shape as
+  `corner2_liverpool_psg`. **Not adopted** — unchanged, still `reliable: false`.
+- `corner1_barca_madrid`: previously the one segment flagged *reliable* (for its
+  near-box positions). Re-verifying it under the new logic was explicitly required
+  before trusting it — and it should NOT be trusted: multiple checked frames now show
+  box corners projecting onto open grass, a regression from its prior state. **Not
+  adopted** — its original (pre-fix) calibration data is kept as shipped, since it was
+  the better of the two and remains flagged `reliable: true` based on that original,
+  separately-verified data, not the new fit.
+
+**Bottom line:** the fix demonstrably works for the case it targets (two competing,
+internally-consistent keypoint clusters), and fully resolved 1 of the 5 previously-
+checked corner segments. It's a real improvement, not a complete one — 4 of 5 segments
+still need either the existing honest-fallback UI treatment (already in place and
+correctly gating all of them) or further calibration work, most likely something
+beyond cluster-agreement checking alone: at least one failure mode observed here
+(`corner1_liverpool_psg`, frame 90) is a small-but-self-consistent inlier set that
+fits itself with near-zero residual yet is too spatially clustered to safely
+extrapolate a full projective transform beyond its own immediate neighborhood — a
+different problem from the two-competing-clusters signature this fix targets, and not
+yet addressed.
 
 **Update — `barca_madrid_pt1`'s 3 new corner segments** (same real-coordinate
 back-projection method, same per-segment `calibration_status.json` sidecar the
@@ -66,8 +108,11 @@ before: the bug's *far-field extrapolation* being wrong doesn't necessarily mean
 *near-field* positions a corner-kick metric depends on are also wrong; check the
 box-zone frame count directly rather than assuming one implies the other.
 `corner2_barca_madrid` (16:17–16:26, 9.3% box-tracked) and `corner3_barca_madrid`
-(20:50–21:01, 8.7% box-tracked, degrading partway through its own window) are both
-unreliable, matching the `corner1/2_liverpool_psg` pattern.
+(20:50–21:01, originally 8.7% box-tracked, degrading partway through its own window)
+were both unreliable at the time this was written, matching the `corner1/2_liverpool_psg`
+pattern. **`corner3_barca_madrid`'s status has since changed** — see the "Fix —
+implemented, partial" section above; it was recalibrated and is now `reliable: true`.
+`corner2_barca_madrid` remains unreliable, unchanged.
 
 ## Corner-kicks feature: `resolve_corner_team_mapping` assumed reference team1 = team_a
 

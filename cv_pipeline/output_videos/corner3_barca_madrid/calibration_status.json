@@ -1,4 +1,4 @@
 {
-  "reliable": false,
-  "note": "Verified unreliable via real-coordinate back-projection. An early frame checked out correctly (box corners and near-box landmarks lined up), but a later frame in the same window - after the corner's own delivery/clearance phase, once the camera view changes - showed multiple box-corner reference points collapsing onto nearly the same pixel location, the same self-consistent-but-wrong-cluster failure found on the Liverpool/PSG corners. Only 24/275 frames (8.7%) had a defender tracked inside the real penalty-box zone across the whole window. See KNOWN_ISSUES.md."
+  "reliable": true,
+  "note": "Re-verified reliable after the pitch_calibrator.py fix (RANSAC reprojection threshold corrected from world-space metres to pixel space, plus an ambiguous-cluster check that rejects a frame when both the accepted and rejected keypoint clusters independently fit their own clean homography). Recalibrated (calibration only, detection/tracking reused from cache) and re-verified via real-coordinate back-projection across multiple frames spanning the window (box corners, goal posts, and the center circle all land in visually correct positions). Box-tracked frames rose from 24/275 (8.7%) to 199/275 (72.4%). See KNOWN_ISSUES.md."
 }
