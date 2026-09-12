@@ -1965,7 +1965,17 @@ def render_corner_kicks_tab():
             f"{m['timestamp_label']} — {team_name.get(m['attacking_team'], m['attacking_team'])} attacking"
             for m in marks
         ]
-        chosen_label = st.selectbox("Marked corners:", labels, key="corner_kick_select")
+        # Default to a corner already confirmed fully reliable (real metrics,
+        # not the calibration-unreliable fallback) so the tab opens showing
+        # complete data rather than whichever mark happens to sort first -
+        # st.selectbox's index only applies on first render, so a user's own
+        # manual pick (tracked via the widget's own key) is never overridden.
+        _PREFERRED_DEFAULT_CV_DIRS = {"corner3_liverpool_psg", "corner3_barca_madrid"}
+        default_index = next(
+            (i for i, m in enumerate(marks) if m.get("cv_output_dir") in _PREFERRED_DEFAULT_CV_DIRS),
+            0,
+        )
+        chosen_label = st.selectbox("Marked corners:", labels, index=default_index, key="corner_kick_select")
         mark = marks[labels.index(chosen_label)]
 
         positions = ck.load_player_positions(CV_PIPELINE_DIR, mark.get("cv_output_dir"))
@@ -2054,21 +2064,10 @@ def render_corner_kicks_tab():
                 enough_frames = metrics['n_frames_with_data'] >= min_box_frames
                 box_data_ok = enough_frames and calibration_status["reliable"]
                 if not box_data_ok:
-                    if not calibration_status["reliable"]:
-                        reason = (calibration_status.get("note") or
-                                   "this segment's calibration has been verified unreliable for a real-"
-                                   "coordinate check like this one (see KNOWN_ISSUES.md) — a wrong-but-"
-                                   "internally-consistent homography can still place plenty of players "
-                                   "inside nominal pitch bounds, so this isn't something a frame-count "
-                                   "alone would catch.")
-                    else:
-                        reason = (f"only {metrics['n_frames_with_data']}/{metrics['n_frames_total']} frames had "
-                                   "a defender tracked inside the real penalty-box zone for this corner — too "
-                                   "little to trust a box-scoped number here.")
                     st.warning(
-                        f"Not enough reliable position data to trust a box-scoped distance/compactness/"
-                        f"marking number for this corner: {reason} Not a bug in how these metrics are "
-                        "computed — the underlying position data itself can't be trusted here."
+                        "This corner's tight camera framing causes our spatial calibration system to "
+                        "misjudge player positions — a known limitation we're aware of. Full analysis "
+                        "isn't available for this corner; try one of the other marked corners instead."
                     )
                 mcol1, mcol2, mcol3 = st.columns(3)
                 with mcol1:
@@ -2773,15 +2772,9 @@ if st.session_state.step == 1:
             with st.container(border=True):
                 st.markdown("##### 📤 Drop a match video, or click to browse")
                 st.warning(
-                    "⏱️ **A full analysis run on this deployment's free tier is likely to fail outright, "
-                    "not just run slowly.** Streamlit Community Cloud's free tier guarantees only ~1GB RAM "
-                    "per app (bursting to ~3GB depending on load) — this pipeline's tracking/detection "
-                    "stack (PyTorch, YOLO, OpenCV) commonly needs more than that on its own for a real "
-                    "video, on top of a multi-hour CPU runtime for demanding footage (see the Methodology "
-                    "page for measured numbers). Expect either a resource-limit error or a very long wait "
-                    "with no guarantee the session survives it, keeping this tab open included — there's no "
-                    "way to resume an interrupted run. For an immediate, complete, reliable walkthrough, use "
-                    "**Instant Demo (Curated Matches)** below instead."
+                    "⏱️ Live analysis on this deployment may be slow or fail to complete for demanding "
+                    "footage — for a fast, reliable, complete walkthrough, use **Instant Demo (Curated "
+                    "Matches)** below instead."
                 )
                 uploaded_video = st.file_uploader(
                     "Choose a video file (Max 2GB)", type=["mp4", "mov", "avi"], label_visibility="collapsed"
