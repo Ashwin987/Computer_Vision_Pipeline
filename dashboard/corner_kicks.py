@@ -22,17 +22,12 @@ Storage: marks are written to CACHE_DIR (the writable system-temp location
 the repo read-only), same ephemeral-across-restarts tradeoff already
 accepted for training plans and curated-match renames. Never bundle.json.
 """
-import colorsys
 import json
 import math
 import os
-from collections import defaultdict, deque
 from pathlib import Path
 
 import re
-
-import cv2
-import numpy as np
 
 PITCH_LENGTH_M = 105.0
 PITCH_WIDTH_M = 68.0
@@ -368,135 +363,3 @@ def compute_corner_metrics(positions_data, team_mapping, attacking_team_token, d
         "n_frames_with_data": len(last_defender_vals),
         "n_frames_total": len(positions_data["frames"]),
     }
-
-
-# ==========================================
-# _pitch_base: shared blank-pitch background, used by the trails-only video
-# below. The standalone top-down team-shape diagram that used to be built
-# here (render_team_shape_video) has been removed - the real-video overlay
-# tactical map (built in reconstruct_positions.py, cv_pipeline side) now
-# carries the "Team Shape (Diagram)" name and does the same convex-hull
-# shape job directly on real broadcast footage instead of an abstract
-# pitch drawing.
-# ==========================================
-
-def _pitch_base(px_per_m=10):
-    w, h = int(PITCH_LENGTH_M * px_per_m), int(PITCH_WIDTH_M * px_per_m)
-    img = np.full((h, w, 3), (34, 139, 34), dtype=np.uint8)  # grass green, BGR
-    line = (255, 255, 255)
-
-    def pt(x, y):
-        return (int(x * px_per_m), int(y * px_per_m))
-
-    cv2.rectangle(img, pt(0, 0), pt(PITCH_LENGTH_M, PITCH_WIDTH_M), line, 2)
-    cv2.line(img, pt(52.5, 0), pt(52.5, PITCH_WIDTH_M), line, 2)
-    cv2.circle(img, pt(52.5, 34), int(9.15 * px_per_m), line, 2)
-    cv2.rectangle(img, pt(0, 13.84), pt(16.5, 54.16), line, 2)
-    cv2.rectangle(img, pt(0, 24.84), pt(5.5, 43.16), line, 2)
-    cv2.rectangle(img, pt(88.5, 13.84), pt(105, 54.16), line, 2)
-    cv2.rectangle(img, pt(99.5, 24.84), pt(105, 43.16), line, 2)
-    return img, px_per_m
-
-
-
-# ==========================================
-# TRAILS-ONLY VIDEO — clean-pitch movement trails, no player markers, no
-# footage underneath. Same real position_transformed data the team-shape
-# video already uses (not the CV pipeline's own render_output6.py, which
-# operates on raw camera-pixel coordinates with its own camera-movement
-# compensation - unnecessary here since position_transformed is already in
-# real, camera-motion-independent pitch meters). Same fading-trail concept
-# (short history, fades oldest-to-newest) as render_output6, re-expressed
-# against this feature's own already-available data instead of importing
-# cv_pipeline code the dashboard environment (no ultralytics/torch) can't
-# run anyway.
-# ==========================================
-
-_TRAIL_SECONDS = 3.0   # matches render_output6.py's own trail-history window
-_VARIANT_BUCKETS = 7   # small per-player hue/value jitter so two teammates
-                        # whose trails cross don't read as one indistinct line
-# Found necessary by direct visual inspection of a real rendered clip: without
-# this, a tracker-id gap or reassignment (the same fragmentation issue
-# render_output6.py's own RECORD_JUMP_PX/TRAIL_EXPIRE_FRAMES guard against)
-# produced dead-straight lines connecting two totally unrelated pitch
-# locations, since a raw tracker id can reappear later at a real player's
-# CURRENT position with nothing recorded in between. Well above any plausible
-# single real movement at 25fps (sprinting is ~0.4m/frame) but far below a
-# near-pitch-length artifact.
-_MAX_FRAME_GAP = 25     # ~1 real second - a longer absence means "different sighting"
-_MAX_JUMP_M = 5.0
-
-
-def _variant_color(base_bgr, seed):
-    b, g, r = base_bgr
-    h, s, v = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
-    hue_bucket = int(seed) % _VARIANT_BUCKETS
-    val_bucket = (int(seed) * 3) % _VARIANT_BUCKETS
-    half = (_VARIANT_BUCKETS - 1) / 2.0
-    h2 = (h + ((hue_bucket - half) / half) * 0.05) % 1.0
-    v2 = min(1.0, max(0.55, v + ((val_bucket - half) / half) * 0.18))
-    r2, g2, b2 = colorsys.hsv_to_rgb(h2, s, v2)
-    return (int(round(b2 * 255)), int(round(g2 * 255)), int(round(r2 * 255)))
-
-
-def render_trails_only_video(positions_data, team_mapping, attacking_team_token, defending_team_token,
-                              attacking_label, defending_label, out_path, fps=25.0):
-    """out_path should end in .avi - written XVID, same convention
-    run_cv_analysis.py's save_video() already uses for every other
-    rendered output in this app. NOT written directly as a browser-
-    playable mp4: confirmed live that cv2.VideoWriter's mp4v output isn't
-    reliably playable by Streamlit's st.video() (MediaFileStorageError).
-    The caller must run this through app.py's existing
-    _ensure_browser_playable_video (the same moviepy-based transcode
-    every other CV-rendered video already goes through) rather than
-    displaying it directly."""
-    attacking_num = _team_num_for(team_mapping, attacking_team_token)
-    defending_num = _team_num_for(team_mapping, defending_team_token)
-    attacking_color = (0, 140, 255)   # orange, BGR - same convention as team-shape
-    defending_color = (60, 60, 230)   # red, BGR
-
-    base_img, px_per_m = _pitch_base()
-    h, w = base_img.shape[:2]
-
-    def pt(x, y):
-        return (int(x * px_per_m), int(y * px_per_m))
-
-    trail_len = max(2, int(round(fps * _TRAIL_SECONDS)))
-    trails = defaultdict(lambda: deque(maxlen=trail_len))  # (team_num, player_id) -> deque[(x,y)]
-    last_point = {}  # (team_num, player_id) -> (frame_num, x, y), for gap/jump detection
-
-    fourcc = cv2.VideoWriter_fourcc(*"XVID")
-    writer = cv2.VideoWriter(str(out_path), fourcc, fps, (w, h))
-    try:
-        for frame_num, frame in enumerate(positions_data["frames"]):
-            img = base_img.copy()
-            for team_num, color in ((attacking_num, attacking_color), (defending_num, defending_color)):
-                for pid, (x, y) in _outfield_with_ids(frame, team_num):
-                    key = (team_num, pid)
-                    prev = last_point.get(key)
-                    if prev is not None:
-                        prev_fn, px, py = prev
-                        if (frame_num - prev_fn > _MAX_FRAME_GAP
-                                or math.hypot(x - px, y - py) > _MAX_JUMP_M):
-                            trails[key].clear()   # different sighting - start this trail fresh
-                    trails[key].append((x, y))
-                    last_point[key] = (frame_num, x, y)
-
-            for (team_num, pid), history in trails.items():
-                if len(history) < 2:
-                    continue
-                color = attacking_color if team_num == attacking_num else defending_color
-                variant = _variant_color(color, pid)
-                pts = [pt(x, y) for x, y in history]
-                n = len(pts)
-                for i in range(1, n):
-                    t = i / n
-                    alpha = 0.20 + 0.80 * t   # oldest 20% opacity -> newest 100%, same fade as render_output6
-                    seg_color = tuple(int(c * alpha) for c in variant)
-                    cv2.line(img, pts[i - 1], pts[i], seg_color, 2, cv2.LINE_AA)
-
-            cv2.putText(img, f"{attacking_label} (attacking)", (10, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.55, attacking_color, 2)
-            cv2.putText(img, f"{defending_label} (defending)", (10, 46), cv2.FONT_HERSHEY_SIMPLEX, 0.55, defending_color, 2)
-            writer.write(img)
-    finally:
-        writer.release()

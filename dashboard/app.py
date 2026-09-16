@@ -1995,27 +1995,19 @@ def render_corner_kicks_tab():
                 attacking_label = team_name.get(mark["attacking_team"], mark["attacking_team"])
                 defending_label = team_name.get(mark["defending_team"], mark["defending_team"])
 
-                shape_dir = CACHE_DIR / "corner_shapes"
-                shape_dir.mkdir(parents=True, exist_ok=True)
                 cv_out_dir = CV_PIPELINE_DIR / "output_videos" / mark["cv_output_dir"]
                 tactical_map_path = cv_out_dir / "tactical_map.avi"
 
-                # "Team Shape (Diagram)" now IS the real-video overlay (dots +
+                # "Team Shape (Diagram)" IS the real-video overlay (dots +
                 # convex hull drawn directly on broadcast footage, built in
-                # reconstruct_positions.py) - the earlier standalone abstract
-                # top-down diagram has been removed outright, not kept
-                # alongside this one under a different name.
-                viz_options = []
+                # reconstruct_positions.py) - the standalone abstract top-down
+                # diagram and the clean-pitch movement-trails view have both
+                # been removed outright, not kept alongside this one.
                 if tactical_map_path.exists():
-                    viz_options.append("Team Shape (Diagram)")
-                viz_options.append("Movement Trails (Clean Pitch)")
-                viz_choice = st.radio("Visualization:", viz_options, key="corner_viz_choice", horizontal=True)
-
-                # .avi (XVID), not .mp4 - same reason every other CV-rendered
-                # video in this app needs _ensure_browser_playable_video's
-                # transcode: confirmed live that cv2.VideoWriter's raw output
-                # isn't reliably playable by st.video() directly.
-                if viz_choice == "Team Shape (Diagram)":
+                    # .avi (XVID), not .mp4 - same reason every other CV-rendered
+                    # video in this app needs _ensure_browser_playable_video's
+                    # transcode: confirmed live that cv2.VideoWriter's raw output
+                    # isn't reliably playable by st.video() directly.
                     playable_tactical_map = _ensure_browser_playable_video(tactical_map_path)
                     if playable_tactical_map and playable_tactical_map.exists():
                         st.video(str(playable_tactical_map))
@@ -2028,23 +2020,7 @@ def render_corner_kicks_tab():
                         "since this render is shared across every mark on this window)."
                     )
                 else:
-                    trails_path = shape_dir / f"{ck.safe_filename_part(key)}_{ck.safe_filename_part(mark['id'])}_trails.avi"
-                    if not trails_path.exists():
-                        with st.spinner("Rendering trails video (one-time, cached after this)..."):
-                            ck.render_trails_only_video(
-                                positions, corner_mapping, mark["attacking_team"], mark["defending_team"],
-                                attacking_label, defending_label, trails_path,
-                            )
-                    playable_trails_path = _ensure_browser_playable_video(trails_path)
-                    if playable_trails_path and playable_trails_path.exists():
-                        st.video(str(playable_trails_path))
-                    else:
-                        st.warning("Couldn't prepare the trails video for in-browser playback.")
-                    st.caption(
-                        f"Only the runs — no player markers, no footage — on a clean pitch. {attacking_label} "
-                        f"(orange) and {defending_label} (red), each player's own recent ~3 seconds of real "
-                        "tracked movement, fading oldest to newest."
-                    )
+                    st.info("Team Shape diagram isn't available for this corner yet.")
 
                 metrics = ck.compute_corner_metrics(positions, corner_mapping, mark["attacking_team"], mark["defending_team"])
                 calibration_status = ck.load_calibration_status(CV_PIPELINE_DIR, mark["cv_output_dir"])
