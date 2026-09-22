@@ -31,6 +31,8 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
+import player_labels as pl
+
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 ROUTING_MODEL = "gemini-2.5-flash"
 
@@ -201,14 +203,30 @@ def get_tactical_event_highlights(stats_json, event_type=None, top_n=3):
     return highlights, None
 
 
+def _resolve_team_target(target):
+    """'team' was the only team-target token back when there was a single,
+    team_a-only plan - kept accepted (mapped to 'team_a') so an in-flight
+    chat session or a cached LOOKUP_TOOLS response from before this
+    dashboard supported two team plans doesn't just start failing. Returns
+    None for a player-id target."""
+    t = str(target).lower()
+    if t == "team":
+        return "team_a"
+    if t in ("team_a", "team_b"):
+        return t
+    return None
+
+
 def get_training_plan_field(training_plan_draft, target, day, field):
     if not training_plan_draft:
         return None, "No training plan has been generated for this match yet."
-    if str(target).lower() == "team":
-        days = (training_plan_draft.get("team_plan") or {}).get("days", [])
+    team_key = _resolve_team_target(target)
+    if team_key:
+        team_plans = training_plan_draft.get("team_plans") or {}
+        days = (team_plans.get(team_key) or {}).get("days", [])
         idx = _find_day_index([d.get("day", "") for d in days], day)
         if idx is None:
-            return None, f"'{day}' isn't a day in this team plan."
+            return None, f"'{day}' isn't a day in {team_key}'s plan."
         return days[idx].get(field), None
     player_plan = training_plan_draft.get("player_plan") or {}
     players = player_plan.get("players", [])
@@ -306,11 +324,11 @@ LOOKUP_TOOLS = [
     ),
     types.FunctionDeclaration(
         name="get_training_plan_field",
-        description="Look up one field of this match's current training plan for the team or one player, on one day.",
+        description="Look up one field of this match's current training plan for one team or one player, on one day.",
         parameters={
             "type": "OBJECT",
             "properties": {
-                "target": {"type": "STRING", "description": "'team' or a player id"},
+                "target": {"type": "STRING", "description": "'team_a', 'team_b', or a player id"},
                 "day": {"type": "STRING"},
                 "field": {"type": "STRING"},
             },
@@ -345,7 +363,21 @@ def _momentum_team_sentence(minute, value, field, team_a, team_b):
     return substitute_team_tokens(templated, team_a, team_b)
 
 
-def run_structured_lookup(client, question, df, stats_json, training_plan_draft, team_a, team_b):
+def _player_label_context_line(player_labels):
+    """One line mapping labeled real names back to their numeric tracking
+    id, handed to the lookup/edit LLM calls so a question naming a player by
+    their real name (e.g. "What was Messi's top speed?") still resolves to
+    the numeric player_id every lookup/edit function actually takes -
+    without this, labeling a player would only change how answers display,
+    not what questions can be asked. Empty string when nothing is labeled
+    yet, so the prompt doesn't grow for the common unlabeled case."""
+    if not player_labels:
+        return ""
+    pairs = ", ".join(f"{name} = player id {pid}" for pid, name in player_labels.items())
+    return f" Named players in this match: {pairs} - use the numeric player id, never the name, as a function argument."
+
+
+def run_structured_lookup(client, question, df, stats_json, training_plan_draft, team_a, team_b, player_labels=None):
     """Stage B for the STRUCTURED route: one function-calling call maps the
     question to exactly one read-only lookup, which then runs as plain
     Python (no LLM). Returns (answer_text, source_tag) or (None, None) if
@@ -358,7 +390,12 @@ def run_structured_lookup(client, question, df, stats_json, training_plan_draft,
             system_instruction=(
                 "You answer questions about one soccer match's real analyzed data by calling "
                 "exactly one of the provided lookup functions with concrete arguments extracted "
-                "from the question. Always call a function - never answer in plain text."
+                "from the question. Always call a function - never answer in plain text. "
+                f"For get_training_plan_field, this match's two teams are '{team_a}' (token "
+                f"'team_a') and '{team_b}' (token 'team_b') - when the question names a team by "
+                "its real name or asks about 'the team' generically, use that team's token as "
+                "target; use a numeric player id as target only for a player-specific question."
+                + _player_label_context_line(player_labels)
             ),
         ),
     )
@@ -419,7 +456,9 @@ def run_structured_lookup(client, question, df, stats_json, training_plan_draft,
         value, err = get_training_plan_field(training_plan_draft, args["target"], args["day"], args["field"])
         if err:
             return err, None
-        return f"{args['target']} · {args['day']} · {args['field']}: **{value}**", f"training_plan · {args['target']} · {args['day']}"
+        team_key = _resolve_team_target(args["target"])
+        target_label = {"team_a": team_a, "team_b": team_b}.get(team_key, args["target"])
+        return f"{target_label} · {args['day']} · {args['field']}: **{value}**", f"training_plan · {args['target']} · {args['day']}"
 
     return None, None
 
@@ -710,7 +749,7 @@ EDIT_TOOLS = [
         parameters={
             "type": "OBJECT",
             "properties": {
-                "target": {"type": "STRING", "description": "'team' or a player id"},
+                "target": {"type": "STRING", "description": "'team_a', 'team_b', or a player id"},
                 "day": {"type": "STRING"},
                 "title": {"type": "STRING"},
                 "note": {"type": "STRING"},
@@ -727,7 +766,7 @@ EDIT_TOOLS = [
         parameters={
             "type": "OBJECT",
             "properties": {
-                "target": {"type": "STRING"},
+                "target": {"type": "STRING", "description": "'team_a', 'team_b', or a player id"},
                 "day": {"type": "STRING"},
                 "grounding_field": {"type": "STRING"},
                 "grounding_value": {"type": "STRING"},
@@ -739,16 +778,16 @@ EDIT_TOOLS = [
         name="modify_session",
         description=(
             "Propose changing one field of an existing day's plan. IMPORTANT: which "
-            "field names are valid depends on the target. When target is \"team\", "
-            f"field must be one of {TEAM_DAY_EDITABLE_FIELDS} - use \"why_stat\" for "
-            "the day's justification/reasoning text, NOT \"note\" (that field only "
+            "field names are valid depends on the target. When target is \"team_a\" or "
+            f"\"team_b\", field must be one of {TEAM_DAY_EDITABLE_FIELDS} - use \"why_stat\" "
+            "for the day's justification/reasoning text, NOT \"note\" (that field only "
             "exists on player sessions). When target is a player id, field must be "
             f"one of {PLAYER_SESSION_EDITABLE_FIELDS}."
         ),
         parameters={
             "type": "OBJECT",
             "properties": {
-                "target": {"type": "STRING"},
+                "target": {"type": "STRING", "description": "'team_a', 'team_b', or a player id"},
                 "day": {"type": "STRING"},
                 "field": {"type": "STRING"},
                 "new_value": {"type": "STRING"},
@@ -760,31 +799,42 @@ EDIT_TOOLS = [
     ),
     types.FunctionDeclaration(
         name="swap_days",
-        description="Propose swapping the team plan's content between two days.",
+        description="Propose swapping one team's plan content between two days.",
         parameters={
             "type": "OBJECT",
             "properties": {
+                "target": {"type": "STRING", "description": "'team_a' or 'team_b' - which team's plan to swap days within"},
                 "day_a": {"type": "STRING"},
                 "day_b": {"type": "STRING"},
                 "grounding_field": {"type": "STRING"},
                 "grounding_value": {"type": "STRING"},
             },
-            "required": ["day_a", "day_b", "grounding_field", "grounding_value"],
+            "required": ["target", "day_a", "day_b", "grounding_field", "grounding_value"],
         },
     ),
 ]
 
-EDIT_SYSTEM_INSTRUCTION = (
-    "You propose edits to a soccer training plan, grounded ONLY in this match's real data. "
-    "You will be given a block of real data for this match (player stats, tactical event "
-    "counts, match-wide averages) before each request - use it to find a real, specific stat "
-    "that justifies the requested edit. Every proposal MUST include grounding_field (the exact "
-    "dotted path shown in the data block, e.g. players.247.top_speed_kmh or "
-    "tactical_events.counts.PRESS) and grounding_value (the real value shown there) - this will "
-    "be checked against the real data before anything is shown to the user. "
-    "If the given data block genuinely has nothing that justifies the requested edit, DO NOT "
-    "call a function - respond in plain text explaining that you don't have data to support it."
-)
+def _edit_system_instruction(team_a, team_b, player_labels=None):
+    """Built per-call (not a module constant) since it now needs to name
+    this match's actual two teams, so Gemini can map "add a press day for
+    {team_a}" to target="team_a" rather than the old single ambiguous
+    "team" token from before two independent team plans existed."""
+    return (
+        "You propose edits to a soccer training plan, grounded ONLY in this match's real data. "
+        "You will be given a block of real data for this match (player stats, tactical event "
+        "counts, match-wide averages) before each request - use it to find a real, specific stat "
+        "that justifies the requested edit. Every proposal MUST include grounding_field (the exact "
+        "dotted path shown in the data block, e.g. players.247.top_speed_kmh or "
+        "tactical_events.counts.PRESS) and grounding_value (the real value shown there) - this will "
+        "be checked against the real data before anything is shown to the user. "
+        f"This match's two teams are '{team_a}' (token 'team_a') and '{team_b}' (token 'team_b') - "
+        "when a team-level edit is requested, target MUST be 'team_a' or 'team_b', resolved from "
+        "which real team name the request names (or the team the request's own context implies); "
+        "never use the target 'team' or leave it ambiguous."
+        + _player_label_context_line(player_labels) +
+        " If the given data block genuinely has nothing that justifies the requested edit, DO NOT "
+        "call a function - respond in plain text explaining that you don't have data to support it."
+    )
 
 
 def _available_data_summary(df, stats_json):
@@ -846,7 +896,7 @@ def validate_grounding(ctx, grounding_field, grounding_value):
     return _safe_str(actual).strip().lower() == _safe_str(grounding_value).strip().lower()
 
 
-def propose_edit(client, question, ctx, df=None, stats_json=None):
+def propose_edit(client, question, ctx, team_a, team_b, df=None, stats_json=None, player_labels=None):
     """Returns ('proposal', {name, args}) | ('decline', text)."""
     data_summary = _available_data_summary(df, stats_json)
     prompt = f"AVAILABLE REAL DATA FOR THIS MATCH:\n{data_summary}\n\nUSER REQUEST: {question}"
@@ -855,7 +905,7 @@ def propose_edit(client, question, ctx, df=None, stats_json=None):
         contents=prompt,
         config=types.GenerateContentConfig(
             tools=[types.Tool(function_declarations=EDIT_TOOLS)],
-            system_instruction=EDIT_SYSTEM_INSTRUCTION,
+            system_instruction=_edit_system_instruction(team_a, team_b, player_labels),
         ),
     )
     parts = resp.candidates[0].content.parts if resp.candidates else []
@@ -896,21 +946,33 @@ def _rebase_and_mark(item, original_item, fields):
     item["chat_confirmed_fields"] = sorted(confirmed)
 
 
-def describe_proposal(name, args):
+def _display_target(target, team_a, team_b, player_labels=None):
+    """Real team name for a team_a/team_b target, or a labeled player's real
+    name for a player-id target (falls back to the raw id if unlabeled) -
+    so the proposal card never shows an internal token or a bare id once a
+    real name is available."""
+    team_key = _resolve_team_target(target)
+    if team_key:
+        return {"team_a": team_a, "team_b": team_b}.get(team_key, target)
+    return (player_labels or {}).get(str(target), target)
+
+
+def describe_proposal(name, args, team_a=None, team_b=None, player_labels=None):
     """Diff-style text for the proposal card, matching chatbot_edit_flow_mockup.html."""
+    target_label = _display_target(args.get("target", ""), team_a, team_b, player_labels) if "target" in args else None
     if name == "add_session":
-        return (f"**{args['target']} · {args['day']}**\n\n"
+        return (f"**{target_label} · {args['day']}**\n\n"
                 f"+ {args['title']}" + (f" — {args['duration_min']} min" if args.get("duration_min") else "")
                 + f"\n{args['note']}\n\nGrounded in: `{args['grounding_field']}` = {args['grounding_value']}")
     if name == "remove_session":
-        return (f"**{args['target']} · {args['day']}**\n\n- remove this day's session(s)\n\n"
+        return (f"**{target_label} · {args['day']}**\n\n- remove this day's session(s)\n\n"
                 f"Grounded in: `{args['grounding_field']}` = {args['grounding_value']}")
     if name == "modify_session":
-        return (f"**{args['target']} · {args['day']}**\n\n"
+        return (f"**{target_label} · {args['day']}**\n\n"
                 f"{args['field']} → {args['new_value']}\n\n"
                 f"Grounded in: `{args['grounding_field']}` = {args['grounding_value']}")
     if name == "swap_days":
-        return (f"Swap **{args['day_a']}** ↔ **{args['day_b']}** (team plan)\n\n"
+        return (f"Swap **{args['day_a']}** ↔ **{args['day_b']}** ({target_label}'s plan)\n\n"
                 f"Grounded in: `{args['grounding_field']}` = {args['grounding_value']}")
     return json.dumps(args)
 
@@ -926,16 +988,20 @@ def apply_edit(training_plan_draft, name, args):
     target/day genuinely not existing, and the two used to be reported to the
     user identically ("target/day not found"), which pointed them at the
     wrong problem."""
-    team_plan = training_plan_draft.get("team_plan") or {}
+    team_plans = training_plan_draft.setdefault("team_plans", {})
     player_plan = training_plan_draft.get("player_plan") or {}
 
     if name == "swap_days":
+        team_key = _resolve_team_target(args.get("target", ""))
+        if team_key is None:
+            return False, f"'{args.get('target')}' isn't a valid team target - use 'team_a' or 'team_b'"
+        team_plan = team_plans.get(team_key) or {}
         days = team_plan.get("days", [])
         original_days = team_plan.get("_original_days", [])
         ia = _find_day_index([d.get("day", "") for d in days], args["day_a"])
         ib = _find_day_index([d.get("day", "") for d in days], args["day_b"])
         if ia is None or ib is None:
-            return False, "one of those days wasn't found in the team plan"
+            return False, f"one of those days wasn't found in {team_key}'s plan"
         fields = ["focus_label", "focus_category", "drills", "why_stat"]
         for f in fields:
             days[ia][f], days[ib][f] = days[ib][f], days[ia][f]
@@ -946,12 +1012,17 @@ def apply_edit(training_plan_draft, name, args):
         return True, None
 
     target = args["target"]
-    if str(target).lower() == "team":
+    team_key = _resolve_team_target(target)
+    if team_key is not None:
+        # Only this team's entry in team_plans is read or mutated below -
+        # the other team's plan (and player_plan) is never touched by a
+        # single-team edit, same isolation the live UI's per-team tabs rely on.
+        team_plan = team_plans.get(team_key) or {}
         days = team_plan.get("days", [])
         original_days = team_plan.get("_original_days", [])
         idx = _find_day_index([d.get("day", "") for d in days], args["day"])
         if idx is None:
-            return False, f"day '{args['day']}' wasn't found in the team plan"
+            return False, f"day '{args['day']}' wasn't found in {team_key}'s plan"
         original = original_days[idx] if idx < len(original_days) else {}
 
         if name == "add_session":
@@ -973,6 +1044,7 @@ def apply_edit(training_plan_draft, name, args):
             _rebase_and_mark(days[idx], original, [field])
         else:
             return False, f"unknown edit type '{name}'"
+        team_plans[team_key] = team_plan
         return True, None
 
     # player target
@@ -1045,7 +1117,8 @@ def _render_source_tags(tags):
     st.markdown(" ".join(pills), unsafe_allow_html=True)
 
 
-def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, source, key, save_training_plan_fn):
+def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, source, key, save_training_plan_fn, player_labels=None):
+    player_labels = player_labels or {}
     st.subheader("💬 Ask the Assistant")
     st.caption(
         "Answers are grounded in this match's real tracking data and coach report only — "
@@ -1097,7 +1170,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
             fastest = max(stats_json["players"], key=lambda p: p.get("top_speed_kmh") or 0)
             suggestions.append(f"What was P{fastest['player_id']}'s top speed?")
         suggestions.append(f"When did {team_a} look most vulnerable?")
-        suggestions.append("Add a recovery session for the team on Thursday")
+        suggestions.append(f"Add a recovery session for {team_a} on Thursday")
         for i, sug in enumerate(suggestions):
             if st.button(sug, key=f"chat_sugg_{i}", use_container_width=True):
                 st.session_state.chatbot_pending_submit = sug
@@ -1113,7 +1186,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
         if pending:
             with st.chat_message("assistant"):
                 st.markdown("⚠ **PROPOSED — not yet saved**")
-                st.markdown(describe_proposal(pending["name"], pending["args"]))
+                st.markdown(describe_proposal(pending["name"], pending["args"], team_a, team_b, player_labels))
                 c1, c2 = st.columns(2)
                 if c1.button("✅ Confirm", key="chat_edit_confirm", use_container_width=True):
                     draft = st.session_state.get("training_plan_draft")
@@ -1154,7 +1227,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
                         answer = "Generate a training plan first (Training Plan tab) before I can propose changes to it."
                     else:
                         ctx = build_grounding_context(df, stats_json)
-                        kind, payload = propose_edit(client, question, ctx, df, stats_json)
+                        kind, payload = propose_edit(client, question, ctx, team_a, team_b, df, stats_json, player_labels)
                         if kind == "decline":
                             answer = payload
                         else:
@@ -1162,7 +1235,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
                             answer = "Here's what I'd change — see the proposal below."
                 elif route == "STRUCTURED":
                     status.update(label="Looking up the answer…")
-                    answer, tag = run_structured_lookup(client, question, df, stats_json, st.session_state.get("training_plan_draft"), team_a, team_b)
+                    answer, tag = run_structured_lookup(client, question, df, stats_json, st.session_state.get("training_plan_draft"), team_a, team_b, player_labels)
                     if answer is None:
                         route = "SEMANTIC"
                     else:
@@ -1189,6 +1262,12 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
 
                 status.update(label="Done", state="complete")
 
+            # One centralized substitution point for every route (STRUCTURED,
+            # SEMANTIC, EDIT, PROJECT_INFO) rather than threading player_labels
+            # through each answer-building helper individually - safe because
+            # it's the same bounded 'P123'/'Player 123' pattern used everywhere
+            # else in this feature, never a blind text scan.
+            answer = pl.substitute_player_labels(answer, player_labels)
             st.session_state.chatbot_history.append({"role": "assistant", "content": answer, "tags": tags})
             st.session_state.chatbot_debug_last = debug_rows
             st.rerun()

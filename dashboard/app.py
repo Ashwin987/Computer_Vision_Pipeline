@@ -16,6 +16,7 @@ from streamlit_autorefresh import st_autorefresh
 import training_plan as tp
 import chatbot as cb
 import corner_kicks as ck
+import player_labels as pl
 import numpy as np
 import random
 import io
@@ -657,43 +658,45 @@ def _cv_summary_flowables(cv_output_dir, team_a, team_b, cv_team_mapping, styles
         flowables.append(Paragraph("No tactical-event observations were available for this window.", styles['BodyText']))
     return flowables
 
-def _training_plan_flowables(plan, styles):
+def _training_plan_flowables(plan, styles, team_a, team_b):
     flowables = []
     if not plan:
         flowables.append(Paragraph("No training plan has been generated for this match yet.", styles['BodyText']))
         return flowables
 
-    team_plan = plan.get('team_plan')
-    flowables.append(Paragraph("Team Plan", styles['Heading2']))
-    if team_plan and team_plan.get('days'):
-        flowables.append(Paragraph(_esc_rl(team_plan.get('source_note', '')), styles['Italic']))
-        flowables.append(Spacer(1, 6))
-        for d in team_plan['days']:
-            edited = set(d.get('edited_fields') or [])
-            chat_confirmed = set(d.get('chat_confirmed_fields') or [])
-            label_note = " (manually edited)" if ('focus_label' in edited or 'focus_category' in edited) else ""
-            flowables.append(Paragraph(f"<b>{_esc_rl(d.get('day'))} — {_esc_rl(d.get('focus_label'))}</b>{label_note}", styles['BodyText']))
-            drills_note = " (manually edited)" if 'drills' in edited else ""
-            for dr in (d.get('drills') or []):
-                flowables.append(Paragraph(
-                    f"&nbsp;&nbsp;• {_esc_rl(dr.get('title'))} ({_esc_rl(dr.get('duration_min'))} min) — "
-                    f"{_esc_rl(dr.get('note'))}{drills_note}", styles['BodyText']))
-            # Same 3-way precedence as the live UI's badge (_src_pill in
-            # training_plan.py): manually edited > confirmed via chat >
-            # grounded - a later hand-edit after a chat-confirm wins visually
-            # here too, matching the calendar exactly.
-            if 'why_stat' in edited:
-                why_note = " (manually edited — not verified against match data)"
-            elif 'why_stat' in chat_confirmed:
-                why_note = " (confirmed via chat — an AI-proposed edit the user approved)"
-            else:
-                why_note = " (grounded in match data)"
-            flowables.append(Paragraph(f"<i>Why: {_esc_rl(d.get('why_stat'))}</i>{why_note}", styles['BodyText']))
-            flowables.append(Spacer(1, 8))
-    else:
-        flowables.append(Paragraph("No team plan has been generated for this match yet.", styles['BodyText']))
-
-    flowables.append(Spacer(1, 10))
+    plan = tp.normalize_plan(plan)
+    team_plans = plan.get('team_plans') or {}
+    for team_key, team_label in (("team_a", team_a), ("team_b", team_b)):
+        team_plan = team_plans.get(team_key)
+        flowables.append(Paragraph(f"Team Plan — {_esc_rl(team_label)}", styles['Heading2']))
+        if team_plan and team_plan.get('days'):
+            flowables.append(Paragraph(_esc_rl(team_plan.get('source_note', '')), styles['Italic']))
+            flowables.append(Spacer(1, 6))
+            for d in team_plan['days']:
+                edited = set(d.get('edited_fields') or [])
+                chat_confirmed = set(d.get('chat_confirmed_fields') or [])
+                label_note = " (manually edited)" if ('focus_label' in edited or 'focus_category' in edited) else ""
+                flowables.append(Paragraph(f"<b>{_esc_rl(d.get('day'))} — {_esc_rl(d.get('focus_label'))}</b>{label_note}", styles['BodyText']))
+                drills_note = " (manually edited)" if 'drills' in edited else ""
+                for dr in (d.get('drills') or []):
+                    flowables.append(Paragraph(
+                        f"&nbsp;&nbsp;• {_esc_rl(dr.get('title'))} ({_esc_rl(dr.get('duration_min'))} min) — "
+                        f"{_esc_rl(dr.get('note'))}{drills_note}", styles['BodyText']))
+                # Same 3-way precedence as the live UI's badge (_src_pill in
+                # training_plan.py): manually edited > confirmed via chat >
+                # grounded - a later hand-edit after a chat-confirm wins visually
+                # here too, matching the calendar exactly.
+                if 'why_stat' in edited:
+                    why_note = " (manually edited — not verified against match data)"
+                elif 'why_stat' in chat_confirmed:
+                    why_note = " (confirmed via chat — an AI-proposed edit the user approved)"
+                else:
+                    why_note = " (grounded in match data)"
+                flowables.append(Paragraph(f"<i>Why: {_esc_rl(d.get('why_stat'))}</i>{why_note}", styles['BodyText']))
+                flowables.append(Spacer(1, 8))
+        else:
+            flowables.append(Paragraph(f"No plan has been generated yet for {_esc_rl(team_label)}.", styles['BodyText']))
+        flowables.append(Spacer(1, 10))
     player_plan = plan.get('player_plan')
     flowables.append(Paragraph("Player Plans", styles['Heading2']))
     if player_plan and player_plan.get('players'):
@@ -772,7 +775,7 @@ def generate_full_pdf_report(team_a, team_b, color_a, color_b, raw_data, ai_repo
 
     flowables.append(Paragraph("Training Plan", styles['Heading1']))
     plan = tp.load_training_plan(source, key, CURATED_MATCHES_DIR, CACHE_DIR) if source else None
-    flowables.extend(_training_plan_flowables(plan, styles))
+    flowables.extend(_training_plan_flowables(plan, styles, team_a, team_b))
     flowables.append(PageBreak())
 
     try:
@@ -1740,6 +1743,55 @@ def _render_team_mapping_confirmation(stats, team_a, team_b):
             _persist_cv_team_mapping(mapping)
             st.rerun()
 
+def _render_player_labeler(stats, team_mapping, source, key, player_labels):
+    """Left-most panel in the CV Deep Analysis tab (video moved to the
+    middle column, Window Stats keeps its existing right-most spot) - lets
+    the user attach a real name to each tracking ID this window saw. Saved
+    names are picked up by every OTHER call site in this tab (and training
+    plans / chat / stat cards elsewhere) via player_labels.player_label /
+    substitute_player_labels - this function only owns the edit UI + save,
+    never the substitution itself."""
+    with st.container(border=True):
+        st.markdown("**🏷️ Label Players**")
+        st.caption("Give real names to tracking IDs — used everywhere in this match's live UI.")
+
+        players = (stats or {}).get('players', [])
+        if not players:
+            st.caption("No tracked players in this window yet.")
+        elif not source:
+            st.caption("This match has no saved identity yet, so labels can't be persisted across reloads.")
+        else:
+            rows = []
+            for p in players:
+                pid = str(p.get('player_id'))
+                team_display = _cv_team_label(p.get('team'), st.session_state.get('team_a', 'Team A'),
+                                               st.session_state.get('team_b', 'Team B'), team_mapping)
+                rows.append({"ID": f"P{pid}", "Team": team_display, "Name": player_labels.get(pid, "")})
+
+            edited_rows = st.data_editor(
+                rows, hide_index=True, use_container_width=True, height=280,
+                key=f"player_labels_editor_{source}_{key}",
+                column_config={
+                    "ID": st.column_config.TextColumn(disabled=True),
+                    "Team": st.column_config.TextColumn(disabled=True),
+                    "Name": st.column_config.TextColumn(help="Leave blank to keep showing the tracking ID"),
+                },
+            )
+            if st.button("💾 Save names", key=f"player_labels_save_{source}_{key}"):
+                new_labels = {
+                    str(p.get('player_id')): row.get("Name", "")
+                    for p, row in zip(players, edited_rows)
+                }
+                pl.save_labels(CACHE_DIR, key, new_labels)
+                st.success("Saved.")
+                st.rerun()
+
+        st.caption(
+            "⚠️ Names only update this live dashboard (Window Stats, training plans, chat, stat "
+            "cards) — already-rendered CV overlay videos have raw IDs burned into their pixels "
+            "and won't be relabeled."
+        )
+
 def render_cv_completed_state(status, cv_output_dir):
     outputs = status.get('outputs', {})
     stats_file = status.get('stats_file')
@@ -1757,7 +1809,13 @@ def render_cv_completed_state(status, cv_output_dir):
     _render_team_mapping_confirmation(stats, st.session_state.get('team_a', 'Team A'), st.session_state.get('team_b', 'Team B'))
     team_mapping = st.session_state.get('cv_team_mapping')
 
-    video_col, side_col = st.columns([1.4, 1])
+    source, key = _get_active_match_identity()
+    player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+
+    labeler_col, video_col, side_col = st.columns([1, 1.4, 1])
+
+    with labeler_col:
+        _render_player_labeler(stats, team_mapping, source, key, player_labels)
 
     with video_col:
         st.markdown("**📹 Rendered Analysis**")
@@ -1791,11 +1849,11 @@ def render_cv_completed_state(status, cv_output_dir):
                 speed_str = f"{p.get('top_speed_kmh', 0):.1f} km/h"
                 team_display = _cv_team_label(p.get('team'), st.session_state.get('team_a', 'Team A'),
                                                st.session_state.get('team_b', 'Team B'), team_mapping)
-                player_label = f"P{p.get('player_id')} ({team_display})"
+                p_label = pl.player_label(p.get('player_id'), team_display, player_labels)
                 if conf == 'high':
-                    st.write(f"**{player_label}** — **{speed_str}** ✅ high confidence")
+                    st.write(f"**{p_label}** — **{speed_str}** ✅ high confidence")
                 else:
-                    st.caption(f"{player_label} — {speed_str} ⚠️ {conf} confidence")
+                    st.caption(f"{p_label} — {speed_str} ⚠️ {conf} confidence")
 
             st.markdown("**Window Stats**")
             team_res = stats.get('team_resolution', {})
@@ -1880,7 +1938,7 @@ def render_cv_completed_state(status, cv_output_dir):
         highlights = stats.get('tactical_events', {}).get('highlights', [])
         if highlights:
             for h in highlights[:10]:
-                st.write(f"- **{str(h.get('type', '')).upper()}** — Player {h.get('player_id')} · "
+                st.write(f"- **{str(h.get('type', '')).upper()}** — {pl.player_label(h.get('player_id'), None, player_labels)} · "
                          f"score {h.get('score')} · {h.get('metric', '')}")
 
             team_a_name = st.session_state.get('team_a', 'Team A')
@@ -1889,7 +1947,7 @@ def render_cv_completed_state(status, cv_output_dir):
             if observations:
                 st.markdown("**Observations — specific to this match**")
                 for obs in observations:
-                    st.write(f"- {obs}")
+                    st.write(f"- {pl.substitute_player_labels(obs, player_labels)}")
         else:
             st.caption("No tactical events detected in this window.")
 
@@ -2234,11 +2292,57 @@ def _get_active_match_identity():
         return "cache", st.session_state.video_hash
     return None, None
 
+def _generate_team_plan_for(team_key):
+    """Shared by the initial Generate button (both teams) and each team
+    tab's own scoped regenerate - so there's exactly one place that knows
+    how to build the Gemini call for a single team's plan."""
+    return tp.generate_team_plan(
+        st.session_state.raw_data,
+        # ai_report stores literal {TEAM_A}/{TEAM_B} tokens (see Step 3's
+        # writing_prompt) - substitute real names before handing it to
+        # another Gemini prompt as free-text context, or that prompt sees
+        # confusing placeholder tokens instead of names.
+        cb.substitute_team_tokens(st.session_state.ai_report, st.session_state.team_a, st.session_state.team_b),
+        st.session_state.team_a, st.session_state.team_b, valid_keys[0],
+        focus_team=team_key,
+    )
+
+def _generate_player_plan_and_cv_insights():
+    """Shared by the initial Generate button and the Player Plans tab's own
+    scoped regenerate. Independent of team plans - never touches them."""
+    player_plan = None
+    cv_insights = None
+    cv_output_dir = st.session_state.get('cv_job_output_dir')
+    if cv_output_dir:
+        cv_status = get_cv_job_status_safe(cv_output_dir)
+        if cv_status.get('status') == 'complete' and cv_status.get('stats_file'):
+            resolved = _resolve_cv_path(cv_status['stats_file'])
+            if resolved.exists():
+                with open(resolved, 'r') as f:
+                    stats_json = json.load(f)
+                player_plan = tp.generate_player_plan(
+                    stats_json, st.session_state.team_a, st.session_state.team_b,
+                    st.session_state.get('cv_team_mapping'), _cv_team_label, valid_keys[0],
+                )
+                # Second, additive layer (grounded in tactical-event
+                # highlights + tracking-coverage - see
+                # generate_cv_insights' docstring for why only these
+                # two of five originally-considered CV signals are
+                # used) - never replaces player_plan above.
+                if player_plan:
+                    cv_insights = tp.generate_cv_insights(
+                        stats_json, st.session_state.team_a, st.session_state.team_b,
+                        st.session_state.get('cv_team_mapping'), _cv_team_label,
+                        player_plan['players'], valid_keys[0],
+                    )
+    return player_plan, cv_insights
+
 def render_training_plan_tab():
     st.subheader("🏋️ Training Plan")
     st.caption(
-        "A 7-day team training schedule generated from this match's real tactical patterns, "
-        "plus individual player plans from the CV pipeline's tracked physical data."
+        "Independent 7-day team training schedules for each team, generated from this match's "
+        "real tactical patterns, plus individual player plans from the CV pipeline's tracked "
+        "physical data."
     )
 
     source, key = _get_active_match_identity()
@@ -2261,76 +2365,84 @@ def render_training_plan_tab():
             if not valid_keys:
                 st.error("No Gemini API key configured.")
             else:
-                with st.spinner("Generating team + player training plans from real match data..."):
-                    # ai_report stores literal {TEAM_A}/{TEAM_B} tokens (see Step
-                    # 3's writing_prompt) - substitute real names before handing it
-                    # to another Gemini prompt as free-text context, or that
-                    # prompt sees confusing placeholder tokens instead of names.
-                    team_plan = tp.generate_team_plan(
-                        st.session_state.raw_data,
-                        cb.substitute_team_tokens(st.session_state.ai_report, st.session_state.team_a, st.session_state.team_b),
-                        st.session_state.team_a, st.session_state.team_b, valid_keys[0],
-                    )
-                    player_plan = None
-                    cv_insights = None
-                    cv_output_dir = st.session_state.get('cv_job_output_dir')
-                    if cv_output_dir:
-                        cv_status = get_cv_job_status_safe(cv_output_dir)
-                        if cv_status.get('status') == 'complete' and cv_status.get('stats_file'):
-                            resolved = _resolve_cv_path(cv_status['stats_file'])
-                            if resolved.exists():
-                                with open(resolved, 'r') as f:
-                                    stats_json = json.load(f)
-                                player_plan = tp.generate_player_plan(
-                                    stats_json, st.session_state.team_a, st.session_state.team_b,
-                                    st.session_state.get('cv_team_mapping'), _cv_team_label, valid_keys[0],
-                                )
-                                # Second, additive layer (grounded in tactical-event
-                                # highlights + tracking-coverage - see
-                                # generate_cv_insights' docstring for why only these
-                                # two of five originally-considered CV signals are
-                                # used) - never replaces player_plan above.
-                                if player_plan:
-                                    cv_insights = tp.generate_cv_insights(
-                                        stats_json, st.session_state.team_a, st.session_state.team_b,
-                                        st.session_state.get('cv_team_mapping'), _cv_team_label,
-                                        player_plan['players'], valid_keys[0],
-                                    )
-                if team_plan is None:
-                    st.error("Failed to generate the team plan after multiple attempts. Please try again.")
+                with st.spinner("Generating each team's plan + player plans from real match data..."):
+                    team_plan_a = _generate_team_plan_for("team_a")
+                    team_plan_b = _generate_team_plan_for("team_b")
+                    player_plan, cv_insights = _generate_player_plan_and_cv_insights()
+                if team_plan_a is None and team_plan_b is None:
+                    st.error("Failed to generate either team's plan after multiple attempts. Please try again.")
                 else:
-                    new_plan = {"team_plan": team_plan, "player_plan": player_plan, "cv_insights": cv_insights}
+                    new_plan = {
+                        "team_plans": {"team_a": team_plan_a, "team_b": team_plan_b},
+                        "player_plan": player_plan, "cv_insights": cv_insights,
+                    }
                     st.session_state.training_plan_draft = new_plan
                     if source:
                         tp.save_training_plan(source, key, new_plan, CURATED_MATCHES_DIR, CACHE_DIR)
                     st.rerun()
         return
 
-    sub_team, sub_player = st.tabs(["Team Plan", "Player Plans"])
-    with sub_team:
-        _render_team_plan_subtab(source, key)
+    sub_team_a, sub_team_b, sub_player = st.tabs([
+        f"{st.session_state.get('team_a', 'Team A')} Plan",
+        f"{st.session_state.get('team_b', 'Team B')} Plan",
+        "Player Plans",
+    ])
+    with sub_team_a:
+        _render_team_plan_subtab(source, key, "team_a")
+    with sub_team_b:
+        _render_team_plan_subtab(source, key, "team_b")
     with sub_player:
         _render_player_plan_subtab(source, key)
 
-def _render_team_plan_subtab(source, key):
-    team_plan = st.session_state.training_plan_draft.get("team_plan")
+def _render_team_plan_subtab(source, key, team_key):
+    """team_key is 'team_a' or 'team_b' - and, conveniently, the exact
+    st.session_state key each team's real display name already lives under,
+    so no separate team_key->name lookup table is needed."""
+    team_name = st.session_state.get(team_key, team_key)
+    team_plans = st.session_state.training_plan_draft.setdefault("team_plans", {})
+    team_plan = team_plans.get(team_key)
+
     if not team_plan:
-        st.info("No team plan available.")
+        st.info(f"No plan generated yet for {team_name}.")
+        if st.button(f"⚡ Generate {team_name}'s plan", key=f"tp_gen_{team_key}_{source}_{key}"):
+            if not valid_keys:
+                st.error("No Gemini API key configured.")
+            else:
+                with st.spinner(f"Generating {team_name}'s training plan..."):
+                    new_team_plan = _generate_team_plan_for(team_key)
+                if new_team_plan is None:
+                    st.error(f"Failed to generate {team_name}'s plan after multiple attempts. Please try again.")
+                else:
+                    team_plans[team_key] = new_team_plan
+                    st.session_state.training_plan_draft['team_plans'] = team_plans
+                    if source:
+                        tp.save_training_plan(source, key, st.session_state.training_plan_draft, CURATED_MATCHES_DIR, CACHE_DIR)
+                    st.rerun()
         return
 
     cv_insights = st.session_state.training_plan_draft.get("cv_insights") or {}
-    team_insights = cv_insights.get("team_insights") or []
+    # cv_insights' team_insights are keyed by real team label (e.g. "PSG"),
+    # from the same cv_team_label_fn resolution used everywhere else - not
+    # by "team_a"/"team_b" tokens - so this team's tab only shows its own
+    # card, never the other team's.
+    team_insights = [ti for ti in (cv_insights.get("team_insights") or []) if ti.get("team") == team_name]
+    player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+    team_insights = [
+        {k: (pl.substitute_player_labels(v, player_labels) if isinstance(v, str) else v) for k, v in ti.items()}
+        for ti in team_insights
+    ]
     st.components.v1.html(
         tp.render_team_calendar_html(team_plan, team_insights), height=560 + (170 * len(team_insights)), scrolling=True
     )
 
-    # Same fix as _render_player_plan_subtab's match_prefix: these widget
-    # keys used to be keyed only by day index (i)/drill index (j), with no
-    # match identity at all - switching matches (or a Reset+regenerate)
-    # could leave a text_input showing session-state from a PREVIOUS match's
-    # Monday instead of the freshly-generated one, since Streamlit only
-    # honors a widget's value= the first time that exact key ever appears.
-    match_prefix = f"{source}_{key}"
+    # Keyed per-team (not just per-match) - these widget keys used to be
+    # keyed only by day index (i)/drill index (j) with no match identity at
+    # all (switching matches, or a Reset+regenerate, could leave a
+    # text_input showing a PREVIOUS match's Monday instead of the freshly-
+    # generated one, since Streamlit only honors a widget's value= the first
+    # time that exact key ever appears). Now also scoped by team_key so
+    # team_a's Monday widget and team_b's Monday widget never share state.
+    match_prefix = f"{source}_{key}_{team_key}"
 
     st.markdown("---")
     st.markdown("**✏️ Edit this week's plan**")
@@ -2390,8 +2502,36 @@ def _render_team_plan_subtab(source, key):
     # in the draft by the time "Save changes" persists it - no separate
     # tracking mechanism.
     tp.recompute_edited_fields(team_plan['days'], team_plan.get('_original_days', []), tp.TEAM_DAY_TRACKED_FIELDS)
-    st.session_state.training_plan_draft['team_plan'] = team_plan
-    _render_training_plan_save_reset("tp_team", source, key)
+    # Written back into team_plans[team_key] specifically, not a shared
+    # single-plan slot - the other team's entry in this same dict is never
+    # touched by this assignment.
+    team_plans[team_key] = team_plan
+    st.session_state.training_plan_draft['team_plans'] = team_plans
+
+    st.markdown("---")
+    st.caption(f"Save/Reset below only affect {team_name}'s plan — the other team's plan and the player plans are untouched.")
+    bcol1, bcol2 = st.columns(2)
+    with bcol1:
+        if st.button("💾 Save changes", key=f"tp_team_save_{team_key}"):
+            if source:
+                tp.save_training_plan(source, key, st.session_state.training_plan_draft, CURATED_MATCHES_DIR, CACHE_DIR)
+                st.success("Saved.")
+            else:
+                st.warning("This match has no saved identity — changes stay for this session only.")
+    with bcol2:
+        if st.button(f"↺ Regenerate {team_name}'s plan from AI", key=f"tp_team_reset_{team_key}"):
+            if not valid_keys:
+                st.error("No Gemini API key configured.")
+            else:
+                with st.spinner(f"Regenerating {team_name}'s plan..."):
+                    new_team_plan = _generate_team_plan_for(team_key)
+                if new_team_plan is None:
+                    st.error(f"Failed to regenerate {team_name}'s plan. Please try again.")
+                else:
+                    st.session_state.training_plan_draft['team_plans'][team_key] = new_team_plan
+                    if source:
+                        tp.save_training_plan(source, key, st.session_state.training_plan_draft, CURATED_MATCHES_DIR, CACHE_DIR)
+                    st.rerun()
 
 def _render_player_plan_subtab(source, key):
     player_plan = st.session_state.training_plan_draft.get("player_plan")
@@ -2416,8 +2556,9 @@ def _render_player_plan_subtab(source, key):
     # value= argument the very first time that key appears; once a key has
     # session-state, value= is ignored on every later rerun.
     match_prefix = f"{source}_{key}"
+    player_labels = pl.load_labels(CACHE_DIR, key)
 
-    labels = [f"P{p['player_id']} ({p.get('team_label', '?')})" for p in players]
+    labels = [pl.player_label(p['player_id'], p.get('team_label', '?'), player_labels) for p in players]
     chosen_label = st.selectbox("Choose a player:", labels, key=f"tp_player_select_{match_prefix}")
     chosen_idx = labels.index(chosen_label)
     player = players[chosen_idx]
@@ -2429,6 +2570,10 @@ def _render_player_plan_subtab(source, key):
 
     cv_insights = st.session_state.training_plan_draft.get("cv_insights") or {}
     player_insights = (cv_insights.get("player_insights") or {}).get(str(player['player_id'])) or []
+    player_insights = [
+        {k: pl.substitute_player_labels(v, player_labels) for k, v in ins.items()}
+        for ins in player_insights
+    ]
     st.components.v1.html(
         tp.render_player_card_html(player, player_insights), height=440 + (170 * len(player_insights)), scrolling=True
     )
@@ -2465,24 +2610,29 @@ def _render_player_plan_subtab(source, key):
     players[chosen_idx] = player
     player_plan['players'] = players
     st.session_state.training_plan_draft['player_plan'] = player_plan
-    _render_training_plan_save_reset("tp_player", source, key)
 
-def _render_training_plan_save_reset(key_prefix, source, key):
-    st.caption("Resetting regenerates BOTH the team and player plans from scratch (they're stored together).")
+    st.markdown("---")
+    st.caption("Save/Reset below only affect the player plans — both teams' training plans are untouched.")
     bcol1, bcol2 = st.columns(2)
     with bcol1:
-        if st.button("💾 Save changes", key=f"{key_prefix}_save"):
+        if st.button("💾 Save changes", key="tp_player_save"):
             if source:
                 tp.save_training_plan(source, key, st.session_state.training_plan_draft, CURATED_MATCHES_DIR, CACHE_DIR)
                 st.success("Saved.")
             else:
                 st.warning("This match has no saved identity — changes stay for this session only.")
     with bcol2:
-        if st.button("↺ Reset to AI-generated plan", key=f"{key_prefix}_reset"):
-            if source:
-                tp.delete_training_plan(source, key, CURATED_MATCHES_DIR, CACHE_DIR)
-            st.session_state.training_plan_draft = None
-            st.rerun()
+        if st.button("↺ Regenerate player plans from AI", key="tp_player_reset"):
+            if not valid_keys:
+                st.error("No Gemini API key configured.")
+            else:
+                with st.spinner("Regenerating player plans..."):
+                    new_player_plan, new_cv_insights = _generate_player_plan_and_cv_insights()
+                st.session_state.training_plan_draft['player_plan'] = new_player_plan
+                st.session_state.training_plan_draft['cv_insights'] = new_cv_insights
+                if source:
+                    tp.save_training_plan(source, key, st.session_state.training_plan_draft, CURATED_MATCHES_DIR, CACHE_DIR)
+                st.rerun()
 
 def extract_video_segment(source_path, start_sec, end_sec, output_path):
     """Cuts [start_sec, end_sec) out of source_path and writes it to output_path.
@@ -2584,7 +2734,19 @@ def process_single_minute(start_min, duration_sec, temp_video_path, api_key, mas
     
     FRACTIONAL ATTACKING TIME: You must output two integers (0-60) for 'team_a_attack_sec' and 'team_b_attack_sec' representing exactly how many literal seconds each team spent in the attacking third during this minute.
     
-    CRITICAL VOCABULARY UPGRADE (GEGENPRESSING): If a team immediately swarms the ball high up the pitch after losing it, you MUST tag their 'pressing_trigger' as 'gegenpress' and their 'block_height' as 'high'. Do this EVEN IF the opponent bypasses the press and forces them to defend deep later in the minute. Do not fall for the "Recovery Illusion."
+    PRESSING TRIGGER VOCABULARY: 'pressing_trigger' must be exactly one of five values, chosen by WHAT ACTUALLY CUED the press this minute, not by whether the press worked:
+    - 'counter_press': the team immediately swarms the ball high up the pitch within a few seconds of losing possession. Tag this EVEN IF the opponent bypasses the press and forces them to defend deep later in the minute - the trigger already happened; do not fall for the "Recovery Illusion" of judging the trigger by its outcome.
+    - 'press_heavy_touch': the defending team holds off until an opponent takes a loose or heavy touch that pushes the ball further from their body than normal control, then presses that specific opponent.
+    - 'press_back_pass': the defending team specifically triggers its press the moment an opponent plays the ball backward (e.g. to a center-back or goalkeeper), using the backward pass itself as the cue.
+    - 'mid_block_trigger': the team holds a mid or low block and does not press until the ball physically enters a specific zone (e.g. crossing into the middle third or a wide channel), at which point it engages - a zonal trap, not a reaction to a specific touch or pass.
+    - 'no_press': no coordinated pressing action is visible this minute - the team is passive out of possession, applying no organized pressure regardless of what the opponent does with the ball.
+    When 'counter_press' applies, also tag 'block_height' as 'high'.
+
+    TRANSITION SPEED: 'transition_speed' measures how quickly a team moved from winning the ball back to a genuine forward attacking action (a forward pass, dribble, or shot progressing toward goal) - a separate judgment from 'transition_threat' above, which categorizes the TYPE of transition rather than its speed. Judge it by elapsed time from the moment of winning the ball:
+    - 'fast': the first forward attacking action came within roughly 3 seconds of winning the ball.
+    - 'moderate': the first forward attacking action came within roughly 4-8 seconds.
+    - 'slow': it took longer than roughly 8 seconds, or the team showed no urgency to move forward after winning it.
+    - 'no_transition': the team did not win back possession during this minute, so there is nothing to judge.
     
     CRITICAL VOCABULARY UPGRADE (TRANSITIONS): A 'counter_attack' is when a team sits deep, wins the ball, and breaks. A 'fast_vertical_transition' is when a team uses rapid, direct passing to bypass an opponent's high press. Use these tags correctly in 'transition_threat'.
     
@@ -2610,9 +2772,10 @@ def process_single_minute(start_min, duration_sec, temp_video_path, api_key, mas
     - "team_a_build_up_shape": "3-2", "2-3", "4-2", or "3-box-3"
     - "team_a_attacking_tempo": "fast_direct", "patient_possession", "sustained_high_pressure", "none", or "dead_ball_stoppage"
     - "team_a_transition_threat": "counter_attack", "fast_vertical_transition", "sustained_build", or "none"
+    - "team_a_transition_speed": "fast", "moderate", "slow", or "no_transition"
     - "team_a_striker_profile": "false_9", "target_man", or "channel_runner"
     - "team_a_fullback_role": "overlapping", "inverted", or "defensive"
-    - "team_a_pressing_trigger": "gegenpress", "loss_of_possession", "backward_pass", "poor_touch", or "none"
+    - "team_a_pressing_trigger": "counter_press", "press_heavy_touch", "press_back_pass", "mid_block_trigger", or "no_press"
     - "team_a_rest_defense_shape": "3-2", "2-3", or "unstructured"
     - "team_a_attacking_bias": "left_flank", "right_flank", or "central_channel"
     - "team_a_defensive_line_action": "drop_deep" or "step_up"
@@ -2625,9 +2788,10 @@ def process_single_minute(start_min, duration_sec, temp_video_path, api_key, mas
     - "team_b_build_up_shape": "3-2", "2-3", "4-2", or "3-box-3"
     - "team_b_attacking_tempo": "fast_direct", "patient_possession", "sustained_high_pressure", "none", or "dead_ball_stoppage"
     - "team_b_transition_threat": "counter_attack", "fast_vertical_transition", "sustained_build", or "none"
+    - "team_b_transition_speed": "fast", "moderate", "slow", or "no_transition"
     - "team_b_striker_profile": "false_9", "target_man", or "channel_runner"
     - "team_b_fullback_role": "overlapping", "inverted", or "defensive"
-    - "team_b_pressing_trigger": "gegenpress", "loss_of_possession", "backward_pass", "poor_touch", or "none"
+    - "team_b_pressing_trigger": "counter_press", "press_heavy_touch", "press_back_pass", "mid_block_trigger", or "no_press"
     - "team_b_rest_defense_shape": "3-2", "2-3", or "unstructured"
     - "team_b_attacking_bias": "left_flank", "right_flank", or "central_channel"
     - "team_b_defensive_line_action": "drop_deep" or "step_up"
@@ -3390,6 +3554,24 @@ elif st.session_state.step == 3:
     tb_def_action = get_mode('team_b_defensive_line_action')
     tb_half_space = get_mode('team_b_half_space_occupancy')
 
+    # Real per-minute timelines for the coach-report prompt below - a mode()
+    # value above (kept as-is; ta_block_height/tb_block_height specifically
+    # are still used by the "Primary Block Height" stat cards further down)
+    # only ever says what was MOST COMMON across the whole window, discarding
+    # every bit of when/how it changed. build_timeline (training_plan.py)
+    # collapses consecutive-minute runs of the same value into ranges
+    # instead, e.g. "mid_block_trigger (min 1-22) -> counter_press (min
+    # 23-51)" - real timing information the coach report can actually
+    # reason about (a press that collapsed in the final third, a shape
+    # change after a specific minute), not just an average.
+    _TIMELINE_FIELDS = [
+        'block_height', 'pressing_intensity', 'defensive_line_action', 'pressing_trigger',
+        'build_up_shape', 'attacking_tempo', 'transition_speed', 'attacking_bias',
+        'striker_profile', 'half_space_occupancy', 'fullback_role',
+    ]
+    ta_timelines = {f: tp.build_timeline(st.session_state.raw_data, f'team_a_{f}') for f in _TIMELINE_FIELDS}
+    tb_timelines = {f: tp.build_timeline(st.session_state.raw_data, f'team_b_{f}') for f in _TIMELINE_FIELDS}
+
     sidebar_placeholder = st.sidebar.empty()
 
     if st.session_state.ai_report is None and st.session_state.view_mode != 'ticker':
@@ -3411,9 +3593,34 @@ elif st.session_state.step == 3:
                 - Total Fractional Time in Attack (Minutes): {team_a} ({ta_att_count}), {team_b} ({tb_att_count})
                 - Total High-Value Transitions (Counters/Fast Vertical): {team_a} ({ta_counters}), {team_b} ({tb_counters})
 
-                PREDOMINANT TACTICAL MODES:
-                - {team_a}: Def: Block: {ta_block_height} | Press: {ta_press_intensity}/10 | Line: {ta_def_action} | Trigger: {ta_trigger}. Off: Build: {ta_build_up} | Tempo: {ta_tempo} | Bias: {ta_bias} | Striker: {ta_striker}. Space: Half-Space: {ta_half_space} | Fullbacks: {ta_fullback}
-                - {team_b}: Def: Block: {tb_block_height} | Press: {tb_press_intensity}/10 | Line: {tb_def_action} | Trigger: {tb_trigger}. Off: Build: {tb_build_up} | Tempo: {tb_tempo} | Bias: {tb_bias} | Striker: {tb_striker}. Space: Half-Space: {tb_half_space} | Fullbacks: {tb_fullback}
+                TACTICAL TIMELINES (minute-by-minute, real data — each line is the actual
+                sequence of values across the analyzed window, not just the single most common
+                one. Use this to describe HOW a team's approach evolved over the match - a press
+                that collapsed after a specific minute, a shape change, a tempo shift - not just
+                what it was on average. "min X-Y" is an inclusive 0-indexed minute range.):
+                - {team_a} Block Height: {ta_timelines['block_height']}
+                - {team_a} Pressing Intensity (1-10): {ta_timelines['pressing_intensity']}
+                - {team_a} Defensive Line Action: {ta_timelines['defensive_line_action']}
+                - {team_a} Pressing Trigger: {ta_timelines['pressing_trigger']}
+                - {team_a} Build-Up Shape: {ta_timelines['build_up_shape']}
+                - {team_a} Attacking Tempo: {ta_timelines['attacking_tempo']}
+                - {team_a} Transition Speed: {ta_timelines['transition_speed']}
+                - {team_a} Attacking Bias: {ta_timelines['attacking_bias']}
+                - {team_a} Striker Profile: {ta_timelines['striker_profile']}
+                - {team_a} Half-Space Occupancy (0-4 players): {ta_timelines['half_space_occupancy']}
+                - {team_a} Fullback Role: {ta_timelines['fullback_role']}
+
+                - {team_b} Block Height: {tb_timelines['block_height']}
+                - {team_b} Pressing Intensity (1-10): {tb_timelines['pressing_intensity']}
+                - {team_b} Defensive Line Action: {tb_timelines['defensive_line_action']}
+                - {team_b} Pressing Trigger: {tb_timelines['pressing_trigger']}
+                - {team_b} Build-Up Shape: {tb_timelines['build_up_shape']}
+                - {team_b} Attacking Tempo: {tb_timelines['attacking_tempo']}
+                - {team_b} Transition Speed: {tb_timelines['transition_speed']}
+                - {team_b} Attacking Bias: {tb_timelines['attacking_bias']}
+                - {team_b} Striker Profile: {tb_timelines['striker_profile']}
+                - {team_b} Half-Space Occupancy (0-4 players): {tb_timelines['half_space_occupancy']}
+                - {team_b} Fullback Role: {tb_timelines['fullback_role']}
 
                 CRITICAL INSTRUCTION FOR WRITING:
                 - For EVERY single section and sub-section below, you MUST write a rich, highly detailed analytical paragraph (at least 4-5 sentences).
@@ -3871,9 +4078,11 @@ elif st.session_state.step == 3:
                             with open(resolved_chat, 'r') as f:
                                 stats_json_for_chat = json.load(f)
                 chat_source, chat_key = _get_active_match_identity()
+                chat_player_labels = pl.load_labels(CACHE_DIR, chat_key) if chat_key else {}
                 cb.render_chatbot_tab(
                     df, stats_json_for_chat, team_a, team_b, ai_report_text,
                     valid_keys[0] if valid_keys else None, chat_source, chat_key,
                     lambda s, k, plan: tp.save_training_plan(s, k, plan, CURATED_MATCHES_DIR, CACHE_DIR),
+                    chat_player_labels,
                 )
 

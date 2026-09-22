@@ -6,6 +6,11 @@ Two plans, from genuinely different data sources:
 - TEAM plan: aggregated over the FULL raw_data array (every analyzed minute)
   plus the existing coach report text - legitimate to summarize across the
   whole analyzed segment, since that's real per-minute Gemini tactical data.
+  Generated once per team (generate_team_plan's focus_team param) - each
+  team's plan is its own Gemini call grounded in that team's own numbers
+  from compute_team_source_stats, stored independently under
+  team_plan["team_plans"]["team_a"] / ["team_b"] so editing/resetting one
+  never touches the other.
 - PLAYER plan: from the CV pipeline's stats.json players[] list ONLY - a
   single ~30-second peak-momentum window, never a full match. Explicitly
   scoped and captioned as such everywhere it's shown (PLAYER_PLAN_SCOPE_NOTE)
@@ -87,12 +92,56 @@ def _esc(s):
 # GENERATION
 # ==========================================
 
+def build_timeline(raw_data, column):
+    """Consecutive-minute runs of the same value in `column`, collapsed into
+    ranges with their minute spans (e.g. "mid_block_trigger (min 1-22) -> "
+    "counter_press (min 23-51)") - real timing/ordering information a
+    single mode()/freq() collapse throws away entirely (mode() keeps only
+    the single most common value for the whole window; freq() keeps only a
+    count of matching minutes - neither says WHEN). Shared by app.py's
+    coach-report prompt and generate_team_plan below so both read the same
+    timeline for a given field, never two independently-built summaries of
+    the same underlying data.
+
+    Minute numbers are the row's own position in raw_data (row 0 = minute
+    0, chronological order - the same convention every other per-minute
+    lookup in this app already uses, e.g. chatbot.py's get_raw_data_field
+    indexes raw_data the same way), NOT the '_minute_index' field written
+    by process_single_minute - confirmed directly that field is never
+    actually persisted to stored raw_data (absent from every curated
+    match's bundle.json; only present transiently on the dict
+    process_single_minute returns, before it's ever serialized).
+
+    Returns "" for missing/empty data, never a placeholder string."""
+    if not raw_data or column not in raw_data[0]:
+        return ""
+    runs = []
+    for i, row in enumerate(raw_data):
+        val = row.get(column)
+        val = "unknown" if val is None or val == "" else val
+        if runs and runs[-1][0] == val:
+            runs[-1][2] = i
+        else:
+            runs.append([val, i, i])
+    return " → ".join(
+        f"{val} (min {start}-{end})" if start != end else f"{val} (min {start})"
+        for val, start, end in runs
+    )
+
+
 def compute_team_source_stats(raw_data):
     """Real, computable aggregates over every analyzed minute - grounds both
     the Gemini prompt and the on-screen 'why' stats, so nothing in the plan
     is invented. Same underlying columns app.py's Step 3 dashboard already
     computes modes/counts from, just re-derived here for this module's own
-    prompt (kept independent rather than threading dashboard locals through)."""
+    prompt (kept independent rather than threading dashboard locals through).
+
+    The *_minutes counts below are still useful as a short, precise number
+    for a why_stat sentence to cite - but a count alone can't say WHEN a
+    pattern happened, so 'timelines' (see build_timeline) is included
+    alongside them for generate_team_plan to reason about ordering (e.g. a
+    press that collapsed in the final third of the window) that a count or
+    a mode() would silently discard."""
     df = pd.DataFrame(raw_data)
     n_minutes = len(df)
 
@@ -101,10 +150,21 @@ def compute_team_source_stats(raw_data):
             return 0
         return int(df[col].astype(str).str.lower().isin(values).sum())
 
+    # 'gegenpress' is the pre-rename value (see app.py's process_single_minute
+    # schema) - matched alongside its successor 'counter_press' so a curated
+    # match's historical raw_data (tagged before the vocabulary was expanded)
+    # still counts correctly, not silently zeroed by the rename.
+    timelines = {
+        f"{team}_{field}_timeline": build_timeline(raw_data, f"{team}_{field}")
+        for team in ("team_a", "team_b")
+        for field in ("pressing_trigger", "transition_threat", "fullback_role",
+                       "defensive_line_action", "build_up_shape")
+    }
+
     return {
         "n_minutes": n_minutes,
-        "team_a_gegenpress_minutes": freq('team_a_pressing_trigger', ['gegenpress']),
-        "team_b_gegenpress_minutes": freq('team_b_pressing_trigger', ['gegenpress']),
+        "team_a_gegenpress_minutes": freq('team_a_pressing_trigger', ['gegenpress', 'counter_press']),
+        "team_b_gegenpress_minutes": freq('team_b_pressing_trigger', ['gegenpress', 'counter_press']),
         "team_a_counter_minutes": freq('team_a_transition_threat', ['counter_attack', 'fast_vertical_transition']),
         "team_b_counter_minutes": freq('team_b_transition_threat', ['counter_attack', 'fast_vertical_transition']),
         "team_a_defensive_fullback_minutes": freq('team_a_fullback_role', ['defensive']),
@@ -113,31 +173,51 @@ def compute_team_source_stats(raw_data):
         "team_b_overlapping_fullback_minutes": freq('team_b_fullback_role', ['overlapping']),
         "team_a_dropdeep_minutes": freq('team_a_defensive_line_action', ['drop_deep']),
         "team_b_dropdeep_minutes": freq('team_b_defensive_line_action', ['drop_deep']),
+        **timelines,
     }
 
 
-def generate_team_plan(raw_data, ai_report_text, team_a, team_b, api_key):
-    """One Gemini call -> a 7-day team training schedule. Returns None on
-    total failure (caller shows an error, never a placeholder plan)."""
+def generate_team_plan(raw_data, ai_report_text, team_a, team_b, api_key, focus_team='team_a'):
+    """One Gemini call -> a 7-day team training schedule for ONE team
+    (focus_team: 'team_a' or 'team_b'). Call this once per team - app.py's
+    render_training_plan_tab does exactly that so both teams get their own,
+    independently-generated plan, each grounded in that team's own numbers
+    from compute_team_source_stats (both teams' numbers are computed either
+    way - see that function's docstring - so this never triggers a second,
+    divergent derivation of the underlying stats, just a second prompt/call
+    that targets the other team's own numbers). Returns None on total
+    failure (caller shows an error, never a placeholder plan)."""
     stats = compute_team_source_stats(raw_data)
     client = genai.Client(api_key=api_key)
+    target_name, other_name = (team_a, team_b) if focus_team == 'team_a' else (team_b, team_a)
 
     prompt = f"""
 You are an elite soccer fitness/tactics coach. Using the coach report and the real
 per-minute statistics below (from {stats['n_minutes']} analyzed minutes of a match
 between {team_a} and {team_b}), build a 7-day team training schedule for the week
-following this match, for {team_a} specifically (the team whose staff commissioned
-this report).
+following this match, for {target_name} specifically (the team whose staff commissioned
+this report). Ground every "why_stat" in {target_name}'s OWN numbers below, not
+{other_name}'s - this plan is for {target_name}'s training staff.
 
 COACH REPORT (for tactical context):
 {ai_report_text[:4000]}
 
 REAL PER-MINUTE STATISTICS (use these exact numbers in "why_stat" — never invent
 different numbers):
-- {team_a} used gegenpress in {stats['team_a_gegenpress_minutes']} of {stats['n_minutes']} minutes; {team_b} in {stats['team_b_gegenpress_minutes']}.
+- {team_a} used a counter-press trigger in {stats['team_a_gegenpress_minutes']} of {stats['n_minutes']} minutes; {team_b} in {stats['team_b_gegenpress_minutes']}.
 - {team_a} was involved in a counter-attack or fast vertical transition in {stats['team_a_counter_minutes']} minutes; {team_b} in {stats['team_b_counter_minutes']}.
 - {team_a}'s fullbacks played defensive (not attacking) in {stats['team_a_defensive_fullback_minutes']} minutes and overlapping in {stats['team_a_overlapping_fullback_minutes']}; {team_b}'s were defensive in {stats['team_b_defensive_fullback_minutes']}, overlapping in {stats['team_b_overlapping_fullback_minutes']}.
 - {team_a} dropped its defensive line deep in {stats['team_a_dropdeep_minutes']} minutes; {team_b} in {stats['team_b_dropdeep_minutes']}.
+
+{target_name}'S OWN TACTICAL TIMELINE (minute-by-minute, real data — a count above only
+tells you HOW MANY minutes, this tells you WHEN; use this to notice patterns like a press
+collapsing in the second half, or a shape change after a specific minute, and let that timing
+inform which DAY of the week you schedule a given focus on, not just which focus to pick):
+- Pressing trigger: {stats[f'{focus_team}_pressing_trigger_timeline']}
+- Transition threat: {stats[f'{focus_team}_transition_threat_timeline']}
+- Fullback role: {stats[f'{focus_team}_fullback_role_timeline']}
+- Defensive line action: {stats[f'{focus_team}_defensive_line_action_timeline']}
+- Build-up shape: {stats[f'{focus_team}_build_up_shape_timeline']}
 
 Return EXACTLY 7 days (Monday through Sunday), each addressing a real weakness or
 pattern from the numbers above. Include at least one full recovery/rest day and a
@@ -173,9 +253,10 @@ Respond with ONLY a JSON array of exactly 7 such day objects.
                     # ever compares against. Never touched again except by a
                     # fresh Generate (Reset wipes the whole plan, this included).
                     "_original_days": copy.deepcopy(days),
+                    "team": focus_team,
                     "source_note": (
-                        f"Generated from real per-minute tactical patterns across the "
-                        f"{stats['n_minutes']} analyzed minutes of this match."
+                        f"Generated for {target_name} from real per-minute tactical patterns "
+                        f"across the {stats['n_minutes']} analyzed minutes of this match."
                     ),
                     "generated_at": datetime.now(timezone.utc).isoformat(),
                 }
@@ -711,6 +792,22 @@ def _legacy_curated_training_plan_path(key, curated_matches_dir):
     return curated_matches_dir / key / "training_plan.json"
 
 
+def normalize_plan(plan):
+    """Migrates the pre-per-team storage shape ({"team_plan": {...}}, always
+    team_a's plan back when generate_team_plan had no focus_team param) to
+    the current shape ({"team_plans": {"team_a": {...}, "team_b": {...}}})
+    in memory, in place. Never rewrites the file itself - a plan loaded this
+    way is only persisted in the new shape once the user actually saves
+    something, same non-destructive-until-saved discipline as this module's
+    CACHE_DIR-vs-curated_matches_dir fallback above."""
+    if not plan:
+        return plan
+    if "team_plans" not in plan:
+        legacy = plan.pop("team_plan", None)
+        plan["team_plans"] = {"team_a": legacy} if legacy else {}
+    return plan
+
+
 def load_training_plan(source, key, curated_matches_dir, cache_dir):
     if not source or not key:
         return None
@@ -721,7 +818,7 @@ def load_training_plan(source, key, curated_matches_dir, cache_dir):
         return None
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            return normalize_plan(json.load(f))
     except (json.JSONDecodeError, OSError):
         return None
 
