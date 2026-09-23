@@ -2555,7 +2555,10 @@ def render_game_board_tab():
         "action wherever you like, then drag players around to test a different shape, a different "
         "marking assignment, or a bit of extra off-ball movement — and see straight away how the "
         "picture changes. There's no tracking data or numbers to read through: just the real "
-        "players, on the real pitch, moved to wherever you want to try them."
+        "players, on the real pitch, moved to wherever you want to try them.\n\n"
+        "It's also a handy way to coach a player directly: pull up the exact moment in question and "
+        "show them, on the real pitch, where they should have been — or where you want them standing "
+        "next time. It's a lot easier to make the point on the actual play than on a whiteboard."
     )
 
 
@@ -4390,10 +4393,12 @@ elif st.session_state.step == 3:
                 - {team_b} Fullback Role: {tb_timelines['fullback_role']}
 
                 CRITICAL INSTRUCTION FOR WRITING:
-                - For EVERY single section and sub-section below, you MUST write a rich, highly detailed analytical paragraph (at least 4-5 sentences).
-                - DO NOT use brief bullet points. Expand deeply on the tactical theory and what it means for the game.
-                - DO NOT use raw variable names or key-value pairs (like 'line: step_up') anywhere in your text. Translate all data into natural, free-flowing, professional scouting language.
-                - WRITE FOR AN ASSISTANT COACH, NOT A LITERARY AUDIENCE: use plain, direct sentences - short and clear beats long or nested. Keep every football/tactical term exactly as it should be used (deep block, counter-attack, high line, press, compactness, transition, threat score, and others like them) - that vocabulary is precise and useful, so don't cut or soften any of it. But drop general-vocabulary words chosen to sound sophisticated rather than to be clear. For example: "dichotomy" should become a direct description of the contrast instead ("PSG dominated while Liverpool sat back"); "unequivocally" should be cut, or replaced with "clearly"; "relentlessly pushing" should become "kept pushing" or "consistently pushed"; "meager" should become "low". A real tactical framing like "conservative approach" is fine to keep as-is - it's precise, not decorative - just don't dress it up with flourish around it. Treat this as a general standard for word choice, not a fixed list of words to avoid - apply the same plain-but-precise judgment to any other word that fits the same pattern, even ones not named here.
+                - WHO YOU ARE WRITING FOR: scouts, assistant coaches, and managers - people who know football deeply and don't need the terminology explained, but have no patience for dense or flowery prose. Every sentence should be short and direct. This is the single most important instruction in this prompt - it overrides any instinct to sound literary or impressive.
+                - Cut words and phrases picked to sound sophisticated rather than to be clear - things like "dichotomy," "unequivocally," "meager," "relentlessly," "asserting dominance." Say it plainly instead: "PSG dominated," "Liverpool barely threatened," "Liverpool sat deep and defended." If you notice yourself reaching for a longer or fancier word than the plain one, use the plain one.
+                - Real football/tactical terminology is the opposite of what the instruction above targets - keep every one of these terms exactly as it should be used: deep block, counter-attack, high line, press, compactness, transition, threat score, and every other genuine tactical term like them. That vocabulary is precise and useful to this audience; it is not what needs simplifying. A phrase like "conservative approach" is a real tactical framing too and is fine to keep as-is - just don't dress it up with flourish around it.
+                - For EVERY single section and sub-section below, write a substantive analytical paragraph (at least 4-5 sentences) - but "substantive" means packed with specific tactical observations from the real data, not long or elaborate sentences. Short, direct sentences stacked one after another are exactly what's wanted here, not fewer, longer, more ornate ones.
+                - DO NOT use brief bullet points in place of that analysis - the length requirement above is about how much real tactical substance you cover, not how the prose sounds.
+                - DO NOT use raw variable names or key-value pairs (like 'line: step_up') anywhere in your text. Translate all data into plain, direct scouting language - see the writing-for instruction above.
                 - YOU MUST PLACE A DOUBLE LINE BREAK BETWEEN EVERY SINGLE NUMBERED POINT so the Markdown formats cleanly.
                 - TRANSITIONAL THREAT: Analyze the team's transitional threat based on the Total Transitions Logged data. Do NOT explicitly list the raw count of transitions. Instead, write a narrative analysis explaining how they successfully absorbed pressure and used fast vertical transitions or counters to bypass the opponent's structure.
                 - CRITICAL - TEAM NAME TOKENS: throughout your ENTIRE response, never write {team_a}'s real name or color - instead write the exact literal placeholder text {{TEAM_A}} (including in headers and the middle of sentences). Never write {team_b}'s real name or color either - write the exact literal placeholder text {{TEAM_B}} instead. This applies with NO exceptions anywhere in the report, so that team names can be substituted in later without regenerating this text. Do not explain or acknowledge the tokens - just use them exactly as shown in the structure below.
@@ -4604,20 +4609,6 @@ elif st.session_state.step == 3:
                 ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
-                # Same Game Board feature as its own tab - _render_game_board_core
-                # is the exact shared implementation (see its own docstring),
-                # not a second copy - just a different natural place to reach
-                # it from, with its own paused-frame state so scrubbing here
-                # doesn't disturb the Game Board tab's own moment.
-                st.subheader("🧩 Game Board")
-                st.caption(
-                    "The same game board as the Game Board tab — play the real broadcast clip, pause "
-                    "on any moment, then drag players to test a different shape. Repositions here are "
-                    "the same ones saved for this match everywhere else in the app."
-                )
-                _render_game_board_core(key_suffix="_dash")
-                st.markdown("---")
-
                 st.subheader("Global Control")
                 col1, col2, col3, col4 = st.columns(4)
             
