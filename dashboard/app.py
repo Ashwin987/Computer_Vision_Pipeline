@@ -17,6 +17,8 @@ import training_plan as tp
 import chatbot as cb
 import corner_kicks as ck
 import player_labels as pl
+import player_repositioning as pr
+import base64
 import numpy as np
 import random
 import io
@@ -1792,6 +1794,225 @@ def _render_player_labeler(stats, team_mapping, source, key, player_labels):
             "and won't be relabeled."
         )
 
+def _repositioning_video_path(source, key):
+    """Resolves the real video clip player_repositioning.py needs (actual
+    decodable frames, not the already-rendered CV overlay videos) - a
+    curated match's own committed peak_momentum_segment.mp4, or a live
+    upload's session-extracted one (st.session_state.cv_segment_path,
+    already set by the same CV-launch flow this tab already depends on for
+    everything else). Returns None, not a guess, when neither is
+    available."""
+    if source == "curated" and key:
+        candidate = CURATED_MATCHES_DIR / key / "peak_momentum_segment.mp4"
+        return str(candidate) if candidate.exists() else None
+    cached_path = st.session_state.get('cv_segment_path')
+    return cached_path if cached_path and Path(cached_path).exists() else None
+
+
+def _build_reposition_drag_html(frame_img, players_in_frame, display_width, team_a, team_b,
+                                 team_mapping, player_labels, moved_ids):
+    """Real HTML5 drag-and-drop over the actual current frame image (base64
+    JPEG, no server round-trip needed to show it) - a marker per currently-
+    tracked, not-yet-moved player. Drop coordinates are converted back to
+    real frame-pixel space in JS (dividing out the same display-vs-real
+    scale factor used to place the markers) and handed to Python the same
+    way this codebase's own admin panel already does (st.query_params -
+    see _render_admin_panel / the `?admin=1` check), not a new mechanism."""
+    ok, buf = cv2.imencode('.jpg', frame_img, [cv2.IMWRITE_JPEG_QUALITY, 85])
+    b64 = base64.b64encode(buf).decode('ascii') if ok else ""
+    img_h, img_w = frame_img.shape[:2]
+    scale = display_width / img_w
+    display_height = int(img_h * scale)
+
+    markers = []
+    for tid, info in players_in_frame.items():
+        if tid in moved_ids:
+            continue
+        x1, y1, x2, y2 = info["bbox"]
+        team_num = None  # raw tracks.pkl export has no team field (see export_repositioning_data.py docstring) - fall back to id-only label
+        label = pl.player_label(tid, None, player_labels)
+        fx, fy = (x1 + x2) / 2 * scale, y2 * scale
+        markers.append(
+            f'<div class="pr-marker" draggable="true" data-tid="{_esc_html(tid)}" '
+            f'style="left:{fx - 16:.1f}px; top:{fy - 16:.1f}px;" title="Drag to reposition">'
+            f'{_esc_html(label)}</div>'
+        )
+
+    return f"""
+<style>
+  .pr-wrap {{ position:relative; width:{display_width}px; height:{display_height}px;
+              background-image:url(data:image/jpeg;base64,{b64}); background-size:100% 100%;
+              border-radius:10px; overflow:hidden; border:1px solid #2a3142; }}
+  .pr-marker {{ position:absolute; width:32px; height:32px; border-radius:50%;
+                background:rgba(79,140,255,.88); border:2px solid #fff; color:#fff;
+                font:600 10px -apple-system,sans-serif; display:flex; align-items:center;
+                justify-content:center; cursor:grab; user-select:none; text-align:center;
+                line-height:1.05; overflow:hidden; padding:1px; }}
+  .pr-marker:active {{ cursor:grabbing; }}
+  .pr-wrap.pr-over {{ outline:3px dashed #4f8cff; outline-offset:-3px; }}
+</style>
+<div class="pr-wrap" id="prWrap">{''.join(markers)}</div>
+<script>
+  const wrap = document.getElementById('prWrap');
+  wrap.addEventListener('dragstart', e => {{
+    if (e.target.classList.contains('pr-marker')) {{
+      e.dataTransfer.setData('text/plain', e.target.dataset.tid);
+    }}
+  }});
+  wrap.addEventListener('dragover', e => {{ e.preventDefault(); wrap.classList.add('pr-over'); }});
+  wrap.addEventListener('dragleave', () => wrap.classList.remove('pr-over'));
+  wrap.addEventListener('drop', e => {{
+    e.preventDefault();
+    wrap.classList.remove('pr-over');
+    const tid = e.dataTransfer.getData('text/plain');
+    if (!tid) return;
+    const rect = wrap.getBoundingClientRect();
+    const realX = Math.round((e.clientX - rect.left) / {scale});
+    const realY = Math.round((e.clientY - rect.top) / {scale});
+    const url = new URL(window.top.location.href);
+    url.searchParams.set('reposition_tid', tid);
+    url.searchParams.set('reposition_x', realX);
+    url.searchParams.set('reposition_y', realY);
+    url.searchParams.set('reposition_t', Date.now().toString());
+    window.top.location.href = url.toString();
+  }});
+</script>
+"""
+
+
+def _esc_html(s):
+    return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+REPOSITION_FRAME_IDX = 0  # a fixed, deterministic "paused frame" for this window
+
+
+def render_player_repositioning_tab():
+    """Drag-and-drop hypothetical player repositioning - see
+    player_repositioning.py's own module docstring for the full design
+    history (three prior investigation/polish rounds) this is built on."""
+    st.subheader("🎯 Player Repositioning")
+    st.caption(
+        "Drag any tracked player to a new spot on the paused frame below — anywhere, including "
+        "off the pitch. Every drop is honored: size always stays plausible (derived from real "
+        "players already visible in this frame), even where the calibration can't be trusted "
+        "directly. Moved players are tagged with a persistent \"hypothetical position\" badge "
+        "baked into the image, so this is never confused with real tracking data."
+    )
+
+    source, key = _get_active_match_identity()
+    cv_output_dir = st.session_state.get('cv_job_output_dir')
+    if not cv_output_dir:
+        st.info("This match doesn't have a completed CV Deep Analysis job yet — repositioning needs that first.")
+        return
+
+    video_path = _repositioning_video_path(source, key)
+    if not video_path:
+        st.info(
+            "This match's original CV analysis clip isn't available in this session, so the real "
+            "video frames repositioning needs to erase/composite against can't be read."
+        )
+        return
+
+    ctx = pr.load_context(cv_output_dir, video_path)
+    if ctx is None:
+        st.warning(
+            "This match hasn't been exported for repositioning yet — it needs "
+            "`export_repositioning_data.py` run once against its CV output "
+            "(see that script's own docstring), same one-time offline step this project already "
+            "uses for corner-kick team-shape data."
+        )
+        return
+
+    match_key = key or "session"
+    state_key = f"reposition_moves_{source}_{match_key}"
+    if state_key not in st.session_state:
+        st.session_state[state_key] = pr.load_repositions(CACHE_DIR, match_key) if source else []
+    moves = st.session_state[state_key]
+
+    # one-shot drop handling via query params - same bridge this app's own
+    # admin panel already uses (`?admin=1`), not a new mechanism
+    q_tid = st.query_params.get("reposition_tid")
+    if q_tid:
+        try:
+            qx = float(st.query_params.get("reposition_x", "0"))
+            qy = float(st.query_params.get("reposition_y", "0"))
+        except ValueError:
+            qx = qy = None
+        if qx is not None:
+            moves = [m for m in moves if m["track_id"] != q_tid]
+            moves.append({"track_id": q_tid, "target_x": qx, "target_y": qy})
+            st.session_state[state_key] = moves
+            if source:
+                pr.save_repositions(CACHE_DIR, match_key, moves)
+        for p in ("reposition_tid", "reposition_x", "reposition_y", "reposition_t"):
+            if p in st.query_params:
+                del st.query_params[p]
+        st.rerun()
+
+    team_a = st.session_state.get('team_a', 'Team A')
+    team_b = st.session_state.get('team_b', 'Team B')
+    player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+    team_mapping = st.session_state.get('cv_team_mapping')
+
+    composite = None
+    moved_ids = set()
+    placements = []
+    failed = []
+    for move in moves:
+        result = pr.propose_reposition(ctx, REPOSITION_FRAME_IDX, move["track_id"],
+                                        (move["target_x"], move["target_y"]), base_img=composite)
+        if result.get("error"):
+            failed.append((move["track_id"], result["error"]))
+            continue
+        composite = result["composite_img"]
+        moved_ids.add(move["track_id"])
+        placements.append((move["track_id"], result))
+
+    display_img = composite if composite is not None else ctx.get_frame(REPOSITION_FRAME_IDX)
+    html = _build_reposition_drag_html(
+        display_img, ctx.players[REPOSITION_FRAME_IDX], 900, team_a, team_b,
+        team_mapping, player_labels, moved_ids,
+    )
+    st.components.v1.html(html, height=int(900 * ctx.frame_h / ctx.frame_w) + 20, scrolling=False)
+
+    for tid, err in failed:
+        label = pl.player_label(tid, None, player_labels)
+        st.warning(f"Couldn't place {label}: {err}")
+
+    bcol1, bcol2 = st.columns([1, 3])
+    with bcol1:
+        if st.button("↺ Reset all repositions", key=f"reposition_reset_{match_key}"):
+            st.session_state[state_key] = []
+            if source:
+                pr.clear_repositions(CACHE_DIR, match_key)
+            st.rerun()
+    with bcol2:
+        if not source:
+            st.caption("This match has no saved identity — repositions stay for this session only.")
+
+    if placements:
+        st.markdown("**Active repositions**")
+        for tid, result in placements:
+            label = pl.player_label(tid, None, player_labels)
+            info = result["scale_info"]
+            with st.container(border=True):
+                cols = st.columns([2, 2, 3])
+                cols[0].markdown(f"**{label}**")
+                cols[1].caption(f"scale ×{info['ratio']:.2f}" + (" (clamped)" if info["clamped"] else ""))
+                if info["on_pitch"]:
+                    pstats = pr.compute_placement_stats(ctx, REPOSITION_FRAME_IDX, tid, info["target_pitch"])
+                    if pstats:
+                        cols[2].caption(
+                            f"Nearest player: {pstats['nearest_player_distance_m']}m · "
+                            f"within 5m: {pstats['n_players_within_5m']} · within 10m: {pstats['n_players_within_10m']}"
+                        )
+                    else:
+                        cols[2].caption("On-pitch, but no other player position to compare against.")
+                else:
+                    cols[2].caption("Off-pitch placement — position-dependent stats don't apply here.")
+
+
 def render_cv_completed_state(status, cv_output_dir):
     outputs = status.get('outputs', {})
     stats_file = status.get('stats_file')
@@ -1920,6 +2141,10 @@ def render_cv_completed_state(status, cv_output_dir):
                 )
         else:
             st.info("Stats file not yet available on disk.")
+
+    st.markdown("---")
+    with st.expander("🎯 Player Repositioning (hypothetical, drag-and-drop)", expanded=False):
+        render_player_repositioning_tab()
 
     st.markdown("---")
     st.markdown("**Tactical Events — in this window**")
