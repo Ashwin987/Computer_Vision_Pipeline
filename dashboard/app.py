@@ -1773,7 +1773,7 @@ def _render_player_labeler(stats, team_mapping, source, key, player_labels):
                 rows.append({"ID": f"P{pid}", "Team": team_display, "Name": player_labels.get(pid, "")})
 
             edited_rows = st.data_editor(
-                rows, hide_index=True, use_container_width=True, height=280,
+                rows, hide_index=True, width='stretch', height=280,
                 key=f"player_labels_editor_{source}_{key}",
                 column_config={
                     "ID": st.column_config.TextColumn(disabled=True),
@@ -2521,7 +2521,7 @@ def render_cv_completed_state(status, cv_output_dir):
                     }
                     for i, (x, y, name) in sorted(PITCH_REFERENCE_POINTS.items())
                 ]
-                st.dataframe(ref_rows, hide_index=True, use_container_width=True)
+                st.dataframe(ref_rows, hide_index=True, width='stretch')
                 st.caption(
                     "Note: indices 8 and 32 currently share the identical coordinate (16.50, 0.00). "
                     "The technical report (Section 2.4.6) documents this exact symptom — two indices "
@@ -2746,7 +2746,7 @@ def render_corner_kicks_tab():
                         st.dataframe(
                             [{"Defender": f"P{d['player_id']}", "Distance to nearest attacker (m, avg)": d['distance_m']}
                              for d in metrics['marking_distances']],
-                            hide_index=True, use_container_width=True,
+                            hide_index=True, width='stretch',
                         )
 
                 st.markdown("**This corner's own rendered outputs**")
@@ -3530,11 +3530,11 @@ if st.session_state.step == 1:
                     "Choose a video file (Max 2GB)", type=["mp4", "mov", "avi"], label_visibility="collapsed"
                 )
                 st.caption("MP4 · MOV · up to 45 min · requires an active Gemini API key")
-                extract_btn = st.button("🚀 Analyze This Match", type="primary", use_container_width=True)
+                extract_btn = st.button("🚀 Analyze This Match", type="primary", width='stretch')
 
                 st.markdown('<div class="tac-upload-divider">or</div>', unsafe_allow_html=True)
 
-                if st.button("▶ See a sample report (Recruiter Demo)", use_container_width=True):
+                if st.button("▶ See a sample report (Recruiter Demo)", width='stretch'):
                     st.session_state.show_demo_panel = not st.session_state.show_demo_panel
 
                 uploaded_csv = None
@@ -3545,11 +3545,11 @@ if st.session_state.step == 1:
                         "(bypasses the AI video processing phase)."
                     )
                     uploaded_csv = st.file_uploader("Upload Tactical CSV", type=["csv"], key="demo_csv_uploader")
-                    demo_btn = st.button("Load Instant Demo Match", use_container_width=True)
+                    demo_btn = st.button("Load Instant Demo Match", width='stretch')
 
                 st.markdown('<div class="tac-upload-divider">or</div>', unsafe_allow_html=True)
 
-                if st.button("⚡ Instant Demo (Curated Matches)", use_container_width=True):
+                if st.button("⚡ Instant Demo (Curated Matches)", width='stretch'):
                     st.session_state.show_instant_demo_panel = not st.session_state.get("show_instant_demo_panel", False)
 
                 instant_demo_bundle = None
@@ -3569,7 +3569,7 @@ if st.session_state.step == 1:
                         item_names = [it["display_name"] for it in instant_demo_items]
                         chosen_name = st.selectbox("Choose a saved match:", item_names, key="instant_demo_picker")
                         chosen_item = next(it for it in instant_demo_items if it["display_name"] == chosen_name)
-                        if st.button("View Instant Demo", use_container_width=True, key="instant_demo_go"):
+                        if st.button("View Instant Demo", width='stretch', key="instant_demo_go"):
                             instant_demo_bundle = chosen_item["bundle"]
 
                         with st.expander("✏️ Rename this match / set real team names"):
@@ -4312,7 +4312,7 @@ elif st.session_state.step == 3:
     with sidebar_placeholder.container():
         st.success("Analysis Complete!")
         with st.container(border=True):
-            if st.button("💾 Save Report to History", use_container_width=True):
+            if st.button("💾 Save Report to History", width='stretch'):
                 if st.session_state.ai_report is not None:
                     st.session_state.history.append({
                         'team_a': st.session_state.team_a,
@@ -4335,7 +4335,7 @@ elif st.session_state.step == 3:
                     placeholder=f"{st.session_state.team_a} vs {st.session_state.team_b}",
                     key="save_to_cache_name",
                 )
-            if st.button("📦 Save to Cache", use_container_width=True):
+            if st.button("📦 Save to Cache", width='stretch'):
                 if st.session_state.ai_report is None:
                     st.warning("Generate the full report before saving to cache.")
                 else:
@@ -4365,7 +4365,7 @@ elif st.session_state.step == 3:
                         st.session_state[confirm_flag] = False
                         st.success("Saved to cache — it'll appear in Instant Demo once its CV analysis is complete.")
 
-            if st.button("🗑️ Start Over (Clear Screen)", use_container_width=True):
+            if st.button("🗑️ Start Over (Clear Screen)", width='stretch'):
                 st.session_state.step = 1
                 st.session_state.view_mode = 'dashboard'
                 st.session_state.ai_report = None
@@ -4535,7 +4535,7 @@ elif st.session_state.step == 3:
                                 hovertemplate="%{label}: %{value} times (%{percent})<br>Minutes: %{customdata}<extra></extra>",
                             )])
                             themed_plotly_layout(pie_fig, height=340)
-                            st.plotly_chart(pie_fig, use_container_width=True, key=f"pie_{team_label}")
+                            st.plotly_chart(pie_fig, width='stretch', key=f"pie_{team_label}")
 
                             # Unchanged matplotlib render, kept only to back the PNG download
                             # button (Plotly's PNG export needs a Chromium-based renderer
@@ -4569,7 +4569,7 @@ elif st.session_state.step == 3:
                     ))
                     themed_plotly_layout(heat_fig, height=280)
                     heat_fig.update_layout(xaxis_title="Pitch Zone")
-                    st.plotly_chart(heat_fig, use_container_width=True, key="heat_possession")
+                    st.plotly_chart(heat_fig, width='stretch', key="heat_possession")
 
                     heatmap_data = compute_possession_heatmap_data(df, team_a, team_b, color_a, color_b)
                     fig3 = build_heatmap_mpl(heatmap_data, 'Blues')
@@ -4594,7 +4594,7 @@ elif st.session_state.step == 3:
                     ))
                     themed_plotly_layout(block_fig, height=280)
                     block_fig.update_layout(xaxis_title="Pitch Zone")
-                    st.plotly_chart(block_fig, use_container_width=True, key="heat_block")
+                    st.plotly_chart(block_fig, width='stretch', key="heat_block")
 
                     fig5 = build_heatmap_mpl(position_df, 'Purples')
                     st.download_button("💾 Download Block Heatmap", fig_to_png_bytes(fig5), "defensive_block_heatmap.png", "image/png", key="dl_heat2")
@@ -4614,7 +4614,7 @@ elif st.session_state.step == 3:
                     themed_plotly_layout(mom_fig, height=420)
                     mom_fig.update_layout(yaxis_title="Absolute Attacking Threat", xaxis_tickangle=-45,
                                            hovermode="x unified")
-                    st.plotly_chart(mom_fig, use_container_width=True, key="mom_chart")
+                    st.plotly_chart(mom_fig, width='stretch', key="mom_chart")
 
                     fig4 = build_momentum_mpl(df, team_a, team_b)
                     st.download_button("💾 Download Momentum Graph", fig_to_png_bytes(fig4), "momentum_chart.png", "image/png", key="dl_mom")

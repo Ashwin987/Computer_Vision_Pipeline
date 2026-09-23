@@ -1172,7 +1172,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
         suggestions.append(f"When did {team_a} look most vulnerable?")
         suggestions.append(f"Add a recovery session for {team_a} on Thursday")
         for i, sug in enumerate(suggestions):
-            if st.button(sug, key=f"chat_sugg_{i}", use_container_width=True):
+            if st.button(sug, key=f"chat_sugg_{i}", width='stretch'):
                 st.session_state.chatbot_pending_submit = sug
                 st.rerun()
 
@@ -1188,7 +1188,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
                 st.markdown("⚠ **PROPOSED — not yet saved**")
                 st.markdown(describe_proposal(pending["name"], pending["args"], team_a, team_b, player_labels))
                 c1, c2 = st.columns(2)
-                if c1.button("✅ Confirm", key="chat_edit_confirm", use_container_width=True):
+                if c1.button("✅ Confirm", key="chat_edit_confirm", width='stretch'):
                     draft = st.session_state.get("training_plan_draft")
                     with st.spinner("Saving to training plan…"):
                         if draft:
@@ -1203,7 +1203,7 @@ def render_chatbot_tab(df, stats_json, team_a, team_b, ai_report_text, api_key, 
                     st.session_state.chatbot_history.append({"role": "assistant", "content": note, "tags": []})
                     st.session_state.chatbot_pending_edit = None
                     st.rerun()
-                if c2.button("Cancel", key="chat_edit_cancel", use_container_width=True):
+                if c2.button("Cancel", key="chat_edit_cancel", width='stretch'):
                     st.session_state.chatbot_pending_edit = None
                     st.rerun()
 
