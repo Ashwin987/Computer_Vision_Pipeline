@@ -1832,6 +1832,12 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
   .pr-cutout:hover { filter:drop-shadow(0 0 6px rgba(79,140,255,0.9)); }
   .pr-cutout:active { cursor:grabbing; }
   .pr-wrap.pr-over { outline:3px dashed #4f8cff; outline-offset:-3px; }
+  .pr-draw-canvas { position:absolute; left:0; top:0; touch-action:none; }
+  .pr-tool { background:#1c2333; color:#e6e6e6; border:1px solid #2a3142; border-radius:8px;
+             padding:7px 12px; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .pr-tool:hover { background:#252d42; }
+  .pr-tool.pr-tool-active { background:#2a3660; border-color:#4f8cff; }
+  .pr-swatch { width:14px; height:14px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,0.4); }
 </style>
 </head>
 <body>
@@ -1887,6 +1893,7 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
   function renderEdit(args) {
     root.innerHTML = "";
     browseState = { mode: "edit", videoUrl: null };
+    var tool = 'move'; // 'move' | 'red' | 'black' | 'eraser'
 
     var topRow = document.createElement('div');
     topRow.className = 'pr-row';
@@ -1897,10 +1904,38 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     topRow.appendChild(backBtn);
     var label = document.createElement('span');
     label.className = 'pr-hint';
-    label.textContent = 'Frame ' + args.frame_idx + ' / ' + ((args.n_frames || 1) - 1) +
-                         ' — drag any real player to a new spot, on the pitch or off it.';
+    label.textContent = 'Frame ' + args.frame_idx + ' / ' + ((args.n_frames || 1) - 1);
     topRow.appendChild(label);
     root.appendChild(topRow);
+
+    // Toolbar: Move (drag real players) vs draw tools (Paint-style: a red
+    // pen, a black pen, an eraser) - mutually exclusive, since a drag
+    // gesture and a freehand stroke can't both claim the same pointer
+    // event. Selecting a draw tool disables pointer-events on the cutout
+    // layer's drag handling by putting the canvas (which DOES capture
+    // pointer events while a draw tool is active) on top of it.
+    var toolRow = document.createElement('div');
+    toolRow.className = 'pr-row';
+    var toolBtns = {};
+    function makeToolBtn(key, html, title) {
+      var b = document.createElement('button');
+      b.className = 'pr-tool';
+      b.innerHTML = html;
+      b.title = title;
+      b.onclick = function() { setTool(key); };
+      toolBtns[key] = b;
+      toolRow.appendChild(b);
+      return b;
+    }
+    makeToolBtn('move', '🖐 Move players', 'Drag real players to a new spot');
+    makeToolBtn('red', '<span class="pr-swatch" style="background:#ff2b2b"></span> Red pen', 'Draw in red');
+    makeToolBtn('black', '<span class="pr-swatch" style="background:#111"></span> Black pen', 'Draw in black');
+    makeToolBtn('eraser', '🧹 Eraser', 'Erase parts of the drawing');
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'pr-tool';
+    clearBtn.textContent = '🗑 Clear drawing';
+    toolRow.appendChild(clearBtn);
+    root.appendChild(toolRow);
 
     var wrap = document.createElement('div');
     wrap.className = 'pr-wrap';
@@ -1909,6 +1944,19 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     base.src = 'data:image/jpeg;base64,' + (args.frame_b64 || '');
     wrap.appendChild(base);
     root.appendChild(wrap);
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'pr-draw-canvas';
+    wrap.appendChild(canvas);
+    var cctx = canvas.getContext('2d');
+
+    function setTool(t) {
+      tool = t;
+      canvas.style.pointerEvents = (t === 'move') ? 'none' : 'auto';
+      canvas.style.cursor = (t === 'move') ? 'default' : (t === 'eraser' ? 'cell' : 'crosshair');
+      Object.keys(toolBtns).forEach(function(k) { toolBtns[k].classList.toggle('pr-tool-active', k === t); });
+    }
+    setTool('move');
 
     function layoutCutouts() {
       var scale = base.clientWidth / (base.naturalWidth || 1);
@@ -1927,6 +1975,20 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
         img.style.height = ((c.y2 - c.y1) * scale) + 'px';
         wrap.appendChild(img);
       });
+
+      // Canvas draws in the REAL frame's native pixel space (like the
+      // cutouts' own x1/y1/x2/y2) so a saved drawing round-trips through
+      // Python and back at full, consistent resolution regardless of the
+      // viewer's actual on-screen width - CSS handles the visual scale-down.
+      canvas.width = base.naturalWidth;
+      canvas.height = base.naturalHeight;
+      canvas.style.width = base.clientWidth + 'px';
+      canvas.style.height = base.clientHeight + 'px';
+      if (args.drawing_b64) {
+        var dImg = new Image();
+        dImg.onload = function() { cctx.drawImage(dImg, 0, 0, canvas.width, canvas.height); };
+        dImg.src = 'data:image/png;base64,' + args.drawing_b64;
+      }
       setHeight();
     }
     if (base.complete && base.naturalWidth) { layoutCutouts(); } else { base.addEventListener('load', layoutCutouts); }
@@ -1947,6 +2009,57 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       var realY = Math.round((e.clientY - rect.top) / scale);
       sendValue({ action: 'drop', tid: tid, x: realX, y: realY, t: Date.now() });
     });
+
+    // Paint-style freehand drawing - pen color follows the active tool,
+    // eraser genuinely removes previously-drawn pixels (destination-out)
+    // rather than painting over them, so it works over both the video
+    // frame and any player standing under a stroke.
+    var strokeActive = false;
+    function toCanvasPoint(e) {
+      var rect = canvas.getBoundingClientRect();
+      var sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+      return { x: (e.clientX - rect.left) * sx, y: (e.clientY - rect.top) * sy };
+    }
+    function configureStroke() {
+      cctx.lineCap = 'round';
+      cctx.lineJoin = 'round';
+      if (tool === 'eraser') {
+        cctx.globalCompositeOperation = 'destination-out';
+        cctx.lineWidth = 30;
+      } else {
+        cctx.globalCompositeOperation = 'source-over';
+        cctx.strokeStyle = (tool === 'red') ? '#ff2b2b' : '#111111';
+        cctx.lineWidth = 6;
+      }
+    }
+    canvas.addEventListener('pointerdown', function(e) {
+      if (tool === 'move') return;
+      strokeActive = true;
+      canvas.setPointerCapture(e.pointerId);
+      configureStroke();
+      var pt = toCanvasPoint(e);
+      cctx.beginPath();
+      cctx.moveTo(pt.x, pt.y);
+      cctx.lineTo(pt.x + 0.1, pt.y + 0.1); // ensure a single tap still leaves a dot
+      cctx.stroke();
+    });
+    canvas.addEventListener('pointermove', function(e) {
+      if (!strokeActive) return;
+      var pt = toCanvasPoint(e);
+      cctx.lineTo(pt.x, pt.y);
+      cctx.stroke();
+    });
+    function endStroke() {
+      if (!strokeActive) return;
+      strokeActive = false;
+      sendValue({ action: 'draw', png: canvas.toDataURL('image/png').split(',')[1], t: Date.now() });
+    }
+    canvas.addEventListener('pointerup', endStroke);
+    canvas.addEventListener('pointerleave', endStroke);
+    clearBtn.onclick = function() {
+      cctx.clearRect(0, 0, canvas.width, canvas.height);
+      sendValue({ action: 'draw', png: canvas.toDataURL('image/png').split(',')[1], t: Date.now() });
+    };
 
     setHeight();
   }
@@ -2004,19 +2117,48 @@ def _reposition_video_url(video_path):
     return fname
 
 
-def render_player_repositioning_tab():
-    """Drag-and-drop hypothetical player repositioning against the real,
-    full raw broadcast clip: play it natively, pause anywhere, then drag any
-    real player (their actual segmented cutout - see player_repositioning.py's
-    module docstring) to a new spot on that exact paused frame. See
+def _game_board_drawing_path(cache_dir, match_key, frame_idx):
+    return Path(cache_dir) / "game_board_drawings" / f"{match_key}_{frame_idx}.png"
+
+
+def _save_game_board_drawing(cache_dir, match_key, frame_idx, png_bytes):
+    """Non-destructive per-(match, frame) cache file, same discipline as
+    player_repositioning.save_repositions - never touches bundle.json or
+    any CV pipeline output."""
+    path = _game_board_drawing_path(cache_dir, match_key, frame_idx)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = str(path) + ".tmp"
+    with open(tmp, "wb") as f:
+        f.write(png_bytes)
+    os.replace(tmp, path)
+
+
+def _load_game_board_drawing_b64(cache_dir, match_key, frame_idx):
+    path = _game_board_drawing_path(cache_dir, match_key, frame_idx)
+    if not path.exists():
+        return None
+    try:
+        return base64.b64encode(path.read_bytes()).decode("ascii")
+    except OSError:
+        return None
+
+
+def render_game_board_tab():
+    """The real broadcast clip, played natively and pausable at any frame,
+    with two independent tools on top of whichever frame is paused: drag
+    any real player (their actual segmented cutout - see
+    player_repositioning.py's module docstring) to a new spot anywhere in
+    the frame, and/or freehand-draw over it (red pen, black pen, eraser -
+    a telestrator, not a synthetic overlay baked into any saved data). See
     _get_reposition_component's docstring for why this needs a real
     bidirectional component rather than st.components.v1.html."""
-    st.subheader("🎯 Player Repositioning")
+    st.subheader("🧩 Game Board")
     st.caption(
         "Play the real broadcast clip below, pause it wherever you like, then drag any real "
-        "player to a new spot on that frame — anywhere, including off the pitch. Every drop is "
-        "honored: size always stays plausible (derived from real players already visible in "
-        "that frame), even where the calibration can't be trusted directly."
+        "player to a new spot on that frame — anywhere, including off the pitch — and/or draw "
+        "over it with the pen and eraser tools. Every drop is honored: size always stays "
+        "plausible (derived from real players already visible in that frame), even where the "
+        "calibration can't be trusted directly."
     )
 
     source, key = _get_active_match_identity()
@@ -2052,9 +2194,11 @@ def render_player_repositioning_tab():
     mode_key = f"reposition_mode_{match_key}"
     frame_key = f"reposition_frame_idx_{match_key}"
     nonce_key = f"reposition_last_nonce_{match_key}"
+    drawing_key = f"game_board_drawings_{source}_{match_key}"
     st.session_state.setdefault(mode_key, "browse")
     st.session_state.setdefault(frame_key, 0)
     st.session_state.setdefault(nonce_key, None)
+    st.session_state.setdefault(drawing_key, {})  # {frame_idx: png_b64}
 
     component_func = _get_reposition_component()
     video_url = _reposition_video_url(video_path)
@@ -2121,6 +2265,13 @@ def render_player_repositioning_tab():
         args["frame_b64"] = base64.b64encode(buf).decode('ascii') if ok else ""
         args["cutouts"] = visible_cutouts
 
+        drawing_b64 = st.session_state[drawing_key].get(frame_idx)
+        if drawing_b64 is None and source:
+            drawing_b64 = _load_game_board_drawing_b64(CACHE_DIR, match_key, frame_idx)
+            if drawing_b64:
+                st.session_state[drawing_key][frame_idx] = drawing_b64
+        args["drawing_b64"] = drawing_b64 or ""
+
     value = component_func(**args, key=f"reposition_widget_{match_key}", default=None)
 
     if value and value.get("t") != st.session_state[nonce_key]:
@@ -2145,6 +2296,16 @@ def render_player_repositioning_tab():
                 st.session_state[state_key] = moves
                 if source:
                     pr.save_repositions(CACHE_DIR, match_key, moves)
+            st.rerun()
+        elif action == "draw":
+            png_b64 = value.get("png")
+            if png_b64:
+                st.session_state[drawing_key][frame_idx] = png_b64
+                if source:
+                    try:
+                        _save_game_board_drawing(CACHE_DIR, match_key, frame_idx, base64.b64decode(png_b64))
+                    except (OSError, ValueError):
+                        pass
             st.rerun()
 
     for tid, err in failed:
@@ -2314,10 +2475,6 @@ def render_cv_completed_state(status, cv_output_dir):
                 )
         else:
             st.info("Stats file not yet available on disk.")
-
-    st.markdown("---")
-    with st.expander("🎯 Player Repositioning (hypothetical, drag-and-drop)", expanded=False):
-        render_player_repositioning_tab()
 
     st.markdown("---")
     st.markdown("**Tactical Events — in this window**")
@@ -4230,8 +4387,8 @@ elif st.session_state.step == 3:
 
             st.header("Match Segment Overview")
 
-            tab_dashboard, tab_coach, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
-                ["📊 Data Dashboard", "🎯 Coach Report", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
+            tab_dashboard, tab_coach, tab_game, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
+                ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
                 st.subheader("Global Control")
@@ -4455,6 +4612,8 @@ elif st.session_state.step == 3:
                     except Exception as e:
                         st.error(f"Could not generate the full PDF report: {e}")
 
+            with tab_game:
+                render_game_board_tab()
 
             with tab_cv:
                 render_cv_deep_analysis_tab()

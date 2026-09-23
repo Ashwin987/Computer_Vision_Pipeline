@@ -447,7 +447,22 @@ def composite_patch(dest_img, patch_img, rect, feather_px=10):
 def segment_player(ctx, frame_idx, rect):
     """Background-differencing segmentation, identical method to the
     investigation's Step 2 - clean plate for `rect`, diff against the real
-    frame, Otsu threshold, keep only the largest connected component."""
+    frame, Otsu threshold, keep only the largest connected component.
+
+    Dark kit against a shadowed pitch (verified directly against real
+    frames - a navy shorts/socks region can read within ~10-15px/gray-level
+    of the clean-plate background there) regularly produces a diff band
+    that falls entirely below Otsu's single global threshold, splitting one
+    real player into a torso component and separate, smaller leg/boot
+    fragments - "keep only the largest" then silently drops the real legs,
+    not because they aren't there but because they aren't CONNECTED to the
+    torso blob. A small 3x3 closing kernel (this function's own first
+    version) doesn't bridge that gap - it was typically 5-10px tall in
+    every real case checked. A tall, narrow closing kernel applied before
+    largest-component selection - not after - merges those fragments back
+    into one blob first, so "largest connected component" then correctly
+    keeps the whole player rather than only whichever single piece of them
+    happened to be biggest."""
     found = find_clean_patch(ctx, frame_idx, rect, search_radius=150, max_blend_frames=3)
     if found is None:
         return None
@@ -458,9 +473,14 @@ def segment_player(ctx, frame_idx, rect):
     diff = cv2.absdiff(real, bg)
     diff_gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     _, mask = cv2.threshold(diff_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    kernel = np.ones((3, 3), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    # Bridge low-contrast gaps (dark kit, shadow) between real, separately-
+    # detected body parts BEFORE picking "the largest" component, sized
+    # tall/narrow since these gaps run vertically along the body, not
+    # sideways toward a different player.
+    bridge_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 21))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, bridge_kernel)
+    open_kernel = np.ones((3, 3), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, open_kernel)
     n, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
     if n > 1:
         largest = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
