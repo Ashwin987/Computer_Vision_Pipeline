@@ -1748,13 +1748,13 @@ def _render_team_mapping_confirmation(stats, team_a, team_b):
             st.rerun()
 
 def _render_player_labeler(stats, team_mapping, source, key, player_labels):
-    """Left-most panel in the CV Deep Analysis tab (video moved to the
-    middle column, Window Stats keeps its existing right-most spot) - lets
-    the user attach a real name to each tracking ID this window saw. Saved
-    names are picked up by every OTHER call site in this tab (and training
-    plans / chat / stat cards elsewhere) via player_labels.player_label /
-    substitute_player_labels - this function only owns the edit UI + save,
-    never the substitution itself."""
+    """Full-width panel in the CV Deep Analysis tab, directly under the
+    Rendered Analysis video/side-stats row - lets the user attach a real
+    name to each tracking ID this window saw. Saved names are picked up by
+    every OTHER call site in this tab (and training plans / chat / stat
+    cards elsewhere) via player_labels.player_label / substitute_player_labels
+    - this function only owns the edit UI + save, never the substitution
+    itself."""
     with st.container(border=True):
         st.markdown("**🏷️ Label Players**")
         st.caption("Give real names to tracking IDs — used everywhere in this match's live UI.")
@@ -1772,13 +1772,17 @@ def _render_player_labeler(stats, team_mapping, source, key, player_labels):
                                                st.session_state.get('team_b', 'Team B'), team_mapping)
                 rows.append({"ID": f"P{pid}", "Team": team_display, "Name": player_labels.get(pid, "")})
 
+            # Full page width now (moved out of the old narrow left column),
+            # so this reads as a wide, mostly-horizontal table rather than a
+            # tall scrolled one - fixed-width ID/Team columns, Name gets the
+            # rest of the room.
             edited_rows = st.data_editor(
-                rows, hide_index=True, width='stretch', height=280,
+                rows, hide_index=True, width='stretch', height=220,
                 key=f"player_labels_editor_{source}_{key}",
                 column_config={
-                    "ID": st.column_config.TextColumn(disabled=True),
-                    "Team": st.column_config.TextColumn(disabled=True),
-                    "Name": st.column_config.TextColumn(help="Leave blank to keep showing the tracking ID"),
+                    "ID": st.column_config.TextColumn(disabled=True, width="small"),
+                    "Team": st.column_config.TextColumn(disabled=True, width="small"),
+                    "Name": st.column_config.TextColumn(help="Leave blank to keep showing the tracking ID", width="large"),
                 },
             )
             if st.button("💾 Save names", key=f"player_labels_save_{source}_{key}"):
@@ -2315,32 +2319,27 @@ def _game_board_team_color_resolver(cv_output_dir, team_mapping, color_a, color_
     return color_for
 
 
-def render_game_board_tab():
-    """The real broadcast clip, played natively and scrubbable, with a
-    game board panel appearing underneath once a frame is captured: every
-    tracked player's REAL PIXEL position for that exact frame (see
-    player_repositioning.frame_player_pixel_positions - straight from the
-    tracker's own bbox, no homography or world-coordinate round trip at
-    all) drawn as a team-colored dot directly on that same frame with
-    every player erased (player_repositioning.clean_frame_no_players, the
-    same clean-plate reconstruction already proven for the original drag
-    feature). A dot and the real player it represents come from the exact
-    same tracked bbox in the exact same frame's pixel space, so they are
-    aligned by construction - see player_repositioning.py's module
-    docstring for the direct, real-data root-cause check that led here
-    (this match's own per-frame homography measured genuinely inaccurate;
-    not a bug in how an earlier version of this board used it). Pen/eraser
-    drawing tools apply to this board, unchanged. See
-    _get_reposition_component's docstring for why this needs a real
-    bidirectional component rather than st.components.v1.html."""
-    st.subheader("🧩 Game Board")
-    st.caption(
-        "Play the real broadcast clip below, then use the button to bring up the game board for "
-        "whatever moment you've paused on: every real player, erased from their original spot and "
-        "redrawn as a team-colored dot at that exact same pixel position — drag any dot around, or "
-        "draw over it with the pen and eraser tools."
-    )
+def _render_game_board_core(key_suffix=""):
+    """The reusable core of the Game Board feature: the real broadcast
+    clip, play/pause, and the drag-and-drop board once a frame is
+    captured. Both render_game_board_tab (its own tab) and the Data
+    Dashboard tab call this exact same function - not a second, parallel
+    implementation - so a reposition or drawing made from either place is
+    the same underlying data: state_key/drawing_key/clean_key below are
+    scoped only by match, shared across every place this is called from.
+    `key_suffix` separates only the per-INSTANCE widget identity (which
+    frame THIS particular instance is currently showing, and the declared
+    component's own key) so two instances can each be paused on a
+    different moment at the same time without Streamlit key collisions,
+    while still reading and writing the exact same reposition/drawing data
+    underneath.
 
+    See player_repositioning.py's module docstring for the direct,
+    real-data root-cause check behind this board's current design (real
+    tracked pixel positions on a clean-plate-erased real frame, no
+    homography reprojection), and _get_reposition_component's docstring
+    for why this needs a real bidirectional component rather than
+    st.components.v1.html."""
     source, key = _get_active_match_identity()
     cv_output_dir = st.session_state.get('cv_job_output_dir')
     if not cv_output_dir:
@@ -2371,8 +2370,8 @@ def render_game_board_tab():
         st.session_state[state_key] = pr.load_repositions(CACHE_DIR, match_key) if source else []
     moves = st.session_state[state_key]
 
-    frame_key = f"reposition_frame_idx_{match_key}"
-    nonce_key = f"reposition_last_nonce_{match_key}"
+    frame_key = f"reposition_frame_idx_{match_key}{key_suffix}"
+    nonce_key = f"reposition_last_nonce_{match_key}{key_suffix}"
     drawing_key = f"game_board_drawings_{source}_{match_key}"
     clean_key = f"game_board_clean_{source}_{match_key}"
     st.session_state.setdefault(frame_key, None)  # None = board not shown yet
@@ -2468,7 +2467,7 @@ def render_game_board_tab():
                 st.session_state[drawing_key][frame_idx] = drawing_b64
         args["drawing_b64"] = drawing_b64 or ""
 
-    value = component_func(**args, key=f"reposition_widget_{match_key}", default=None)
+    value = component_func(**args, key=f"reposition_widget_{match_key}{key_suffix}", default=None)
 
     if value and value.get("t") != st.session_state[nonce_key]:
         st.session_state[nonce_key] = value.get("t")
@@ -2502,7 +2501,7 @@ def render_game_board_tab():
 
     bcol1, bcol2 = st.columns([1, 3])
     with bcol1:
-        if st.button("↺ Reset all repositions", key=f"reposition_reset_{match_key}"):
+        if st.button("↺ Reset all repositions", key=f"reposition_reset_{match_key}{key_suffix}"):
             st.session_state[state_key] = []
             if source:
                 pr.clear_repositions(CACHE_DIR, match_key)
@@ -2534,6 +2533,32 @@ def render_game_board_tab():
                     cols[1].caption("No distance estimate available for this position.")
 
 
+def render_game_board_tab():
+    """The Game Board tab: the shared _render_game_board_core (see its own
+    docstring - the exact same function the Data Dashboard tab calls, not
+    a duplicate), framed with this tab's own heading/caption and a plain-
+    English explanation of why a coach would use it."""
+    st.subheader("🧩 Game Board")
+    st.caption(
+        "Play the real broadcast clip below, then use the button to bring up the game board for "
+        "whatever moment you've paused on: every real player, erased from their original spot and "
+        "redrawn as a team-colored dot at that exact same pixel position — drag any dot around, or "
+        "draw over it with the pen and eraser tools."
+    )
+
+    _render_game_board_core()
+
+    st.markdown("---")
+    st.markdown("**Why this is useful**")
+    st.write(
+        "This board lets you try out \"what if\" ideas on a real moment from the match. Pause the "
+        "action wherever you like, then drag players around to test a different shape, a different "
+        "marking assignment, or a bit of extra off-ball movement — and see straight away how the "
+        "picture changes. There's no tracking data or numbers to read through: just the real "
+        "players, on the real pitch, moved to wherever you want to try them."
+    )
+
+
 def render_cv_completed_state(status, cv_output_dir):
     outputs = status.get('outputs', {})
     stats_file = status.get('stats_file')
@@ -2554,10 +2579,7 @@ def render_cv_completed_state(status, cv_output_dir):
     source, key = _get_active_match_identity()
     player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
 
-    labeler_col, video_col, side_col = st.columns([1, 1.4, 1])
-
-    with labeler_col:
-        _render_player_labeler(stats, team_mapping, source, key, player_labels)
+    video_col, side_col = st.columns([2.2, 1])
 
     with video_col:
         st.markdown("**📹 Rendered Analysis**")
@@ -2662,6 +2684,9 @@ def render_cv_completed_state(status, cv_output_dir):
                 )
         else:
             st.info("Stats file not yet available on disk.")
+
+    st.markdown("")
+    _render_player_labeler(stats, team_mapping, source, key, player_labels)
 
     st.markdown("---")
     st.markdown("**Tactical Events — in this window**")
@@ -4368,6 +4393,7 @@ elif st.session_state.step == 3:
                 - For EVERY single section and sub-section below, you MUST write a rich, highly detailed analytical paragraph (at least 4-5 sentences).
                 - DO NOT use brief bullet points. Expand deeply on the tactical theory and what it means for the game.
                 - DO NOT use raw variable names or key-value pairs (like 'line: step_up') anywhere in your text. Translate all data into natural, free-flowing, professional scouting language.
+                - WRITE FOR AN ASSISTANT COACH, NOT A LITERARY AUDIENCE: use plain, direct sentences - short and clear beats long or nested. Keep every football/tactical term exactly as it should be used (deep block, counter-attack, high line, press, compactness, transition, threat score, and others like them) - that vocabulary is precise and useful, so don't cut or soften any of it. But drop general-vocabulary words chosen to sound sophisticated rather than to be clear. For example: "dichotomy" should become a direct description of the contrast instead ("PSG dominated while Liverpool sat back"); "unequivocally" should be cut, or replaced with "clearly"; "relentlessly pushing" should become "kept pushing" or "consistently pushed"; "meager" should become "low". A real tactical framing like "conservative approach" is fine to keep as-is - it's precise, not decorative - just don't dress it up with flourish around it. Treat this as a general standard for word choice, not a fixed list of words to avoid - apply the same plain-but-precise judgment to any other word that fits the same pattern, even ones not named here.
                 - YOU MUST PLACE A DOUBLE LINE BREAK BETWEEN EVERY SINGLE NUMBERED POINT so the Markdown formats cleanly.
                 - TRANSITIONAL THREAT: Analyze the team's transitional threat based on the Total Transitions Logged data. Do NOT explicitly list the raw count of transitions. Instead, write a narrative analysis explaining how they successfully absorbed pressure and used fast vertical transitions or counters to bypass the opponent's structure.
                 - CRITICAL - TEAM NAME TOKENS: throughout your ENTIRE response, never write {team_a}'s real name or color - instead write the exact literal placeholder text {{TEAM_A}} (including in headers and the middle of sentences). Never write {team_b}'s real name or color either - write the exact literal placeholder text {{TEAM_B}} instead. This applies with NO exceptions anywhere in the report, so that team names can be substituted in later without regenerating this text. Do not explain or acknowledge the tokens - just use them exactly as shown in the structure below.
@@ -4578,6 +4604,20 @@ elif st.session_state.step == 3:
                 ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
+                # Same Game Board feature as its own tab - _render_game_board_core
+                # is the exact shared implementation (see its own docstring),
+                # not a second copy - just a different natural place to reach
+                # it from, with its own paused-frame state so scrubbing here
+                # doesn't disturb the Game Board tab's own moment.
+                st.subheader("🧩 Game Board")
+                st.caption(
+                    "The same game board as the Game Board tab — play the real broadcast clip, pause "
+                    "on any moment, then drag players to test a different shape. Repositions here are "
+                    "the same ones saved for this match everywhere else in the app."
+                )
+                _render_game_board_core(key_suffix="_dash")
+                st.markdown("---")
+
                 st.subheader("Global Control")
                 col1, col2, col3, col4 = st.columns(4)
             
