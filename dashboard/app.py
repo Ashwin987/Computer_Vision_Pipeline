@@ -29,6 +29,7 @@ import re
 import subprocess
 import sys
 import hashlib
+import shutil
 from pathlib import Path
 from datetime import datetime, timezone
 from reportlab.lib.pagesizes import letter
@@ -1809,98 +1810,213 @@ def _repositioning_video_path(source, key):
     return cached_path if cached_path and Path(cached_path).exists() else None
 
 
-def _build_reposition_drag_html(frame_img, cutouts, display_width):
-    """Real HTML5 drag-and-drop over the actual current frame image (base64
-    JPEG, no server round-trip needed to show it). What's draggable is each
-    real player's own segmented cutout (a base64 PNG with the segmentation
-    mask as alpha - see player_repositioning.encode_cutout_png), positioned
-    exactly over their real location and sized to their real bbox, so it
-    reads as "drag the player" rather than a marker standing in for one -
-    no ID text, no colored circle, nothing synthetic drawn on top of or
-    instead of the real pixels. Drop coordinates convert back to real
-    frame-pixel space in JS and reach Python via st.query_params, the same
-    bridge this app's own admin panel already uses (`?admin=1`), not a new
-    mechanism.
+_REPOSITION_COMPONENT_DIR = CACHE_DIR / "reposition_component"
 
-    `cutouts`: {track_id: {"png_b64", "x1","y1","x2","y2"}} - already
-    excludes any already-moved player (their real pixels are gone from
-    frame_img itself, erased at composite time, so there's nothing there to
-    make draggable a second time)."""
-    ok, buf = cv2.imencode('.jpg', frame_img, [cv2.IMWRITE_JPEG_QUALITY, 90])
-    b64 = base64.b64encode(buf).decode('ascii') if ok else ""
-    img_h, img_w = frame_img.shape[:2]
-    scale = display_width / img_w
-    display_height = int(img_h * scale)
-
-    tags = []
-    for tid, c in cutouts.items():
-        if c is None:
-            continue
-        x1, y1, x2, y2 = c["x1"], c["y1"], c["x2"], c["y2"]
-        w, h = (x2 - x1) * scale, (y2 - y1) * scale
-        left, top = x1 * scale, y1 * scale
-        tags.append(
-            f'<img class="pr-cutout" draggable="true" data-tid="{_esc_html(tid)}" '
-            f'data-realw="{x2 - x1:.1f}" data-realh="{y2 - y1:.1f}" '
-            f'src="data:image/png;base64,{c["png_b64"]}" '
-            f'style="left:{left:.1f}px; top:{top:.1f}px; width:{w:.1f}px; height:{h:.1f}px;">'
-        )
-
-    return f"""
+_REPOSITION_INDEX_HTML = r"""<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
 <style>
-  .pr-wrap {{ position:relative; width:{display_width}px; height:{display_height}px;
-              background-image:url(data:image/jpeg;base64,{b64}); background-size:100% 100%;
-              border-radius:10px; overflow:hidden; border:1px solid #2a3142; }}
-  .pr-cutout {{ position:absolute; cursor:grab; -webkit-user-drag:element; }}
-  .pr-cutout:active {{ cursor:grabbing; }}
-  .pr-wrap.pr-over {{ outline:3px dashed #4f8cff; outline-offset:-3px; }}
+  html, body { margin:0; padding:0; background:transparent;
+               font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:#e6e6e6; }
+  #root { padding:4px 0 10px 0; }
+  .pr-btn { background:#1c2333; color:#e6e6e6; border:1px solid #2a3142; border-radius:8px;
+            padding:8px 14px; font-size:14px; cursor:pointer; }
+  .pr-btn:hover { background:#252d42; }
+  .pr-row { display:flex; align-items:center; gap:12px; margin-top:10px; flex-wrap:wrap; }
+  .pr-hint { font-size:13px; color:#9aa4b8; }
+  video { width:100%; max-width:900px; display:block; border-radius:10px; border:1px solid #2a3142; background:#000; }
+  .pr-wrap { position:relative; display:inline-block; border-radius:10px; overflow:hidden; border:1px solid #2a3142; }
+  .pr-wrap img#prBase { display:block; max-width:900px; width:100%; height:auto; }
+  .pr-cutout { position:absolute; cursor:grab; -webkit-user-drag:element; }
+  .pr-cutout:hover { filter:drop-shadow(0 0 6px rgba(79,140,255,0.9)); }
+  .pr-cutout:active { cursor:grabbing; }
+  .pr-wrap.pr-over { outline:3px dashed #4f8cff; outline-offset:-3px; }
 </style>
-<div class="pr-wrap" id="prWrap">{''.join(tags)}</div>
+</head>
+<body>
+<div id="root"></div>
 <script>
-  const wrap = document.getElementById('prWrap');
-  wrap.addEventListener('dragstart', e => {{
-    if (e.target.classList.contains('pr-cutout')) {{
-      e.dataTransfer.setData('text/plain', e.target.dataset.tid);
-    }}
-  }});
-  wrap.addEventListener('dragover', e => {{ e.preventDefault(); wrap.classList.add('pr-over'); }});
-  wrap.addEventListener('dragleave', () => wrap.classList.remove('pr-over'));
-  wrap.addEventListener('drop', e => {{
-    e.preventDefault();
-    wrap.classList.remove('pr-over');
-    const tid = e.dataTransfer.getData('text/plain');
-    if (!tid) return;
-    const rect = wrap.getBoundingClientRect();
-    const realX = Math.round((e.clientX - rect.left) / {scale});
-    const realY = Math.round((e.clientY - rect.top) / {scale});
-    const url = new URL(window.top.location.href);
-    url.searchParams.set('reposition_tid', tid);
-    url.searchParams.set('reposition_x', realX);
-    url.searchParams.set('reposition_y', realY);
-    url.searchParams.set('reposition_t', Date.now().toString());
-    window.top.location.href = url.toString();
-  }});
+(function() {
+  var root = document.getElementById('root');
+  var browseState = { mode: null, videoUrl: null };
+
+  function post(msg) { msg.isStreamlitMessage = true; window.parent.postMessage(msg, "*"); }
+  function ready() { post({ type: "streamlit:componentReady", apiVersion: 1 }); }
+  function setHeight() { post({ type: "streamlit:setFrameHeight", height: document.body.scrollHeight + 12 }); }
+  function sendValue(v) { post({ type: "streamlit:setComponentValue", value: v, dataType: "json" }); }
+
+  function renderBrowse(args) {
+    if (browseState.mode === "browse" && browseState.videoUrl === args.video_url) {
+      setHeight();
+      return; // leave the live <video> alone - don't reset playback on unrelated reruns
+    }
+    root.innerHTML = "";
+    var vid = document.createElement('video');
+    vid.controls = true;
+    vid.src = args.video_url;
+    vid.addEventListener('loadedmetadata', function() {
+      try { vid.currentTime = args.start_time || 0; } catch (e) {}
+      setHeight();
+    });
+    vid.addEventListener('loadeddata', setHeight);
+    root.appendChild(vid);
+
+    var row = document.createElement('div');
+    row.className = 'pr-row';
+    var btn = document.createElement('button');
+    btn.className = 'pr-btn';
+    btn.textContent = '⏸ Use this paused frame to reposition players';
+    btn.onclick = function() {
+      vid.pause();
+      var idx = Math.round(vid.currentTime * (args.fps || 25));
+      idx = Math.max(0, Math.min((args.n_frames || 1) - 1, idx));
+      sendValue({ action: 'pause', frame_idx: idx, t: Date.now() });
+    };
+    row.appendChild(btn);
+    var hint = document.createElement('span');
+    hint.className = 'pr-hint';
+    hint.textContent = 'Play, scrub, or pause the real clip — then press the button to drag players on that exact frame.';
+    row.appendChild(hint);
+    root.appendChild(row);
+
+    browseState = { mode: "browse", videoUrl: args.video_url };
+    setHeight();
+  }
+
+  function renderEdit(args) {
+    root.innerHTML = "";
+    browseState = { mode: "edit", videoUrl: null };
+
+    var topRow = document.createElement('div');
+    topRow.className = 'pr-row';
+    var backBtn = document.createElement('button');
+    backBtn.className = 'pr-btn';
+    backBtn.textContent = '▶ Back to video';
+    backBtn.onclick = function() { sendValue({ action: 'back', t: Date.now() }); };
+    topRow.appendChild(backBtn);
+    var label = document.createElement('span');
+    label.className = 'pr-hint';
+    label.textContent = 'Frame ' + args.frame_idx + ' / ' + ((args.n_frames || 1) - 1) +
+                         ' — drag any real player to a new spot, on the pitch or off it.';
+    topRow.appendChild(label);
+    root.appendChild(topRow);
+
+    var wrap = document.createElement('div');
+    wrap.className = 'pr-wrap';
+    var base = document.createElement('img');
+    base.id = 'prBase';
+    base.src = 'data:image/jpeg;base64,' + (args.frame_b64 || '');
+    wrap.appendChild(base);
+    root.appendChild(wrap);
+
+    function layoutCutouts() {
+      var scale = base.clientWidth / (base.naturalWidth || 1);
+      wrap.dataset.scale = scale;
+      var cutouts = args.cutouts || {};
+      Object.keys(cutouts).forEach(function(tid) {
+        var c = cutouts[tid];
+        var img = document.createElement('img');
+        img.className = 'pr-cutout';
+        img.draggable = true;
+        img.dataset.tid = tid;
+        img.src = 'data:image/png;base64,' + c.png_b64;
+        img.style.left = (c.x1 * scale) + 'px';
+        img.style.top = (c.y1 * scale) + 'px';
+        img.style.width = ((c.x2 - c.x1) * scale) + 'px';
+        img.style.height = ((c.y2 - c.y1) * scale) + 'px';
+        wrap.appendChild(img);
+      });
+      setHeight();
+    }
+    if (base.complete && base.naturalWidth) { layoutCutouts(); } else { base.addEventListener('load', layoutCutouts); }
+
+    wrap.addEventListener('dragstart', function(e) {
+      if (e.target.classList.contains('pr-cutout')) { e.dataTransfer.setData('text/plain', e.target.dataset.tid); }
+    });
+    wrap.addEventListener('dragover', function(e) { e.preventDefault(); wrap.classList.add('pr-over'); });
+    wrap.addEventListener('dragleave', function() { wrap.classList.remove('pr-over'); });
+    wrap.addEventListener('drop', function(e) {
+      e.preventDefault();
+      wrap.classList.remove('pr-over');
+      var tid = e.dataTransfer.getData('text/plain');
+      if (!tid) return;
+      var rect = wrap.getBoundingClientRect();
+      var scale = parseFloat(wrap.dataset.scale) || 1;
+      var realX = Math.round((e.clientX - rect.left) / scale);
+      var realY = Math.round((e.clientY - rect.top) / scale);
+      sendValue({ action: 'drop', tid: tid, x: realX, y: realY, t: Date.now() });
+    });
+
+    setHeight();
+  }
+
+  window.addEventListener('message', function(event) {
+    var data = event.data;
+    if (!data || data.type !== 'streamlit:render') return;
+    var args = data.args || {};
+    if (args.mode === 'edit') { renderEdit(args); } else { renderBrowse(args); }
+  });
+  window.addEventListener('resize', setHeight);
+  ready();
+})();
 </script>
+</body>
+</html>
 """
 
 
-def _esc_html(s):
-    return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+@st.cache_resource
+def _get_reposition_component():
+    """Registers a real bidirectional Streamlit component - not the one-way
+    st.components.v1.html the feature's first version used, whose drag-and-
+    drop silently did nothing because its only way to report a drop back to
+    Python was navigating window.top, and Streamlit's own iframe sandbox for
+    st.components.v1.html (sandbox="allow-same-origin allow-scripts
+    allow-downloads" - confirmed directly in the installed streamlit
+    package's bundled frontend JS) carries no allow-top-navigation token, so
+    that navigation was always silently blocked by the browser - never a bug
+    in the drag math itself. A declared custom component instead talks to
+    Python over postMessage (streamlit:componentReady / render /
+    setComponentValue), which isn't subject to that restriction, and it also
+    hosts a real <video> element with native seeking instead of a single
+    fixed frame."""
+    _REPOSITION_COMPONENT_DIR.mkdir(parents=True, exist_ok=True)
+    (_REPOSITION_COMPONENT_DIR / "index.html").write_text(_REPOSITION_INDEX_HTML, encoding="utf-8")
+    return st.components.v1.declare_component("reposition_widget", path=str(_REPOSITION_COMPONENT_DIR))
 
 
-REPOSITION_FRAME_IDX = 0  # a fixed, deterministic "paused frame" for this window
+def _reposition_video_url(video_path):
+    """Copies the match's real clip into the component's own static
+    directory (once per distinct source path - a content-hashed filename
+    means a stale previous match's file is never served under a new
+    match's URL) and returns its relative URL. A component's static route
+    only serves files physically present in its declared directory, and
+    CACHE_DIR - unlike this app's own repo checkout, read-only on Streamlit
+    Community Cloud - stays writable at runtime, same reasoning this
+    project already applies to every other per-match cache file."""
+    digest = hashlib.md5(str(video_path).encode("utf-8")).hexdigest()[:10]
+    fname = f"clip_{digest}.mp4"
+    dest = _REPOSITION_COMPONENT_DIR / fname
+    if not dest.exists():
+        _REPOSITION_COMPONENT_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(video_path, dest)
+    return fname
 
 
 def render_player_repositioning_tab():
-    """Drag-and-drop hypothetical player repositioning - see
-    player_repositioning.py's own module docstring for the full design
-    history (three prior investigation/polish rounds) this is built on."""
+    """Drag-and-drop hypothetical player repositioning against the real,
+    full raw broadcast clip: play it natively, pause anywhere, then drag any
+    real player (their actual segmented cutout - see player_repositioning.py's
+    module docstring) to a new spot on that exact paused frame. See
+    _get_reposition_component's docstring for why this needs a real
+    bidirectional component rather than st.components.v1.html."""
     st.subheader("🎯 Player Repositioning")
     st.caption(
-        "Drag any real player to a new spot on the raw broadcast frame below — anywhere, "
-        "including off the pitch. Every drop is honored: size always stays plausible (derived "
-        "from real players already visible in this frame), even where the calibration can't be "
-        "trusted directly."
+        "Play the real broadcast clip below, pause it wherever you like, then drag any real "
+        "player to a new spot on that frame — anywhere, including off the pitch. Every drop is "
+        "honored: size always stays plausible (derived from real players already visible in "
+        "that frame), even where the calibration can't be trusted directly."
     )
 
     source, key = _get_active_match_identity()
@@ -1933,78 +2049,103 @@ def render_player_repositioning_tab():
         st.session_state[state_key] = pr.load_repositions(CACHE_DIR, match_key) if source else []
     moves = st.session_state[state_key]
 
-    # one-shot drop handling via query params - same bridge this app's own
-    # admin panel already uses (`?admin=1`), not a new mechanism
-    q_tid = st.query_params.get("reposition_tid")
-    if q_tid:
-        try:
-            qx = float(st.query_params.get("reposition_x", "0"))
-            qy = float(st.query_params.get("reposition_y", "0"))
-        except ValueError:
-            qx = qy = None
-        if qx is not None:
-            moves = [m for m in moves if m["track_id"] != q_tid]
-            moves.append({"track_id": q_tid, "target_x": qx, "target_y": qy})
-            st.session_state[state_key] = moves
-            if source:
-                pr.save_repositions(CACHE_DIR, match_key, moves)
-        for p in ("reposition_tid", "reposition_x", "reposition_y", "reposition_t"):
-            if p in st.query_params:
-                del st.query_params[p]
-        st.rerun()
+    mode_key = f"reposition_mode_{match_key}"
+    frame_key = f"reposition_frame_idx_{match_key}"
+    nonce_key = f"reposition_last_nonce_{match_key}"
+    st.session_state.setdefault(mode_key, "browse")
+    st.session_state.setdefault(frame_key, 0)
+    st.session_state.setdefault(nonce_key, None)
+
+    component_func = _get_reposition_component()
+    video_url = _reposition_video_url(video_path)
+    fps = ctx.fps
+    n_frames = ctx.n_frames
+    mode = st.session_state[mode_key]
+    frame_idx = max(0, min(n_frames - 1, st.session_state[frame_key]))
 
     player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+    frame_moves = [m for m in moves if m.get("frame_idx", 0) == frame_idx]
+
+    args = {
+        "mode": mode, "video_url": video_url, "fps": fps, "n_frames": n_frames,
+        "frame_idx": frame_idx, "start_time": frame_idx / fps,
+    }
 
     composite = None
     moved_ids = set()
     placements = []
     failed = []
-    for move in moves:
-        result = pr.propose_reposition(ctx, REPOSITION_FRAME_IDX, move["track_id"],
-                                        (move["target_x"], move["target_y"]), base_img=composite)
-        if result.get("error"):
-            failed.append((move["track_id"], result["error"]))
-            continue
-        composite = result["composite_img"]
-        moved_ids.add(move["track_id"])
-        placements.append((move["track_id"], result))
 
-    # Real segmented cutouts for every currently-tracked player, not a
-    # marker/ID standing in for one (see player_repositioning.py's module
-    # docstring for why a first version got this wrong). Computed once per
-    # (match, frame) and cached in session_state - each cutout runs a real
-    # clean-plate search (player_repositioning.segment_player), and this
-    # tab can have 15-20 players in frame, so recomputing all of them on
-    # every rerun (every drag, every button click) would make the UI
-    # noticeably slow for no benefit: a given real frame's players and
-    # their real pixels never change between reruns, only WHICH of them
-    # are still shown (moved players are filtered out below, by id, not by
-    # recomputing).
-    cutout_cache_key = f"reposition_cutouts_{source}_{match_key}_{REPOSITION_FRAME_IDX}"
-    if cutout_cache_key not in st.session_state:
-        cutouts = {}
-        with st.spinner("Segmenting tracked players for dragging (one-time per match)..."):
-            for tid, info in ctx.players[REPOSITION_FRAME_IDX].items():
-                x1, y1, x2, y2 = info["bbox"]
-                if (x2 - x1) < 10 or (y2 - y1) < 20:
-                    continue
-                margin = 10
-                crop_rect = (x1 - margin, y1 - margin, x2 + margin, y2 + margin)
-                seg = pr.segment_player(ctx, REPOSITION_FRAME_IDX, crop_rect)
-                if seg is None:
-                    continue
-                png_b64 = pr.encode_cutout_png(seg["real"], seg["mask"])
-                if png_b64 is None:
-                    continue
-                cx1, cy1, cx2, cy2 = crop_rect
-                cutouts[tid] = {"png_b64": png_b64, "x1": cx1, "y1": cy1, "x2": cx2, "y2": cy2}
-        st.session_state[cutout_cache_key] = cutouts
-    all_cutouts = st.session_state[cutout_cache_key]
-    visible_cutouts = {tid: c for tid, c in all_cutouts.items() if tid not in moved_ids}
+    if mode == "edit":
+        for move in frame_moves:
+            result = pr.propose_reposition(ctx, frame_idx, move["track_id"],
+                                            (move["target_x"], move["target_y"]), base_img=composite)
+            if result.get("error"):
+                failed.append((move["track_id"], result["error"]))
+                continue
+            composite = result["composite_img"]
+            moved_ids.add(move["track_id"])
+            placements.append((move["track_id"], result))
 
-    display_img = composite if composite is not None else ctx.get_frame(REPOSITION_FRAME_IDX)
-    html = _build_reposition_drag_html(display_img, visible_cutouts, 900)
-    st.components.v1.html(html, height=int(900 * ctx.frame_h / ctx.frame_w) + 20, scrolling=False)
+        # Real segmented cutouts for every currently-tracked player on THIS
+        # frame, not a marker/ID standing in for one (see
+        # player_repositioning.py's module docstring for why a first version
+        # got this wrong). Computed once per (match, frame) and cached in
+        # session_state - a given real frame's players and their real pixels
+        # never change between reruns, only which of them are still shown
+        # (moved players are filtered out below, by id, not by recomputing).
+        cutout_cache_key = f"reposition_cutouts_{source}_{match_key}_{frame_idx}"
+        if cutout_cache_key not in st.session_state:
+            cutouts = {}
+            with st.spinner("Segmenting tracked players on this frame..."):
+                for tid, info in ctx.players[frame_idx].items():
+                    x1, y1, x2, y2 = info["bbox"]
+                    if (x2 - x1) < 10 or (y2 - y1) < 20:
+                        continue
+                    margin = 10
+                    crop_rect = (x1 - margin, y1 - margin, x2 + margin, y2 + margin)
+                    seg = pr.segment_player(ctx, frame_idx, crop_rect)
+                    if seg is None:
+                        continue
+                    png_b64 = pr.encode_cutout_png(seg["real"], seg["mask"])
+                    if png_b64 is None:
+                        continue
+                    cx1, cy1, cx2, cy2 = crop_rect
+                    cutouts[tid] = {"png_b64": png_b64, "x1": cx1, "y1": cy1, "x2": cx2, "y2": cy2}
+            st.session_state[cutout_cache_key] = cutouts
+        all_cutouts = st.session_state[cutout_cache_key]
+        visible_cutouts = {tid: c for tid, c in all_cutouts.items() if tid not in moved_ids}
+
+        display_img = composite if composite is not None else ctx.get_frame(frame_idx)
+        ok, buf = cv2.imencode('.jpg', display_img, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        args["frame_b64"] = base64.b64encode(buf).decode('ascii') if ok else ""
+        args["cutouts"] = visible_cutouts
+
+    value = component_func(**args, key=f"reposition_widget_{match_key}", default=None)
+
+    if value and value.get("t") != st.session_state[nonce_key]:
+        st.session_state[nonce_key] = value.get("t")
+        action = value.get("action")
+        if action == "pause":
+            new_idx = int(value.get("frame_idx", 0))
+            st.session_state[frame_key] = max(0, min(n_frames - 1, new_idx))
+            st.session_state[mode_key] = "edit"
+            st.rerun()
+        elif action == "back":
+            st.session_state[mode_key] = "browse"
+            st.rerun()
+        elif action == "drop":
+            tid = value.get("tid")
+            qx, qy = value.get("x"), value.get("y")
+            if tid is not None and qx is not None and qy is not None:
+                moves = [m for m in moves
+                         if not (m["track_id"] == tid and m.get("frame_idx", 0) == frame_idx)]
+                moves.append({"track_id": tid, "target_x": float(qx), "target_y": float(qy),
+                               "frame_idx": frame_idx})
+                st.session_state[state_key] = moves
+                if source:
+                    pr.save_repositions(CACHE_DIR, match_key, moves)
+            st.rerun()
 
     for tid, err in failed:
         label = pl.player_label(tid, None, player_labels)
@@ -2020,9 +2161,11 @@ def render_player_repositioning_tab():
     with bcol2:
         if not source:
             st.caption("This match has no saved identity — repositions stay for this session only.")
+        elif mode == "edit":
+            st.caption(f"Editing frame {frame_idx} / {n_frames - 1}. Repositions are scoped to this exact frame.")
 
     if placements:
-        st.markdown("**Active repositions**")
+        st.markdown("**Active repositions on this frame**")
         for tid, result in placements:
             label = pl.player_label(tid, None, player_labels)
             info = result["scale_info"]
@@ -2031,7 +2174,7 @@ def render_player_repositioning_tab():
                 cols[0].markdown(f"**{label}**")
                 cols[1].caption(f"scale ×{info['ratio']:.2f}" + (" (clamped)" if info["clamped"] else ""))
                 if info["on_pitch"]:
-                    pstats = pr.compute_placement_stats(ctx, REPOSITION_FRAME_IDX, tid, info["target_pitch"])
+                    pstats = pr.compute_placement_stats(ctx, frame_idx, tid, info["target_pitch"])
                     if pstats:
                         cols[2].caption(
                             f"Nearest player: {pstats['nearest_player_distance_m']}m · "

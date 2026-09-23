@@ -109,6 +109,11 @@ class RepositioningContext:
         _ = self.cap
         return self._frame_h
 
+    @property
+    def fps(self):
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+        return fps if fps and fps > 1 else 25.0
+
     def get_frame(self, idx):
         self.cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
         ok, frame = self.cap.read()
