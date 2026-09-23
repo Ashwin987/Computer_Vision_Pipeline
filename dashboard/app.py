@@ -1958,6 +1958,29 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
   function renderBoardInto(host, args) {
     host.innerHTML = "";
     var positions = args.board_positions || {};
+
+    // A genuine data failure shows a clear message here, not a rendered
+    // board with nothing (or the wrong thing) on it - the Python side
+    // already surfaced the same failure via st.error above this
+    // component too, this is the in-board echo of it.
+    if (args.board_error) {
+      var errEl = document.createElement('div');
+      errEl.className = 'pr-hint';
+      errEl.style.marginTop = '10px';
+      errEl.style.color = '#ff6b6b';
+      errEl.textContent = '⚠️ ' + args.board_error;
+      host.appendChild(errEl);
+      return;
+    }
+    if (!args.frame_b64) {
+      var errEl2 = document.createElement('div');
+      errEl2.className = 'pr-hint';
+      errEl2.style.marginTop = '10px';
+      errEl2.style.color = '#ff6b6b';
+      errEl2.textContent = "⚠️ The cleaned frame image didn't load for this moment - try pressing the button again.";
+      host.appendChild(errEl2);
+      return;
+    }
     if (Object.keys(positions).length === 0) {
       var msg = document.createElement('div');
       msg.className = 'pr-hint';
@@ -2125,7 +2148,9 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
 """
 
 
-@st.cache_resource
+_REPOSITION_INDEX_HTML_HASH = hashlib.md5(_REPOSITION_INDEX_HTML.encode("utf-8")).hexdigest()[:10]
+
+
 def _get_reposition_component():
     """Registers a real bidirectional Streamlit component - not the one-way
     st.components.v1.html the feature's first version used, whose drag-and-
@@ -2139,10 +2164,30 @@ def _get_reposition_component():
     Python over postMessage (streamlit:componentReady / render /
     setComponentValue), which isn't subject to that restriction, and it also
     hosts a real <video> element with native seeking instead of a single
-    fixed frame."""
+    fixed frame.
+
+    Deliberately NOT @st.cache_resource, after a real, confirmed incident:
+    Streamlit Community Cloud's push-triggered redeploy does not reliably
+    restart the underlying Python process (confirmed directly, twice, via
+    an AttributeError on a constant that was verifiably already in the
+    pushed commit - the running process was still serving an old import).
+    A cache_resource-wrapped version of this function would keep returning
+    whatever component it FIRST built in that still-alive process forever,
+    silently - not crash, just serve stale JS (this is exactly what
+    happened: the schematic-pitch board design from two commits ago kept
+    rendering after it had been replaced with the real-frame board,
+    because this function's cached return value was never invalidated).
+    Rewriting the file and re-declaring the component on every call is
+    microseconds of cost, and the component's name is content-hashed
+    (_REPOSITION_INDEX_HTML_HASH, recomputed from the actual current
+    source at import time) so a real content change always gets a new
+    component identity - no stale reuse possible at the Python object,
+    Streamlit-internal, or browser-HTTP-cache layer, even if any of those
+    layers key on name/URL rather than content."""
     _REPOSITION_COMPONENT_DIR.mkdir(parents=True, exist_ok=True)
     (_REPOSITION_COMPONENT_DIR / "index.html").write_text(_REPOSITION_INDEX_HTML, encoding="utf-8")
-    return st.components.v1.declare_component("reposition_widget", path=str(_REPOSITION_COMPONENT_DIR))
+    return st.components.v1.declare_component(f"reposition_widget_{_REPOSITION_INDEX_HTML_HASH}",
+                                                path=str(_REPOSITION_COMPONENT_DIR))
 
 
 def _reposition_video_url(video_path):
@@ -2365,16 +2410,23 @@ def render_game_board_tab():
         # disk cache (same discipline as the drawing cache) so it survives
         # a page reload without recomputing, and only a spinner on the
         # actual first computation for a given frame.
+        board_error = None
         clean_b64 = st.session_state[clean_key].get(frame_idx)
         if clean_b64 is None and source:
             clean_b64 = _load_game_board_clean_frame_b64(CACHE_DIR, match_key, frame_idx)
             if clean_b64:
                 st.session_state[clean_key][frame_idx] = clean_b64
         if clean_b64 is None:
-            with st.spinner("Erasing tracked players from this frame (one-time per frame, up to ~30s)..."):
-                cleaned_img, n_erase_failed = pr.clean_frame_no_players(ctx, frame_idx)
-                ok, buf = cv2.imencode('.jpg', cleaned_img, [cv2.IMWRITE_JPEG_QUALITY, 92])
-                clean_b64 = base64.b64encode(buf).decode('ascii') if ok else ""
+            try:
+                with st.spinner("Erasing tracked players from this frame (one-time per frame, up to ~30s)..."):
+                    cleaned_img, n_erase_failed = pr.clean_frame_no_players(ctx, frame_idx)
+                    ok, buf = cv2.imencode('.jpg', cleaned_img, [cv2.IMWRITE_JPEG_QUALITY, 92])
+                    clean_b64 = base64.b64encode(buf).decode('ascii') if ok else ""
+                if not clean_b64:
+                    board_error = "Couldn't encode the cleaned frame image (cv2.imencode failed)."
+            except Exception as e:
+                clean_b64 = ""
+                board_error = f"Couldn't build the cleaned frame for this moment: {e}"
             st.session_state[clean_key][frame_idx] = clean_b64
             if source and clean_b64:
                 try:
@@ -2386,14 +2438,28 @@ def render_game_board_tab():
         # Real tracked pixel position for everyone, with any dragged
         # player's position overridden by their stored move - no
         # homography anywhere in this path.
-        positions = pr.frame_player_pixel_positions(ctx, frame_idx)
         board_positions = {}
-        for tid, (x, y) in positions.items():
-            move = frame_moves.get(tid)
-            if move is not None:
-                x, y = move["target_x"], move["target_y"]
-            board_positions[tid] = {"x": x, "y": y, "hex": color_for_track(tid)}
+        try:
+            positions = pr.frame_player_pixel_positions(ctx, frame_idx)
+            for tid, (x, y) in positions.items():
+                move = frame_moves.get(tid)
+                if move is not None:
+                    x, y = move["target_x"], move["target_y"]
+                board_positions[tid] = {"x": x, "y": y, "hex": color_for_track(tid)}
+        except Exception as e:
+            if board_error is None:
+                board_error = f"Couldn't read player positions for this frame: {e}"
         args["board_positions"] = board_positions
+
+        # A genuine data failure is shown, not swallowed into a blank or
+        # generic-looking board - a real incident (the schematic-pitch
+        # board silently kept rendering after being replaced, because a
+        # stale cached component was serving old JS - see
+        # _get_reposition_component's docstring) is exactly the kind of
+        # silent-fallback this is meant to catch instead.
+        if board_error:
+            st.error(f"⚠️ Game board couldn't load real data for this frame: {board_error}")
+        args["board_error"] = board_error
 
         drawing_b64 = st.session_state[drawing_key].get(frame_idx)
         if drawing_b64 is None and source:
