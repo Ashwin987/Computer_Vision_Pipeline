@@ -1,61 +1,38 @@
 """
 player_repositioning.py — drag-and-drop hypothetical player repositioning,
-CV Deep Analysis tab.
+the dashboard's "Game Board" tab.
 
-Built on three rounds of prior investigation against this exact match's real
-data (clean-plate reconstruction, background-differencing segmentation, and
-seamless-clone edge blending all verified working; a naive scale-gate first
-built then honestly discarded when tested against real players; a
-temporal-consistency check investigated and also discarded when it failed to
-separate known-good from known-bad placements). This module is the first
-time any of that becomes a real, shipped feature rather than a scratch
-investigation script - see PROPOSAL_advanced_tactical_signals.md and this
-project's own session history for the full record of what was tried and
-rejected before landing on the design below.
+Built on several rounds of prior investigation and two earlier shipped
+designs, in order: (0) a simple ID-labeled circular marker composited onto
+the real broadcast frame, which visually resembled this project's own
+"Tracking + Speed & Distance" rendered output closely enough to be mistaken
+for it; (1) real, background-differencing-segmented player pixels pasted
+onto the real broadcast frame in place of that marker - broadly audited
+against every tracked player across several real frames (not just the one
+case each fix was first tried against) and found to have a genuine,
+structural ~10% failure rate (a dark kit against a shadowed pitch can put a
+real player's legs below Otsu's single global diff threshold entirely, and
+separately, clean-plate reconstruction's own real ~2% residual misalignment
+can produce a false blob larger than the real player) - reported as such
+rather than shipped with the failure rate hidden, since neither is a bug
+more mask post-processing fixes.
 
-Core design decision this module makes differently from every earlier round:
-no position is ever refused. The investigation's scale-gate (reject a
-placement if implied scale looks physically absurd) is replaced here by a
-bounded, continuous scale function (see bounded_scale_for_target) - the goal
-changed from "know when NOT to trust the homography" to "never need to fully
-trust it in the first place": on-pitch positions where the homography's
-local scale passes the same self-consistency check the gate used to enforce
-as a hard reject are used directly; every other position (including
-anywhere off the pitch - stands, crowd, behind the goal) falls back to a
-log-linear perspective trend fitted from this frame's own REAL tracked
-players, clamped to a plausible pixel-size range also derived from those
-same real players. A placement can therefore always be composited; the
-worst case is a size that's merely approximate, never one that's absurd.
+Current design: a plain, team-colored tactical board - the same idea as a
+real coach's magnetic whiteboard, not a doctored photo. Every tracked
+player's REAL pitch position (see frame_player_pitch_positions, via this
+match's own per-frame homography - already the same calibrated pitch plane
+every other module in this project uses) is drawn as a colored dot on a
+flat, schematic 2D pitch, not composited onto the perspective broadcast
+frame at all. This sidesteps every failure mode design (1) had - there is
+no segmentation, no clean-plate erase, no perspective-scale estimation
+anywhere in this design, so there is nothing left in it that can produce a
+"torso only" or oversized/undersized result. The real broadcast frame is
+still shown alongside it, for visual context of the real moment, but is no
+longer the surface anything is dragged on.
 
-Real broadcast frame, team-colored marker: this module operates on, and
-only ever displays, the raw broadcast frame (the same clean, unannotated
-source the clean-plate reconstruction work has used as its input from
-round one) - the original player is genuinely erased from their old spot
-via the same clean-plate reconstruction, and a plain, team-colored circular
-marker (no ID text, no badge) is drawn at the new spot.
-
-This module went through two earlier designs before landing here, in
-order: (1) pasting real, background-differencing-segmented player pixels
-at the new spot, and, before that, (0) a simple ID-labeled circular marker
-that visually resembled this project's own "Tracking + Speed & Distance"
-rendered output closely enough to be mistaken for it. Design (1) was
-broadly audited against every tracked player across several real frames
-(not just the one case each fix was first tried against) and found to have
-a genuine, structural ~10% failure rate - a dark kit against a shadowed
-pitch can put a real player's legs below Otsu's single global diff
-threshold entirely, and separately, clean-plate reconstruction's own
-~2% residual misalignment (already a known, disclosed limit elsewhere in
-this module) can produce a false blob larger than the real player. Neither
-is a bug that more mask post-processing fixes - it's a structural limit of
-background-differencing segmentation on broadcast football footage, and
-was reported as such rather than shipped with the failure rate hidden.
-A team-colored marker has no segmentation dependency at all, so it has
-none of that failure mode - it costs the real, "this is genuinely that
-player's own pixels" quality design (1) had when it worked, in exchange
-for being reliably correct on every player, every frame.
-
-Storage: a per-match list of active repositions, layered non-destructively
-under CACHE_DIR (same pattern as corner_kicks.py / training_plan.py /
+Storage: a per-match list of active repositions (now in pitch-meter
+coordinates, not pixel coordinates), layered non-destructively under
+CACHE_DIR (same pattern as corner_kicks.py / training_plan.py /
 player_labels.py - a separate file, never bundle.json or the CV pipeline's
 own output files).
 
@@ -82,6 +59,18 @@ _BOUNDS_MARGIN_M = 2.0  # matches corner_kicks.py's own _BOUNDS_MARGIN_M
 _CENTER = (52.5, 34.0)
 _SCALE_RATIO_LIMIT = 6.0  # matches the polish-pass report's validated gate threshold
 
+# Standard pitch-marking dimensions (metres) - real FIFA/IFAB dimensions,
+# the same numbers this project's own PITCH_REFERENCE_POINTS convention
+# already implies. Kept here as the single source of truth the tactical
+# board's client-side drawing reads through its own args, rather than a
+# second hardcoded copy.
+CENTER_CIRCLE_R_M = 9.15
+BOX_DEPTH_M = 16.5
+SIXBOX_DEPTH_M = 5.5
+PENALTY_SPOT_DIST_M = 11.0
+BOX_Y_M = (13.84, 54.16)
+SIXBOX_Y_M = (24.84, 43.16)
+
 
 # ==========================================================================
 # CONTEXT LOADING
@@ -104,7 +93,6 @@ class RepositioningContext:
         self._cap = None
         self._frame_w = None
         self._frame_h = None
-        self._trend_cache = {}
 
     @property
     def cap(self):
@@ -159,7 +147,7 @@ def load_context(cv_output_dir, video_path):
 
 
 # ==========================================================================
-# GEOMETRY — camera motion, homography, pitch markings
+# GEOMETRY — camera motion, homography, real pitch coordinates
 # (ported from the investigation's lib.py, adapted to per-context data
 # instead of module-level globals, so this module supports any match)
 # ==========================================================================
@@ -180,21 +168,6 @@ def cumulative_offset(ctx, frame_a, frame_b):
     dx = sign * sum(v[0] for v in seg)
     dy = sign * sum(v[1] for v in seg)
     return dx, dy
-
-
-def shift_rect(rect, dx, dy):
-    x1, y1, x2, y2 = rect
-    return (x1 - dx, y1 - dy, x2 - dx, y2 - dy)
-
-
-def rect_overlap_area(r1, r2):
-    ax1, ay1, ax2, ay2 = r1
-    bx1, by1, bx2, by2 = r2
-    ix1, iy1 = max(ax1, bx1), max(ay1, by1)
-    ix2, iy2 = min(ax2, bx2), min(ay2, by2)
-    if ix2 <= ix1 or iy2 <= iy1:
-        return 0.0
-    return (ix2 - ix1) * (iy2 - iy1)
 
 
 def pixel_to_pitch(ctx, frame_idx, px, py):
@@ -232,53 +205,12 @@ def _in_pitch_bounds(X, Y):
             and -_BOUNDS_MARGIN_M <= Y <= PITCH_WIDTH_M + _BOUNDS_MARGIN_M)
 
 
-# HSV grass-green range - same spirit as this project's own existing
-# jersey-color sampling (technical report Section 2.3: team classification
-# filters OUT grass-green hues to isolate jersey color); used here in the
-# opposite direction, to directly DETECT grass. Deliberately not homography-
-# based: confirmed directly, dragging to a pixel visually in the crowd/
-# advertising-board area at the top of a real frame, the homography's own
-# [0,105]x[0,68] bounds check classified it as "on the pitch" anyway (ratio-
-# consistency passed too) - the same "smoothly wrong" failure pattern this
-# project's calibration work keeps finding, here affecting the on/off-pitch
-# classification that gates whether a stat is even meaningful to show. A
-# direct, real pixel-color read of what's actually there doesn't depend on
-# trusting an extrapolated homography at all.
-_GRASS_HUE_RANGE = (30, 95)   # OpenCV H in [0,179]
-_GRASS_MIN_SAT = 40
-_GRASS_MIN_VAL = 30
-
-
-def _sample_is_grass(frame_img, x, y, radius=8, min_frac=0.5):
-    h, w = frame_img.shape[:2]
-    x1, y1 = max(0, int(x - radius)), max(0, int(y - radius))
-    x2, y2 = min(w, int(x + radius)), min(h, int(y + radius))
-    if x2 <= x1 or y2 <= y1:
-        return False
-    patch = frame_img[y1:y2, x1:x2]
-    hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
-    h_ch, s_ch, v_ch = hsv[..., 0], hsv[..., 1], hsv[..., 2]
-    grass_mask = ((h_ch >= _GRASS_HUE_RANGE[0]) & (h_ch <= _GRASS_HUE_RANGE[1])
-                  & (s_ch >= _GRASS_MIN_SAT) & (v_ch >= _GRASS_MIN_VAL))
-    return float(grass_mask.mean()) >= min_frac
-
-
-def _is_really_on_pitch(ctx, frame_idx, target_pixel_xy, target_pitch_XY):
-    """Both signals required, deliberately - the homography-bounds check
-    alone was confirmed to misclassify a real crowd-area pixel as on-pitch
-    (see module docstring), and grass color alone could misfire on a
-    grass-colored ad board or pitch-adjacent warm-up area, so requiring
-    agreement is more conservative than either check on its own."""
-    if target_pitch_XY is None or not _in_pitch_bounds(*target_pitch_XY):
-        return False
-    frame_img = ctx.get_frame(frame_idx)
-    return _sample_is_grass(frame_img, *target_pixel_xy)
-
-
 def _homography_trustworthy(ctx, frame_idx, X, Y):
     """Same self-consistency check the polish-pass report's validate_scale
-    used as a hard reject - reused here as a soft signal (trust raw
-    homography scale, or fall back to the trend function) instead."""
+    used as a hard reject - reused here as a soft quality filter on which
+    OTHER real players' positions are trusted for the placement-distance
+    stats (see compute_placement_stats), not as a gate on the tactical
+    board's own dot placement (which needs no scale estimate at all)."""
     if not _in_pitch_bounds(X, Y):
         return False
     scale = local_pixel_scale(ctx, frame_idx, X, Y)
@@ -290,390 +222,61 @@ def _homography_trustworthy(ctx, frame_idx, X, Y):
 
 
 # ==========================================================================
-# OCCLUSION + CLEAN-PLATE (ported, per-context)
+# TACTICAL BOARD — real per-player pitch positions for one paused frame
 # ==========================================================================
 
-def is_clean(ctx, frame_idx, rect, overlap_frac_thresh=0.02):
-    rx1, ry1, rx2, ry2 = rect
-    rect_area = max(0.0, rx2 - rx1) * max(0.0, ry2 - ry1)
-    if rect_area <= 0:
-        return False
-    for tracks in (ctx.players[frame_idx], ctx.referees[frame_idx], ctx.ball[frame_idx]):
-        for tid, info in tracks.items():
-            if rect_overlap_area(rect, info["bbox"]) / rect_area > overlap_frac_thresh:
-                return False
-    return True
+def _nearest_homography_frame(ctx, frame_idx, max_search=90):
+    """Nearest frame (this one first) with usable homography, within
+    max_search frames either direction - None if truly none nearby.
+    Verified directly against this project's own real match data: usable
+    calibration is missing on a real minority of frames (~8% for the
+    liverpool_psg curated match), but the longest real gap measured was 12
+    consecutive frames, well inside this function's default search
+    window."""
+    if ctx.homography.get(frame_idx) is not None:
+        return frame_idx
+    for d in range(1, max_search + 1):
+        for cand in (frame_idx - d, frame_idx + d):
+            if 0 <= cand < ctx.n_frames and ctx.homography.get(cand) is not None:
+                return cand
+    return None
 
 
-_CENTER_CIRCLE_R = 9.15
-_PENALTY_SPOT_L = (11.0, 34.0)
-_PENALTY_SPOT_R = (94.0, 34.0)
-_BOX_Y = (13.84, 54.16)
-_SIXBOX_Y = (24.84, 43.16)
+def frame_player_pitch_positions(ctx, frame_idx, max_homography_search=90):
+    """Real pitch (X, Y) position for every tracked player in this frame -
+    the data the tactical board is built from. When this exact frame has no
+    usable homography of its own, borrows the nearest frame's that does
+    (camera-motion-compensated via cumulative_offset, so this frame's own
+    real tracked pixel positions are shifted into that borrowed frame's
+    pixel-coordinate space before projecting - the same alignment
+    convention this module's clean-plate work already used) rather than
+    leaving that frame's board empty; a small time-adjustment error from
+    borrowing a few frames away is preferable to no board at all, and is
+    reported back via the second return value so the caller can disclose it
+    rather than pass it off as exact.
 
-
-def _pitch_marking_points(step=0.25):
-    pts = []
-
-    def seg(x0, y0, x1, y1):
-        n = max(2, int(math.hypot(x1 - x0, y1 - y0) / step))
-        for t in np.linspace(0, 1, n):
-            pts.append((x0 + (x1 - x0) * t, y0 + (y1 - y0) * t))
-
-    seg(0, 0, 105, 0); seg(0, 68, 105, 68); seg(0, 0, 0, 68); seg(105, 0, 105, 68)
-    seg(52.5, 0, 52.5, 68)
-    seg(0, _BOX_Y[0], 16.5, _BOX_Y[0]); seg(0, _BOX_Y[1], 16.5, _BOX_Y[1]); seg(16.5, _BOX_Y[0], 16.5, _BOX_Y[1])
-    seg(105, _BOX_Y[0], 88.5, _BOX_Y[0]); seg(105, _BOX_Y[1], 88.5, _BOX_Y[1]); seg(88.5, _BOX_Y[0], 88.5, _BOX_Y[1])
-    seg(0, _SIXBOX_Y[0], 5.5, _SIXBOX_Y[0]); seg(0, _SIXBOX_Y[1], 5.5, _SIXBOX_Y[1]); seg(5.5, _SIXBOX_Y[0], 5.5, _SIXBOX_Y[1])
-    seg(105, _SIXBOX_Y[0], 99.5, _SIXBOX_Y[0]); seg(105, _SIXBOX_Y[1], 99.5, _SIXBOX_Y[1]); seg(99.5, _SIXBOX_Y[0], 99.5, _SIXBOX_Y[1])
-    n = int(2 * math.pi * _CENTER_CIRCLE_R / step)
-    for a in np.linspace(0, 2 * math.pi, n):
-        pts.append((_CENTER[0] + _CENTER_CIRCLE_R * math.cos(a), _CENTER[1] + _CENTER_CIRCLE_R * math.sin(a)))
-    for a in np.linspace(0, 2 * math.pi, n):
-        x = _PENALTY_SPOT_L[0] + _CENTER_CIRCLE_R * math.cos(a)
-        y = _PENALTY_SPOT_L[1] + _CENTER_CIRCLE_R * math.sin(a)
-        if x > 16.5:
-            pts.append((x, y))
-        xr = _PENALTY_SPOT_R[0] + _CENTER_CIRCLE_R * math.cos(a)
-        yr = _PENALTY_SPOT_R[1] + _CENTER_CIRCLE_R * math.sin(a)
-        if xr < 88.5:
-            pts.append((xr, yr))
-    return pts
-
-
-_PITCH_MARKING_ARRAY = np.array([(X, Y, 1.0) for X, Y in _pitch_marking_points()], dtype=np.float64)
-
-
-def line_crosses_patch(ctx, frame_idx, rect, margin_px=60):
-    """See the polish-pass investigation for why margin_px=60, not a tight
-    few pixels: tested directly against real line-crossing cases, this
-    pipeline's own homography position error ran 50-70px at the halfway
-    line and ~25m of real pitch distance at the center circle - a tight
-    margin missed both."""
-    h = ctx.homography.get(frame_idx)
-    if h is None:
-        return False
-    H_inv = np.array(h[1])
-    proj = (H_inv @ _PITCH_MARKING_ARRAY.T).T
-    w = proj[:, 2]
-    valid = np.abs(w) > 1e-9
-    if not valid.any():
-        return False
-    px = proj[valid, 0] / w[valid]
-    py = proj[valid, 1] / w[valid]
-    x1, y1, x2, y2 = rect
-    x1, y1, x2, y2 = x1 - margin_px, y1 - margin_px, x2 + margin_px, y2 + margin_px
-    return bool(np.any((px >= x1) & (px <= x2) & (py >= y1) & (py <= y2)))
-
-
-def extract_patch(frame_img, rect):
-    x1, y1, x2, y2 = [int(round(v)) for v in rect]
-    return frame_img[y1:y2, x1:x2].copy()
-
-
-def find_clean_patch(ctx, target_frame, rect, search_radius=100, max_blend_frames=3):
-    """Identical algorithm to the investigation/polish-pass lib.py - see
-    that module for the full docstring. Works unchanged for stands/crowd
-    background: is_clean only checks tracked player/referee/ball bboxes,
-    which the tracker only ever produces on the pitch, so any rect
-    entirely in the stands is trivially "clean" the first time it's
-    checked (verified directly - see the report's stands test)."""
-    needs_blend = line_crosses_patch(ctx, target_frame, rect)
-    limit = max_blend_frames if needs_blend else 1
-    found = []
-    for offset in range(1, search_radius + 1):
-        for cand in (target_frame - offset, target_frame + offset):
-            if cand < 0 or cand >= ctx.n_frames:
-                continue
-            dx, dy = cumulative_offset(ctx, target_frame, cand)
-            aligned = shift_rect(rect, dx, dy)
-            ax1, ay1, ax2, ay2 = aligned
-            if ax1 < 0 or ay1 < 0 or ax2 > ctx.frame_w or ay2 > ctx.frame_h:
-                continue
-            if is_clean(ctx, cand, aligned):
-                found.append((cand, offset, aligned))
-                if len(found) >= limit:
-                    break
-        if len(found) >= limit:
-            break
-    if not found:
-        return None
-
-    rx1, ry1, rx2, ry2 = [int(round(v)) for v in rect]
-    target_w, target_h = rx2 - rx1, ry2 - ry1
-    patches = []
-    for cand, offset, aligned in found:
-        img = ctx.get_frame(cand)
-        patch = extract_patch(img, aligned)
-        if patch.shape[1] != target_w or patch.shape[0] != target_h:
-            patch = cv2.resize(patch, (target_w, target_h))
-        patches.append(patch.astype(np.float32))
-
-    if len(patches) == 1:
-        blended = patches[0]
-    else:
-        weights = np.array([1.0 / (offset + 1) for _, offset, _ in found], dtype=np.float32)
-        weights = weights / weights.sum()
-        blended = np.zeros_like(patches[0])
-        for wgt, p in zip(weights, patches):
-            blended += wgt * p
-
-    return {
-        "patch": np.clip(blended, 0, 255).astype(np.uint8),
-        "sources": [(c, o) for c, o, _ in found],
-        "blended": len(patches) > 1,
-    }
-
-
-def composite_patch(dest_img, patch_img, rect, feather_px=10):
-    """Identical to the polish-pass lib.py - see that module for the full
-    docstring (Poisson blend via cv2.seamlessClone, feathered-alpha
-    fallback for a patch flush against the frame edge)."""
-    rx1, ry1, rx2, ry2 = [int(round(v)) for v in rect]
-    w, h = rx2 - rx1, ry2 - ry1
-    if w < 3 or h < 3:
-        result = dest_img.copy()
-        result[ry1:ry2, rx1:rx2] = patch_img
-        return result, "hard-replace"
-
-    if 0 < rx1 and rx2 < dest_img.shape[1] and 0 < ry1 and ry2 < dest_img.shape[0]:
-        try:
-            mask = np.full((h, w), 255, dtype=np.uint8)
-            center = (rx1 + w // 2, ry1 + h // 2)
-            cloned = cv2.seamlessClone(patch_img, dest_img, mask, center, cv2.NORMAL_CLONE)
-            return cloned, "seamless"
-        except cv2.error:
-            pass
-
-    inner = np.zeros((h, w), dtype=np.uint8)
-    if h > 2 and w > 2:
-        inner[1:-1, 1:-1] = 255
-        dist = cv2.distanceTransform(inner, cv2.DIST_L2, 5)
-        alpha = np.clip(dist / max(1, feather_px), 0, 1)[..., None]
-    else:
-        alpha = np.ones((h, w, 1), dtype=np.float32)
-    result = dest_img.copy()
-    dest_region = result[ry1:ry2, rx1:rx2].astype(np.float32)
-    blended = patch_img.astype(np.float32) * alpha + dest_region * (1 - alpha)
-    result[ry1:ry2, rx1:rx2] = np.clip(blended, 0, 255).astype(np.uint8)
-    return result, "feather"
-
-
-# ==========================================================================
-# BOUNDED SCALE — replaces the earlier gate. Never refuses; always returns
-# a plausible pixel size, derived from real players already in this frame.
-# ==========================================================================
-
-def _frame_scale_trend(ctx, frame_idx):
-    """Fits log(local_scale) ~= a + b*pixel_y from every REAL tracked
-    player in this frame whose own position passes the same
-    self-consistency check the earlier gate used as a hard reject (kept
-    here as a soft filter on which samples to trust for the fit, not as a
-    rejector of the fit's own output). Log-linear, not linear: perspective
-    compresses multiplicatively with distance, and a log fit can never
-    predict a negative or zero scale for extreme extrapolation the way a
-    plain linear fit could.
-
-    Also returns [min_height_px, max_height_px]: the plausible on-screen
-    size bound, derived directly from every real player's own tracked bbox
-    height in this frame (expanded by a margin) - literally the sizes
-    already seen in this frame, not a meters conversion (see the
-    polish-pass report for why a meters-based height check was tried and
-    discarded).
-
-    Cached per frame_idx on the context (this frame's real players don't
-    change between multiple repositioning calls in the same session)."""
-    if frame_idx in ctx._trend_cache:
-        return ctx._trend_cache[frame_idx]
-
-    ys, log_scales, heights = [], [], []
+    Returns ({track_id: (X, Y)}, used_frame_idx), or (None, None) only when
+    NO frame within range has usable calibration at all - reported
+    honestly, not faked."""
+    src = _nearest_homography_frame(ctx, frame_idx, max_homography_search)
+    if src is None:
+        return None, None
+    dx, dy = cumulative_offset(ctx, frame_idx, src) if src != frame_idx else (0.0, 0.0)
+    positions = {}
     for tid, info in ctx.players[frame_idx].items():
         x1, y1, x2, y2 = info["bbox"]
-        h_px = y2 - y1
-        if h_px < 15:
-            continue
-        heights.append(h_px)
-        pitch = pixel_to_pitch(ctx, frame_idx, (x1 + x2) / 2, y2)
-        if pitch is None or not _homography_trustworthy(ctx, frame_idx, *pitch):
-            continue
-        scale = local_pixel_scale(ctx, frame_idx, *pitch)
-        if scale is None or scale <= 0:
-            continue
-        ys.append(y2)
-        log_scales.append(math.log(scale))
-
-    if len(ys) >= 2 and (max(ys) - min(ys)) > 5:
-        b, a = np.polyfit(ys, log_scales, 1)
-    elif len(ys) >= 1:
-        # Not enough spread to fit a real trend - flat fallback at the one
-        # (or few, identical-y) sample(s) available, still real data, just
-        # not enough of it to say anything about how scale changes with
-        # depth in this particular frame.
-        a, b = float(np.mean(log_scales)), 0.0
-    else:
-        # No trustworthy on-pitch sample at all in this frame - fall back
-        # to this frame's own pitch-center scale so there's still a real,
-        # frame-specific anchor rather than an arbitrary constant.
-        center_scale = local_pixel_scale(ctx, frame_idx, *_CENTER)
-        a = math.log(center_scale) if center_scale and center_scale > 0 else math.log(15.0)
-        b = 0.0
-
-    if heights:
-        min_h = max(8.0, 0.4 * min(heights))
-        max_h = min(0.75 * ctx.frame_h, 2.5 * max(heights))
-        if max_h < min_h:
-            max_h = min_h * 1.5
-    else:
-        min_h, max_h = 15.0, 0.6 * ctx.frame_h
-
-    result = {"a": float(a), "b": float(b), "min_height_px": min_h, "max_height_px": max_h,
-              "n_samples": len(ys)}
-    ctx._trend_cache[frame_idx] = result
-    return result
-
-
-def bounded_scale_for_target(ctx, frame_idx, source_bbox, target_pixel_xy):
-    """The core replacement for the old scale-gate. Never returns a
-    rejection - always a usable scale ratio (and, for backward-compatible
-    callers, an implied new_width_px/new_height_px for the source bbox's
-    own size), plus metadata about how it was derived.
-
-    Tries the real homography first (only when the target position both
-    resolves to a pitch coordinate AND passes the self-consistency check);
-    otherwise falls back to this frame's own log-linear perspective trend,
-    fitted from real tracked players (see _frame_scale_trend). Either way,
-    the final size is clamped to that same frame's real-player-derived
-    plausible range, so the result can be approximate but is never absurd.
-    """
-    x1, y1, x2, y2 = source_bbox
-    source_w, source_h = x2 - x1, y2 - y1
-    tx, ty = target_pixel_xy
-
-    trend = _frame_scale_trend(ctx, frame_idx)
-    target_pitch = pixel_to_pitch(ctx, frame_idx, tx, ty)
-    on_pitch = _is_really_on_pitch(ctx, frame_idx, target_pixel_xy, target_pitch)
-
-    used_homography = False
-    if target_pitch is not None and _homography_trustworthy(ctx, frame_idx, *target_pitch):
-        target_scale = local_pixel_scale(ctx, frame_idx, *target_pitch)
-        source_pitch = pixel_to_pitch(ctx, frame_idx, (x1 + x2) / 2, y2)
-        if (target_scale is not None and target_scale > 0 and source_pitch is not None
-                and _homography_trustworthy(ctx, frame_idx, *source_pitch)):
-            source_scale = local_pixel_scale(ctx, frame_idx, *source_pitch)
-            if source_scale and source_scale > 0:
-                ratio = target_scale / source_scale
-                used_homography = True
-
-    if not used_homography:
-        predicted_scale_at_target = math.exp(trend["a"] + trend["b"] * ty)
-        source_scale_from_trend = math.exp(trend["a"] + trend["b"] * y2)
-        ratio = predicted_scale_at_target / source_scale_from_trend if source_scale_from_trend > 0 else 1.0
-
-    new_h = source_h * ratio
-    new_h_clamped = max(trend["min_height_px"], min(trend["max_height_px"], new_h))
-    clamped = abs(new_h_clamped - new_h) > 0.5
-    new_w_clamped = source_w * (new_h_clamped / source_h) if source_h > 0 else source_w
-
-    return {
-        "new_width_px": new_w_clamped,
-        "new_height_px": new_h_clamped,
-        "ratio": new_h_clamped / source_h if source_h > 0 else 1.0,
-        "used_homography": used_homography,
-        "clamped": clamped,
-        "on_pitch": on_pitch,
-        "target_pitch": target_pitch if on_pitch else None,
-        "trend_n_samples": trend["n_samples"],
-    }
-
-
-# ==========================================================================
-# FULL PIPELINE
-# ==========================================================================
-
-_MARKER_BASE_RADIUS_PX = 16  # "big dot", tuned against this project's real ~1920px-wide broadcast frames
-_MARKER_MIN_RADIUS_PX = 7
-_MARKER_MAX_RADIUS_PX = 34
-
-
-def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, color_bgr=(60, 60, 220),
-                        erase_margin=6, base_img=None):
-    """Full pipeline for one drag-and-drop move: erase the player from
-    their original position (clean-plate - unaffected by the marker-vs-
-    cutout design change, since erasing only ever needed a clean
-    BACKGROUND patch, never player segmentation), then draw a plain,
-    team-colored circular marker at the new position, sized by
-    bounded_scale_for_target's depth-aware ratio so a marker further from
-    camera reads smaller, like the real players around it. Always
-    succeeds - see module docstring for why - the only failure path is
-    genuinely missing input data (no clean patch findable at all for the
-    erase step, which the investigation measured at under 2% even with a
-    tight 3s search window, effectively never with this function's wider
-    default window).
-
-    `base_img`, when given, is composited onto INSTEAD of a fresh read of
-    the pristine frame - required for applying more than one move to the
-    same frame (each subsequent move must build on the previous one's
-    result, not silently discard it by re-reading the original frame). The
-    clean-plate SEARCH step still always reads real, untouched video frames
-    regardless of base_img - only the "paint onto the canvas" steps (erase,
-    then draw the marker) use base_img as their destination. This is safe
-    precisely because the search step never looks at the composite itself.
-
-    Returns dict(composite_img, ...) or dict(error=...) for the rare
-    missing-clean-patch case."""
-    bbox = ctx.players[frame_idx].get(str(source_track_id), {}).get("bbox")
-    if bbox is None:
-        return {"error": f"player {source_track_id} has no tracked position in frame {frame_idx}"}
-
-    # Clamp the target into the visible canvas rather than refusing - a
-    # real drag interaction is already constrained to the image element by
-    # the browser, so this only matters for a target a few pixels past the
-    # edge (rounding, a drop right at the boundary); "no position should
-    # ever be refused" applies here too, not just to calibration distrust.
-    tx_raw, ty_raw = target_pixel_xy
-    target_pixel_xy = (
-        max(0.0, min(ctx.frame_w - 1.0, tx_raw)),
-        max(0.0, min(ctx.frame_h - 1.0, ty_raw)),
-    )
-
-    x1, y1, x2, y2 = bbox
-    erase_rect = (x1 - erase_margin, y1 - erase_margin, x2 + erase_margin, y2 + erase_margin)
-
-    erase_patch_result = find_clean_patch(ctx, frame_idx, erase_rect, search_radius=150, max_blend_frames=3)
-    if erase_patch_result is None:
-        return {"error": "no clean background patch available at the player's original position"}
-
-    frame_img = base_img if base_img is not None else ctx.get_frame(frame_idx)
-    composite, erase_method = composite_patch(frame_img, erase_patch_result["patch"], erase_rect)
-
-    scale_info = bounded_scale_for_target(ctx, frame_idx, bbox, target_pixel_xy)
-    radius = int(round(max(_MARKER_MIN_RADIUS_PX, min(_MARKER_MAX_RADIUS_PX,
-                                                        _MARKER_BASE_RADIUS_PX * scale_info["ratio"]))))
-    tx, ty = int(round(target_pixel_xy[0])), int(round(target_pixel_xy[1]))
-    # A thin white outline keeps the marker readable against grass, crowd,
-    # or a same-colored kit standing nearby - the same reason a real
-    # player's own silhouette reads clearly against either background; no
-    # ID text, no badge, nothing baked in beyond the marker itself.
-    cv2.circle(composite, (tx, ty), radius, color_bgr, thickness=-1, lineType=cv2.LINE_AA)
-    cv2.circle(composite, (tx, ty), radius, (255, 255, 255), thickness=2, lineType=cv2.LINE_AA)
-
-    px1, py1 = max(0, tx - radius - 4), max(0, ty - radius - 4)
-    px2, py2 = min(ctx.frame_w, tx + radius + 4), min(ctx.frame_h, ty + radius + 4)
-
-    return {
-        "composite_img": composite,
-        "erase_method": erase_method,
-        "erase_sources": erase_patch_result["sources"],
-        "paste_rect": (px1, py1, px2, py2),
-        "scale_info": scale_info,
-        "source_bbox": bbox,
-        "error": None,
-    }
+        fx, fy = (x1 + x2) / 2 - dx, y2 - dy
+        pitch = pixel_to_pitch(ctx, src, fx, fy)
+        if pitch is not None and _in_pitch_bounds(*pitch):
+            positions[tid] = pitch
+    return positions, src
 
 
 # ==========================================================================
 # PERSISTENCE — per-match, non-destructive (same discipline as
-# corner_kicks.py / training_plan.py / player_labels.py)
+# corner_kicks.py / training_plan.py / player_labels.py). Moves are stored
+# in pitch-meter coordinates now, not pixel coordinates - resolution- and
+# camera-independent, matching the tactical board's own coordinate space.
 # ==========================================================================
 
 def _repositions_path(cache_dir, match_key):

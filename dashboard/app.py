@@ -1827,19 +1827,20 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
   .pr-row { display:flex; align-items:center; gap:12px; margin-top:10px; flex-wrap:wrap; }
   .pr-hint { font-size:13px; color:#9aa4b8; }
   video { width:100%; max-width:900px; display:block; border-radius:10px; border:1px solid #2a3142; background:#000; }
-  .pr-wrap { position:relative; display:inline-block; border-radius:10px; overflow:hidden; border:1px solid #2a3142; }
-  .pr-wrap img#prBase { display:block; max-width:900px; width:100%; height:auto; }
-  .pr-marker { position:absolute; cursor:grab; border-radius:50%; border:2px solid #fff;
-               box-shadow:0 1px 4px rgba(0,0,0,0.5); -webkit-user-drag:element; }
-  .pr-marker:hover { filter:brightness(1.15); box-shadow:0 0 0 3px rgba(255,255,255,0.5); }
-  .pr-marker:active { cursor:grabbing; }
-  .pr-wrap.pr-over { outline:3px dashed #4f8cff; outline-offset:-3px; }
-  .pr-draw-canvas { position:absolute; left:0; top:0; touch-action:none; }
   .pr-tool { background:#1c2333; color:#e6e6e6; border:1px solid #2a3142; border-radius:8px;
              padding:7px 12px; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; }
   .pr-tool:hover { background:#252d42; }
   .pr-tool.pr-tool-active { background:#2a3660; border-color:#4f8cff; }
   .pr-swatch { width:14px; height:14px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,0.4); }
+  .pr-board-wrap { position:relative; width:100%; max-width:900px; margin-top:10px; }
+  .pr-board-svg, .pr-board-canvas { position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
+  .pr-board-svg { border-radius:10px; border:1px solid #2a3142; }
+  .pr-board-canvas { touch-action:none; }
+  .pr-pitch-bg { fill:#2e7d32; }
+  .pr-pitch-line { stroke:#eafaf0; stroke-width:2.5; fill:none; }
+  .pr-pitch-spot { fill:#eafaf0; }
+  .pr-board-dot { stroke:#fff; stroke-width:2.5; cursor:grab; }
+  .pr-board-dot:active { cursor:grabbing; }
 </style>
 </head>
 <body>
@@ -1847,177 +1848,234 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
 <script>
 (function() {
   var root = document.getElementById('root');
-  var browseState = { mode: null, videoUrl: null };
+  var built = null;
+  var tool = 'move'; // 'move' | 'red' | 'black' | 'eraser'
+  var toolBtns = {};
 
   function post(msg) { msg.isStreamlitMessage = true; window.parent.postMessage(msg, "*"); }
   function ready() { post({ type: "streamlit:componentReady", apiVersion: 1 }); }
   function setHeight() { post({ type: "streamlit:setFrameHeight", height: document.body.scrollHeight + 12 }); }
   function sendValue(v) { post({ type: "streamlit:setComponentValue", value: v, dataType: "json" }); }
 
-  function renderBrowse(args) {
-    if (browseState.mode === "browse" && browseState.videoUrl === args.video_url) {
-      setHeight();
-      return; // leave the live <video> alone - don't reset playback on unrelated reruns
-    }
+  // The <video> element itself is the ongoing visual reference (built once,
+  // reused across reruns so playback never gets yanked) - the tactical
+  // board is a separate panel that appears underneath it once a frame has
+  // been captured, not something drawn onto the video or a photo of it.
+  function ensureSkeleton(args) {
+    if (built && built.videoUrl === args.video_url) return built;
     root.innerHTML = "";
-    var vid = document.createElement('video');
-    vid.controls = true;
-    vid.src = args.video_url;
-    vid.addEventListener('loadedmetadata', function() {
-      try { vid.currentTime = args.start_time || 0; } catch (e) {}
-      setHeight();
-    });
-    vid.addEventListener('loadeddata', setHeight);
-    root.appendChild(vid);
+
+    var videoEl = document.createElement('video');
+    videoEl.controls = true;
+    videoEl.draggable = false;
+    videoEl.src = args.video_url;
+    videoEl.addEventListener('loadeddata', setHeight);
+    root.appendChild(videoEl);
 
     var row = document.createElement('div');
     row.className = 'pr-row';
     var btn = document.createElement('button');
     btn.className = 'pr-btn';
-    btn.textContent = '⏸ Use this paused frame to reposition players';
-    btn.onclick = function() {
-      vid.pause();
-      var idx = Math.round(vid.currentTime * (args.fps || 25));
-      idx = Math.max(0, Math.min((args.n_frames || 1) - 1, idx));
-      sendValue({ action: 'pause', frame_idx: idx, t: Date.now() });
-    };
     row.appendChild(btn);
     var hint = document.createElement('span');
     hint.className = 'pr-hint';
-    hint.textContent = 'Play, scrub, or pause the real clip — then press the button to drag players on that exact frame.';
     row.appendChild(hint);
     root.appendChild(row);
 
-    browseState = { mode: "browse", videoUrl: args.video_url };
+    var boardHost = document.createElement('div');
+    root.appendChild(boardHost);
+
+    built = { videoEl: videoEl, btn: btn, hint: hint, boardHost: boardHost,
+              videoUrl: args.video_url, lastFrameIdx: null };
+    return built;
+  }
+
+  function captureFrame(b, args) {
+    var idx = Math.round(b.videoEl.currentTime * (args.fps || 25));
+    idx = Math.max(0, Math.min((args.n_frames || 1) - 1, idx));
+    sendValue({ action: 'pause', frame_idx: idx, t: Date.now() });
+  }
+
+  function render(args) {
+    var b = ensureSkeleton(args);
+    b.btn.textContent = args.has_board ? '📍 Update board to current position' : '📍 Show tactical board for this frame';
+    b.btn.onclick = function() { captureFrame(b, args); };
+
+    if (args.has_board) {
+      b.hint.textContent = 'Frame ' + args.frame_idx + ' / ' + ((args.n_frames || 1) - 1) +
+                            ' — drag any dot below, on the pitch or off it. Scrub the video and press '
+                            + 'the button again to move the board to a different moment.';
+      if (b.lastFrameIdx !== args.frame_idx) {
+        b.videoEl.pause();
+        try {
+          if (Math.abs(b.videoEl.currentTime - (args.start_time || 0)) > 0.5 / (args.fps || 25)) {
+            b.videoEl.currentTime = args.start_time || 0;
+          }
+        } catch (e) {}
+        b.lastFrameIdx = args.frame_idx;
+      }
+      renderBoardInto(b.boardHost, args);
+    } else {
+      b.hint.textContent = 'Play, scrub, or pause the real clip, then press the button to bring up the tactical board for that exact moment.';
+      b.boardHost.innerHTML = "";
+    }
     setHeight();
   }
 
-  function renderEdit(args) {
-    root.innerHTML = "";
-    browseState = { mode: "edit", videoUrl: null };
-    var tool = 'move'; // 'move' | 'red' | 'black' | 'eraser'
+  function buildPitchSVG(args) {
+    var scale = 10; // viewBox units per metre
+    var L = (args.pitch_length_m || 105) * scale, W = (args.pitch_width_m || 68) * scale;
+    var boxDepth = (args.box_depth_m || 16.5) * scale, sixDepth = (args.sixbox_depth_m || 5.5) * scale;
+    var boxY = args.box_y_m || [13.84, 54.16], sixY = args.sixbox_y_m || [24.84, 43.16];
+    var boxY0 = boxY[0] * scale, boxY1 = boxY[1] * scale, sixY0 = sixY[0] * scale, sixY1 = sixY[1] * scale;
+    var cx = L / 2, cy = W / 2;
+    var r = (args.center_circle_r_m || 9.15) * scale;
+    var spotDist = (args.penalty_spot_dist_m || 11.0) * scale;
+    var svgns = "http://www.w3.org/2000/svg";
 
-    var topRow = document.createElement('div');
-    topRow.className = 'pr-row';
-    var backBtn = document.createElement('button');
-    backBtn.className = 'pr-btn';
-    backBtn.textContent = '▶ Back to video';
-    backBtn.onclick = function() { sendValue({ action: 'back', t: Date.now() }); };
-    topRow.appendChild(backBtn);
-    var label = document.createElement('span');
-    label.className = 'pr-hint';
-    label.textContent = 'Frame ' + args.frame_idx + ' / ' + ((args.n_frames || 1) - 1);
-    topRow.appendChild(label);
-    root.appendChild(topRow);
+    var svg = document.createElementNS(svgns, "svg");
+    svg.setAttribute("viewBox", "0 0 " + L + " " + W);
+    svg.setAttribute("class", "pr-board-svg");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-    // Toolbar: Move (drag player markers) vs draw tools (Paint-style: a
-    // red pen, a black pen, an eraser) - mutually exclusive, since a drag
-    // gesture and a freehand stroke can't both claim the same pointer
-    // event. Selecting a draw tool disables pointer-events on the marker
-    // layer's drag handling by putting the canvas (which DOES capture
-    // pointer events while a draw tool is active) on top of it.
+    function el(tag, attrs) {
+      var e = document.createElementNS(svgns, tag);
+      Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
+      svg.appendChild(e);
+      return e;
+    }
+    el("rect", { x: 0, y: 0, width: L, height: W, class: "pr-pitch-bg" });
+    el("rect", { x: 0, y: 0, width: L, height: W, class: "pr-pitch-line" });
+    el("line", { x1: L / 2, y1: 0, x2: L / 2, y2: W, class: "pr-pitch-line" });
+    el("circle", { cx: cx, cy: cy, r: r, class: "pr-pitch-line" });
+    el("circle", { cx: cx, cy: cy, r: 3, class: "pr-pitch-spot" });
+    el("rect", { x: 0, y: boxY0, width: boxDepth, height: boxY1 - boxY0, class: "pr-pitch-line" });
+    el("rect", { x: L - boxDepth, y: boxY0, width: boxDepth, height: boxY1 - boxY0, class: "pr-pitch-line" });
+    el("rect", { x: 0, y: sixY0, width: sixDepth, height: sixY1 - sixY0, class: "pr-pitch-line" });
+    el("rect", { x: L - sixDepth, y: sixY0, width: sixDepth, height: sixY1 - sixY0, class: "pr-pitch-line" });
+    el("circle", { cx: spotDist, cy: cy, r: 3, class: "pr-pitch-spot" });
+    el("circle", { cx: L - spotDist, cy: cy, r: 3, class: "pr-pitch-spot" });
+
+    return { svg: svg, vbW: L, vbH: W, scale: scale };
+  }
+
+  function setTool(t, canvas) {
+    tool = t;
+    canvas.style.pointerEvents = (t === 'move') ? 'none' : 'auto';
+    canvas.style.cursor = (t === 'move') ? 'default' : (t === 'eraser' ? 'cell' : 'crosshair');
+    Object.keys(toolBtns).forEach(function(k) { toolBtns[k].classList.toggle('pr-tool-active', k === t); });
+  }
+
+  function renderBoardInto(host, args) {
+    host.innerHTML = "";
+    var positions = args.board_positions || {};
+    if (Object.keys(positions).length === 0) {
+      var msg = document.createElement('div');
+      msg.className = 'pr-hint';
+      msg.style.marginTop = '10px';
+      msg.textContent = args.board_unavailable
+        ? "No pitch calibration is available near this frame, so the board can't place anyone here — try a different moment."
+        : "No players resolved to an on-pitch position for this frame.";
+      host.appendChild(msg);
+      return;
+    }
+
     var toolRow = document.createElement('div');
     toolRow.className = 'pr-row';
-    var toolBtns = {};
-    function makeToolBtn(key, html, title) {
-      var b = document.createElement('button');
-      b.className = 'pr-tool';
-      b.innerHTML = html;
-      b.title = title;
-      b.onclick = function() { setTool(key); };
-      toolBtns[key] = b;
-      toolRow.appendChild(b);
-      return b;
+    toolBtns = {};
+    function makeToolBtn(key, html, title, canvas) {
+      var bt = document.createElement('button');
+      bt.className = 'pr-tool';
+      bt.innerHTML = html;
+      bt.title = title;
+      bt.onclick = function() { setTool(key, canvas); };
+      toolBtns[key] = bt;
+      toolRow.appendChild(bt);
     }
-    makeToolBtn('move', '🖐 Move players', 'Drag real players to a new spot');
-    makeToolBtn('red', '<span class="pr-swatch" style="background:#ff2b2b"></span> Red pen', 'Draw in red');
-    makeToolBtn('black', '<span class="pr-swatch" style="background:#111"></span> Black pen', 'Draw in black');
-    makeToolBtn('eraser', '🧹 Eraser', 'Erase parts of the drawing');
     var clearBtn = document.createElement('button');
     clearBtn.className = 'pr-tool';
     clearBtn.textContent = '🗑 Clear drawing';
-    toolRow.appendChild(clearBtn);
-    root.appendChild(toolRow);
+    host.appendChild(toolRow);
 
     var wrap = document.createElement('div');
-    wrap.className = 'pr-wrap';
-    var base = document.createElement('img');
-    base.id = 'prBase';
-    base.src = 'data:image/jpeg;base64,' + (args.frame_b64 || '');
-    wrap.appendChild(base);
-    root.appendChild(wrap);
+    wrap.className = 'pr-board-wrap';
+    host.appendChild(wrap);
+
+    var geo = buildPitchSVG(args);
+    var svg = geo.svg, scale = geo.scale;
+    wrap.style.aspectRatio = geo.vbW + ' / ' + geo.vbH;
+    wrap.appendChild(svg);
 
     var canvas = document.createElement('canvas');
-    canvas.className = 'pr-draw-canvas';
+    canvas.className = 'pr-board-canvas';
+    canvas.width = geo.vbW;
+    canvas.height = geo.vbH;
     wrap.appendChild(canvas);
     var cctx = canvas.getContext('2d');
-
-    function setTool(t) {
-      tool = t;
-      canvas.style.pointerEvents = (t === 'move') ? 'none' : 'auto';
-      canvas.style.cursor = (t === 'move') ? 'default' : (t === 'eraser' ? 'cell' : 'crosshair');
-      Object.keys(toolBtns).forEach(function(k) { toolBtns[k].classList.toggle('pr-tool-active', k === t); });
+    if (args.drawing_b64) {
+      var dImg = new Image();
+      dImg.onload = function() { cctx.drawImage(dImg, 0, 0, canvas.width, canvas.height); };
+      dImg.src = 'data:image/png;base64,' + args.drawing_b64;
     }
-    setTool('move');
 
-    function layoutMarkers() {
-      var scale = base.clientWidth / (base.naturalWidth || 1);
-      wrap.dataset.scale = scale;
-      var markers = args.markers || {};
-      var r = args.marker_radius || 16;
-      Object.keys(markers).forEach(function(tid) {
-        var m = markers[tid];
-        var d = document.createElement('div');
-        d.className = 'pr-marker';
-        d.draggable = true;
-        d.dataset.tid = tid;
-        d.style.background = m.hex || '#888';
-        var diameter = 2 * r * scale;
-        d.style.left = (m.x * scale - diameter / 2) + 'px';
-        d.style.top = (m.y * scale - diameter / 2) + 'px';
-        d.style.width = diameter + 'px';
-        d.style.height = diameter + 'px';
-        wrap.appendChild(d);
-      });
+    makeToolBtn('move', '🖐 Move dots', 'Drag player dots on the board', canvas);
+    makeToolBtn('red', '<span class="pr-swatch" style="background:#ff2b2b"></span> Red pen', 'Draw in red', canvas);
+    makeToolBtn('black', '<span class="pr-swatch" style="background:#111"></span> Black pen', 'Draw in black', canvas);
+    makeToolBtn('eraser', '🧹 Eraser', 'Erase parts of the drawing', canvas);
+    toolRow.appendChild(clearBtn);
+    setTool(tool, canvas);
 
-      // Canvas draws in the REAL frame's native pixel space (like the
-      // markers' own x/y) so a saved drawing round-trips through Python
-      // and back at full, consistent resolution regardless of the
-      // viewer's actual on-screen width - CSS handles the visual scale-down.
-      canvas.width = base.naturalWidth;
-      canvas.height = base.naturalHeight;
-      canvas.style.width = base.clientWidth + 'px';
-      canvas.style.height = base.clientHeight + 'px';
-      if (args.drawing_b64) {
-        var dImg = new Image();
-        dImg.onload = function() { cctx.drawImage(dImg, 0, 0, canvas.width, canvas.height); };
-        dImg.src = 'data:image/png;base64,' + args.drawing_b64;
-      }
-      setHeight();
-    }
-    if (base.complete && base.naturalWidth) { layoutMarkers(); } else { base.addEventListener('load', layoutMarkers); }
-
-    wrap.addEventListener('dragstart', function(e) {
-      if (e.target.classList.contains('pr-marker')) { e.dataTransfer.setData('text/plain', e.target.dataset.tid); }
-    });
-    wrap.addEventListener('dragover', function(e) { e.preventDefault(); wrap.classList.add('pr-over'); });
-    wrap.addEventListener('dragleave', function() { wrap.classList.remove('pr-over'); });
-    wrap.addEventListener('drop', function(e) {
-      e.preventDefault();
-      wrap.classList.remove('pr-over');
-      var tid = e.dataTransfer.getData('text/plain');
-      if (!tid) return;
-      var rect = wrap.getBoundingClientRect();
-      var scale = parseFloat(wrap.dataset.scale) || 1;
-      var realX = Math.round((e.clientX - rect.left) / scale);
-      var realY = Math.round((e.clientY - rect.top) / scale);
-      sendValue({ action: 'drop', tid: tid, x: realX, y: realY, t: Date.now() });
+    var svgns = "http://www.w3.org/2000/svg";
+    Object.keys(positions).forEach(function(tid) {
+      var p = positions[tid];
+      var dot = document.createElementNS(svgns, "circle");
+      dot.setAttribute("r", 14);
+      dot.setAttribute("cx", p.x_m * scale);
+      dot.setAttribute("cy", p.y_m * scale);
+      dot.setAttribute("fill", p.hex || '#888');
+      dot.setAttribute("class", "pr-board-dot");
+      dot.dataset.tid = tid;
+      svg.appendChild(dot);
     });
 
-    // Paint-style freehand drawing - pen color follows the active tool,
-    // eraser genuinely removes previously-drawn pixels (destination-out)
-    // rather than painting over them, so it works over both the video
-    // frame and any player standing under a stroke.
+    // Dragging real player dots - pointer-events, not HTML5 drag-and-drop
+    // (which, on the earlier photo-overlay design, silently picked up the
+    // BACKGROUND IMAGE's own native browser drag when a user missed a
+    // marker and grabbed the frame underneath it instead, corrupting the
+    // drop payload with the image's data URI - confirmed directly from a
+    // real "Couldn't place Pdata:image/jpeg..." error). The board's
+    // background is vector SVG, not an image, so that failure mode can't
+    // recur here, but pointer-events also just needs no such workaround
+    // in the first place.
+    var dragging = null;
+    function svgPoint(evt) {
+      var pt = svg.createSVGPoint();
+      pt.x = evt.clientX; pt.y = evt.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+    svg.addEventListener('pointerdown', function(e) {
+      if (!e.target.classList.contains('pr-board-dot')) return;
+      dragging = e.target;
+      dragging.setPointerCapture(e.pointerId);
+    });
+    svg.addEventListener('pointermove', function(e) {
+      if (!dragging) return;
+      var pt = svgPoint(e);
+      dragging.setAttribute('cx', pt.x);
+      dragging.setAttribute('cy', pt.y);
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      var pt = svgPoint(e);
+      var tid = dragging.dataset.tid;
+      dragging = null;
+      sendValue({ action: 'board_drop', tid: tid, x_m: pt.x / scale, y_m: pt.y / scale, t: Date.now() });
+    }
+    svg.addEventListener('pointerup', endDrag);
+    svg.addEventListener('pointercancel', endDrag);
+
+    // Paint-style freehand drawing over the board - eraser genuinely
+    // removes drawn pixels (destination-out), not paint-over.
     var strokeActive = false;
     function toCanvasPoint(e) {
       var rect = canvas.getBoundingClientRect();
@@ -2029,11 +2087,11 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       cctx.lineJoin = 'round';
       if (tool === 'eraser') {
         cctx.globalCompositeOperation = 'destination-out';
-        cctx.lineWidth = 30;
+        cctx.lineWidth = 22;
       } else {
         cctx.globalCompositeOperation = 'source-over';
         cctx.strokeStyle = (tool === 'red') ? '#ff2b2b' : '#111111';
-        cctx.lineWidth = 6;
+        cctx.lineWidth = 5;
       }
     }
     canvas.addEventListener('pointerdown', function(e) {
@@ -2064,15 +2122,12 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       cctx.clearRect(0, 0, canvas.width, canvas.height);
       sendValue({ action: 'draw', png: canvas.toDataURL('image/png').split(',')[1], t: Date.now() });
     };
-
-    setHeight();
   }
 
   window.addEventListener('message', function(event) {
     var data = event.data;
     if (!data || data.type !== 'streamlit:render') return;
-    var args = data.args || {};
-    if (args.mode === 'edit') { renderEdit(args); } else { renderBrowse(args); }
+    render(data.args || {});
   });
   window.addEventListener('resize', setHeight);
   ready();
@@ -2162,11 +2217,6 @@ def _resolve_color_hex(name, fallback):
         return fallback
 
 
-def _hex_to_bgr(hex_str):
-    r, g, b = (int(round(c * 255)) for c in mcolors.to_rgb(hex_str))
-    return (b, g, r)
-
-
 def _game_board_team_color_resolver(cv_output_dir, team_mapping, color_a, color_b):
     """Returns a track_id -> real team hex-color function. Team affiliation
     for a track comes from this match's own stats.json (players[].team, the
@@ -2205,42 +2255,42 @@ def _game_board_team_color_resolver(cv_output_dir, team_mapping, color_a, color_
 
 
 def render_game_board_tab():
-    """The real broadcast clip, played natively and pausable at any frame,
-    with two independent tools on top of whichever frame is paused: drag a
-    plain, team-colored marker for any tracked player to a new spot
-    anywhere in the frame (see player_repositioning.py's module docstring
-    for why this uses a marker rather than a real-pixel cutout), and/or
-    freehand-draw over it (red pen, black pen, eraser - a telestrator, not
-    a synthetic overlay baked into any saved data). See
-    _get_reposition_component's docstring for why this needs a real
-    bidirectional component rather than st.components.v1.html."""
+    """The real broadcast clip, played natively and scrubbable, with a
+    tactical board panel appearing underneath once a frame is captured:
+    every tracked player's REAL pitch position for that frame (see
+    player_repositioning.frame_player_pitch_positions), drawn as a plain
+    team-colored dot on a flat 2D pitch diagram - a real coach's
+    whiteboard, not a doctored photo. See player_repositioning.py's module
+    docstring for why this replaced an earlier design that composited onto
+    the real broadcast frame, and pen/eraser drawing tools apply to this
+    board. See _get_reposition_component's docstring for why this needs a
+    real bidirectional component rather than st.components.v1.html."""
     st.subheader("🧩 Game Board")
     st.caption(
-        "Play the real broadcast clip below, pause it wherever you like, then drag any "
-        "player's team-colored marker to a new spot on that frame — anywhere, including off "
-        "the pitch — and/or draw over it with the pen and eraser tools. Every drop is honored: "
-        "size always stays plausible (derived from real players already visible in that frame), "
-        "even where the calibration can't be trusted directly."
+        "Play the real broadcast clip below, then use the button to bring up the tactical board "
+        "for whatever moment you've paused on: every player on the pitch at that instant, as a "
+        "team-colored dot you can drag around like a real coach's whiteboard. Draw over it with "
+        "the pen and eraser tools too."
     )
 
     source, key = _get_active_match_identity()
     cv_output_dir = st.session_state.get('cv_job_output_dir')
     if not cv_output_dir:
-        st.info("This match doesn't have a completed CV Deep Analysis job yet — repositioning needs that first.")
+        st.info("This match doesn't have a completed CV Deep Analysis job yet — the game board needs that first.")
         return
 
     video_path = _repositioning_video_path(source, key)
     if not video_path:
         st.info(
             "This match's original CV analysis clip isn't available in this session, so the real "
-            "video frames repositioning needs to erase/composite against can't be read."
+            "video the game board needs can't be read."
         )
         return
 
     ctx = pr.load_context(cv_output_dir, video_path)
     if ctx is None:
         st.warning(
-            "This match hasn't been exported for repositioning yet — it needs "
+            "This match hasn't been exported for the game board yet — it needs "
             "`export_repositioning_data.py` run once against its CV output "
             "(see that script's own docstring), same one-time offline step this project already "
             "uses for corner-kick team-shape data."
@@ -2253,12 +2303,10 @@ def render_game_board_tab():
         st.session_state[state_key] = pr.load_repositions(CACHE_DIR, match_key) if source else []
     moves = st.session_state[state_key]
 
-    mode_key = f"reposition_mode_{match_key}"
     frame_key = f"reposition_frame_idx_{match_key}"
     nonce_key = f"reposition_last_nonce_{match_key}"
     drawing_key = f"game_board_drawings_{source}_{match_key}"
-    st.session_state.setdefault(mode_key, "browse")
-    st.session_state.setdefault(frame_key, 0)
+    st.session_state.setdefault(frame_key, None)  # None = board not shown yet
     st.session_state.setdefault(nonce_key, None)
     st.session_state.setdefault(drawing_key, {})  # {frame_idx: png_b64}
 
@@ -2266,59 +2314,50 @@ def render_game_board_tab():
     video_url = _reposition_video_url(video_path)
     fps = ctx.fps
     n_frames = ctx.n_frames
-    mode = st.session_state[mode_key]
-    frame_idx = max(0, min(n_frames - 1, st.session_state[frame_key]))
+    raw_frame_idx = st.session_state[frame_key]
+    has_board = raw_frame_idx is not None
+    frame_idx = max(0, min(n_frames - 1, raw_frame_idx)) if has_board else 0
 
     player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
-    frame_moves = [m for m in moves if m.get("frame_idx", 0) == frame_idx]
     color_for_track = _game_board_team_color_resolver(
         cv_output_dir, st.session_state.get('cv_team_mapping'),
         st.session_state.get('color_a'), st.session_state.get('color_b'),
     )
 
     args = {
-        "mode": mode, "video_url": video_url, "fps": fps, "n_frames": n_frames,
-        "frame_idx": frame_idx, "start_time": frame_idx / fps,
-        "marker_radius": pr._MARKER_BASE_RADIUS_PX,
+        "video_url": video_url, "fps": fps, "n_frames": n_frames, "has_board": has_board,
+        "pitch_length_m": pr.PITCH_LENGTH_M, "pitch_width_m": pr.PITCH_WIDTH_M,
+        "center_circle_r_m": pr.CENTER_CIRCLE_R_M, "box_depth_m": pr.BOX_DEPTH_M,
+        "sixbox_depth_m": pr.SIXBOX_DEPTH_M, "penalty_spot_dist_m": pr.PENALTY_SPOT_DIST_M,
+        "box_y_m": list(pr.BOX_Y_M), "sixbox_y_m": list(pr.SIXBOX_Y_M),
     }
 
-    composite = None
-    moved_ids = set()
-    placements = []
-    failed = []
+    frame_moves = {}
+    homography_note = None
+    board_unavailable = False
 
-    if mode == "edit":
-        for move in frame_moves:
-            result = pr.propose_reposition(ctx, frame_idx, move["track_id"],
-                                            (move["target_x"], move["target_y"]),
-                                            color_bgr=_hex_to_bgr(color_for_track(move["track_id"])),
-                                            base_img=composite)
-            if result.get("error"):
-                failed.append((move["track_id"], result["error"]))
-                continue
-            composite = result["composite_img"]
-            moved_ids.add(move["track_id"])
-            placements.append((move["track_id"], result))
+    if has_board:
+        args["frame_idx"] = frame_idx
+        args["start_time"] = frame_idx / fps
+        frame_moves = {m["track_id"]: m for m in moves if m.get("frame_idx", 0) == frame_idx}
 
-        # A plain team-colored marker position for every currently-tracked
-        # player on this frame who hasn't been moved yet - just their real
-        # tracked bbox center/foot point, no segmentation involved at all
-        # (see player_repositioning.py's module docstring for why this
-        # feature moved off real-pixel cutouts), so this is trivial to
-        # recompute on every rerun and needs no caching or spinner.
-        markers = {}
-        for tid, info in ctx.players[frame_idx].items():
-            if tid in moved_ids:
-                continue
-            x1, y1, x2, y2 = info["bbox"]
-            if (x2 - x1) < 10 or (y2 - y1) < 20:
-                continue
-            markers[tid] = {"x": (x1 + x2) / 2.0, "y": y2, "hex": color_for_track(tid)}
-
-        display_img = composite if composite is not None else ctx.get_frame(frame_idx)
-        ok, buf = cv2.imencode('.jpg', display_img, [cv2.IMWRITE_JPEG_QUALITY, 90])
-        args["frame_b64"] = base64.b64encode(buf).decode('ascii') if ok else ""
-        args["markers"] = markers
+        positions, used_frame = pr.frame_player_pitch_positions(ctx, frame_idx)
+        if positions is None:
+            board_unavailable = True
+        else:
+            if used_frame != frame_idx:
+                homography_note = (
+                    f"This exact frame doesn't have its own pitch calibration, so these positions "
+                    f"are approximated from frame {used_frame} ({abs(used_frame - frame_idx)} frames away)."
+                )
+            board_positions = {}
+            for tid, (X, Y) in positions.items():
+                move = frame_moves.get(tid)
+                if move is not None:
+                    X, Y = move["target_pitch_x"], move["target_pitch_y"]
+                board_positions[tid] = {"x_m": X, "y_m": Y, "hex": color_for_track(tid)}
+            args["board_positions"] = board_positions
+        args["board_unavailable"] = board_unavailable
 
         drawing_b64 = st.session_state[drawing_key].get(frame_idx)
         if drawing_b64 is None and source:
@@ -2335,18 +2374,14 @@ def render_game_board_tab():
         if action == "pause":
             new_idx = int(value.get("frame_idx", 0))
             st.session_state[frame_key] = max(0, min(n_frames - 1, new_idx))
-            st.session_state[mode_key] = "edit"
             st.rerun()
-        elif action == "back":
-            st.session_state[mode_key] = "browse"
-            st.rerun()
-        elif action == "drop":
+        elif action == "board_drop":
             tid = value.get("tid")
-            qx, qy = value.get("x"), value.get("y")
+            qx, qy = value.get("x_m"), value.get("y_m")
             if tid is not None and qx is not None and qy is not None:
                 moves = [m for m in moves
                          if not (m["track_id"] == tid and m.get("frame_idx", 0) == frame_idx)]
-                moves.append({"track_id": tid, "target_x": float(qx), "target_y": float(qy),
+                moves.append({"track_id": tid, "target_pitch_x": float(qx), "target_pitch_y": float(qy),
                                "frame_idx": frame_idx})
                 st.session_state[state_key] = moves
                 if source:
@@ -2363,9 +2398,8 @@ def render_game_board_tab():
                         pass
             st.rerun()
 
-    for tid, err in failed:
-        label = pl.player_label(tid, None, player_labels)
-        st.warning(f"Couldn't place {label}: {err}")
+    if has_board and homography_note:
+        st.caption(f"ℹ️ {homography_note}")
 
     bcol1, bcol2 = st.columns([1, 3])
     with bcol1:
@@ -2377,29 +2411,25 @@ def render_game_board_tab():
     with bcol2:
         if not source:
             st.caption("This match has no saved identity — repositions stay for this session only.")
-        elif mode == "edit":
-            st.caption(f"Editing frame {frame_idx} / {n_frames - 1}. Repositions are scoped to this exact frame.")
+        elif has_board:
+            st.caption(f"Board frame {frame_idx} / {n_frames - 1}. Repositions are scoped to this exact frame.")
 
-    if placements:
+    if frame_moves:
         st.markdown("**Active repositions on this frame**")
-        for tid, result in placements:
+        for tid, move in frame_moves.items():
             label = pl.player_label(tid, None, player_labels)
-            info = result["scale_info"]
+            target_pitch = (move["target_pitch_x"], move["target_pitch_y"])
             with st.container(border=True):
-                cols = st.columns([2, 2, 3])
+                cols = st.columns([2, 5])
                 cols[0].markdown(f"**{label}**")
-                cols[1].caption(f"scale ×{info['ratio']:.2f}" + (" (clamped)" if info["clamped"] else ""))
-                if info["on_pitch"]:
-                    pstats = pr.compute_placement_stats(ctx, frame_idx, tid, info["target_pitch"])
-                    if pstats:
-                        cols[2].caption(
-                            f"Nearest player: {pstats['nearest_player_distance_m']}m · "
-                            f"within 5m: {pstats['n_players_within_5m']} · within 10m: {pstats['n_players_within_10m']}"
-                        )
-                    else:
-                        cols[2].caption("On-pitch, but no other player position to compare against.")
+                pstats = pr.compute_placement_stats(ctx, frame_idx, tid, target_pitch)
+                if pstats:
+                    cols[1].caption(
+                        f"Nearest player: {pstats['nearest_player_distance_m']}m · "
+                        f"within 5m: {pstats['n_players_within_5m']} · within 10m: {pstats['n_players_within_10m']}"
+                    )
                 else:
-                    cols[2].caption("Off-pitch placement — position-dependent stats don't apply here.")
+                    cols[1].caption("Off the pitch, or no other player position to compare against.")
 
 
 def render_cv_completed_state(status, cv_output_dir):
