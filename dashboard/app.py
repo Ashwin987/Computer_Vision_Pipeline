@@ -1809,33 +1809,41 @@ def _repositioning_video_path(source, key):
     return cached_path if cached_path and Path(cached_path).exists() else None
 
 
-def _build_reposition_drag_html(frame_img, players_in_frame, display_width, team_a, team_b,
-                                 team_mapping, player_labels, moved_ids):
+def _build_reposition_drag_html(frame_img, cutouts, display_width):
     """Real HTML5 drag-and-drop over the actual current frame image (base64
-    JPEG, no server round-trip needed to show it) - a marker per currently-
-    tracked, not-yet-moved player. Drop coordinates are converted back to
-    real frame-pixel space in JS (dividing out the same display-vs-real
-    scale factor used to place the markers) and handed to Python the same
-    way this codebase's own admin panel already does (st.query_params -
-    see _render_admin_panel / the `?admin=1` check), not a new mechanism."""
-    ok, buf = cv2.imencode('.jpg', frame_img, [cv2.IMWRITE_JPEG_QUALITY, 85])
+    JPEG, no server round-trip needed to show it). What's draggable is each
+    real player's own segmented cutout (a base64 PNG with the segmentation
+    mask as alpha - see player_repositioning.encode_cutout_png), positioned
+    exactly over their real location and sized to their real bbox, so it
+    reads as "drag the player" rather than a marker standing in for one -
+    no ID text, no colored circle, nothing synthetic drawn on top of or
+    instead of the real pixels. Drop coordinates convert back to real
+    frame-pixel space in JS and reach Python via st.query_params, the same
+    bridge this app's own admin panel already uses (`?admin=1`), not a new
+    mechanism.
+
+    `cutouts`: {track_id: {"png_b64", "x1","y1","x2","y2"}} - already
+    excludes any already-moved player (their real pixels are gone from
+    frame_img itself, erased at composite time, so there's nothing there to
+    make draggable a second time)."""
+    ok, buf = cv2.imencode('.jpg', frame_img, [cv2.IMWRITE_JPEG_QUALITY, 90])
     b64 = base64.b64encode(buf).decode('ascii') if ok else ""
     img_h, img_w = frame_img.shape[:2]
     scale = display_width / img_w
     display_height = int(img_h * scale)
 
-    markers = []
-    for tid, info in players_in_frame.items():
-        if tid in moved_ids:
+    tags = []
+    for tid, c in cutouts.items():
+        if c is None:
             continue
-        x1, y1, x2, y2 = info["bbox"]
-        team_num = None  # raw tracks.pkl export has no team field (see export_repositioning_data.py docstring) - fall back to id-only label
-        label = pl.player_label(tid, None, player_labels)
-        fx, fy = (x1 + x2) / 2 * scale, y2 * scale
-        markers.append(
-            f'<div class="pr-marker" draggable="true" data-tid="{_esc_html(tid)}" '
-            f'style="left:{fx - 16:.1f}px; top:{fy - 16:.1f}px;" title="Drag to reposition">'
-            f'{_esc_html(label)}</div>'
+        x1, y1, x2, y2 = c["x1"], c["y1"], c["x2"], c["y2"]
+        w, h = (x2 - x1) * scale, (y2 - y1) * scale
+        left, top = x1 * scale, y1 * scale
+        tags.append(
+            f'<img class="pr-cutout" draggable="true" data-tid="{_esc_html(tid)}" '
+            f'data-realw="{x2 - x1:.1f}" data-realh="{y2 - y1:.1f}" '
+            f'src="data:image/png;base64,{c["png_b64"]}" '
+            f'style="left:{left:.1f}px; top:{top:.1f}px; width:{w:.1f}px; height:{h:.1f}px;">'
         )
 
     return f"""
@@ -1843,19 +1851,15 @@ def _build_reposition_drag_html(frame_img, players_in_frame, display_width, team
   .pr-wrap {{ position:relative; width:{display_width}px; height:{display_height}px;
               background-image:url(data:image/jpeg;base64,{b64}); background-size:100% 100%;
               border-radius:10px; overflow:hidden; border:1px solid #2a3142; }}
-  .pr-marker {{ position:absolute; width:32px; height:32px; border-radius:50%;
-                background:rgba(79,140,255,.88); border:2px solid #fff; color:#fff;
-                font:600 10px -apple-system,sans-serif; display:flex; align-items:center;
-                justify-content:center; cursor:grab; user-select:none; text-align:center;
-                line-height:1.05; overflow:hidden; padding:1px; }}
-  .pr-marker:active {{ cursor:grabbing; }}
+  .pr-cutout {{ position:absolute; cursor:grab; -webkit-user-drag:element; }}
+  .pr-cutout:active {{ cursor:grabbing; }}
   .pr-wrap.pr-over {{ outline:3px dashed #4f8cff; outline-offset:-3px; }}
 </style>
-<div class="pr-wrap" id="prWrap">{''.join(markers)}</div>
+<div class="pr-wrap" id="prWrap">{''.join(tags)}</div>
 <script>
   const wrap = document.getElementById('prWrap');
   wrap.addEventListener('dragstart', e => {{
-    if (e.target.classList.contains('pr-marker')) {{
+    if (e.target.classList.contains('pr-cutout')) {{
       e.dataTransfer.setData('text/plain', e.target.dataset.tid);
     }}
   }});
@@ -1893,11 +1897,10 @@ def render_player_repositioning_tab():
     history (three prior investigation/polish rounds) this is built on."""
     st.subheader("🎯 Player Repositioning")
     st.caption(
-        "Drag any tracked player to a new spot on the paused frame below — anywhere, including "
-        "off the pitch. Every drop is honored: size always stays plausible (derived from real "
-        "players already visible in this frame), even where the calibration can't be trusted "
-        "directly. Moved players are tagged with a persistent \"hypothetical position\" badge "
-        "baked into the image, so this is never confused with real tracking data."
+        "Drag any real player to a new spot on the raw broadcast frame below — anywhere, "
+        "including off the pitch. Every drop is honored: size always stays plausible (derived "
+        "from real players already visible in this frame), even where the calibration can't be "
+        "trusted directly."
     )
 
     source, key = _get_active_match_identity()
@@ -1950,10 +1953,7 @@ def render_player_repositioning_tab():
                 del st.query_params[p]
         st.rerun()
 
-    team_a = st.session_state.get('team_a', 'Team A')
-    team_b = st.session_state.get('team_b', 'Team B')
     player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
-    team_mapping = st.session_state.get('cv_team_mapping')
 
     composite = None
     moved_ids = set()
@@ -1969,11 +1969,41 @@ def render_player_repositioning_tab():
         moved_ids.add(move["track_id"])
         placements.append((move["track_id"], result))
 
+    # Real segmented cutouts for every currently-tracked player, not a
+    # marker/ID standing in for one (see player_repositioning.py's module
+    # docstring for why a first version got this wrong). Computed once per
+    # (match, frame) and cached in session_state - each cutout runs a real
+    # clean-plate search (player_repositioning.segment_player), and this
+    # tab can have 15-20 players in frame, so recomputing all of them on
+    # every rerun (every drag, every button click) would make the UI
+    # noticeably slow for no benefit: a given real frame's players and
+    # their real pixels never change between reruns, only WHICH of them
+    # are still shown (moved players are filtered out below, by id, not by
+    # recomputing).
+    cutout_cache_key = f"reposition_cutouts_{source}_{match_key}_{REPOSITION_FRAME_IDX}"
+    if cutout_cache_key not in st.session_state:
+        cutouts = {}
+        with st.spinner("Segmenting tracked players for dragging (one-time per match)..."):
+            for tid, info in ctx.players[REPOSITION_FRAME_IDX].items():
+                x1, y1, x2, y2 = info["bbox"]
+                if (x2 - x1) < 10 or (y2 - y1) < 20:
+                    continue
+                margin = 10
+                crop_rect = (x1 - margin, y1 - margin, x2 + margin, y2 + margin)
+                seg = pr.segment_player(ctx, REPOSITION_FRAME_IDX, crop_rect)
+                if seg is None:
+                    continue
+                png_b64 = pr.encode_cutout_png(seg["real"], seg["mask"])
+                if png_b64 is None:
+                    continue
+                cx1, cy1, cx2, cy2 = crop_rect
+                cutouts[tid] = {"png_b64": png_b64, "x1": cx1, "y1": cy1, "x2": cx2, "y2": cy2}
+        st.session_state[cutout_cache_key] = cutouts
+    all_cutouts = st.session_state[cutout_cache_key]
+    visible_cutouts = {tid: c for tid, c in all_cutouts.items() if tid not in moved_ids}
+
     display_img = composite if composite is not None else ctx.get_frame(REPOSITION_FRAME_IDX)
-    html = _build_reposition_drag_html(
-        display_img, ctx.players[REPOSITION_FRAME_IDX], 900, team_a, team_b,
-        team_mapping, player_labels, moved_ids,
-    )
+    html = _build_reposition_drag_html(display_img, visible_cutouts, 900)
     st.components.v1.html(html, height=int(900 * ctx.frame_h / ctx.frame_w) + 20, scrolling=False)
 
     for tid, err in failed:

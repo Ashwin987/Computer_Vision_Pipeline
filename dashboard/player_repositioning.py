@@ -27,6 +27,18 @@ players, clamped to a plausible pixel-size range also derived from those
 same real players. A placement can therefore always be composited; the
 worst case is a size that's merely approximate, never one that's absurd.
 
+Real player, no synthetic overlay: this module operates on, and only ever
+displays, the raw broadcast frame (the same clean, unannotated source the
+clean-plate reconstruction work has used as its input from round one) - the
+UI it feeds draws real segmented player pixels as the draggable element,
+never an ID-labeled marker icon standing in for one, and the moved result
+carries no badge, label, or other baked-in text distinguishing it from a
+real, untouched player. A first version of this feature's UI used simple
+circular ID markers instead, which - even though the underlying frame was
+already the correct raw one - visually resembled this project's own
+"Tracking + Speed & Distance" rendered output (which does bake in ID-
+labeled circles) closely enough to be mistaken for it. Corrected directly.
+
 Storage: a per-match list of active repositions, layered non-destructively
 under CACHE_DIR (same pattern as corner_kicks.py / training_plan.py /
 player_labels.py - a separate file, never bundle.json or the CV pipeline's
@@ -54,8 +66,6 @@ PITCH_WIDTH_M = 68.0
 _BOUNDS_MARGIN_M = 2.0  # matches corner_kicks.py's own _BOUNDS_MARGIN_M
 _CENTER = (52.5, 34.0)
 _SCALE_RATIO_LIMIT = 6.0  # matches the polish-pass report's validated gate threshold
-
-HYPOTHETICAL_BADGE_TEXT = "hypothetical position"
 
 
 # ==========================================================================
@@ -453,6 +463,24 @@ def segment_player(ctx, frame_idx, rect):
     return {"real": real, "mask": mask, "background_patch": found}
 
 
+def encode_cutout_png(real_bgr, mask):
+    """A real player's segmented pixels as a base64 PNG with the
+    segmentation mask as its alpha channel - transparent everywhere except
+    the real, visible silhouette. This, not an ID-labeled marker icon, is
+    what the drag UI should render and drag: a real player, cropped to
+    their real outline, nothing synthetic added. Returns None if the crop
+    is degenerate (can happen right at a frame edge)."""
+    if real_bgr is None or real_bgr.size == 0:
+        return None
+    b, g, r = cv2.split(real_bgr)
+    bgra = cv2.merge([b, g, r, mask])
+    ok, buf = cv2.imencode('.png', bgra)
+    if not ok:
+        return None
+    import base64
+    return base64.b64encode(buf).decode('ascii')
+
+
 # ==========================================================================
 # BOUNDED SCALE — replaces the earlier gate. Never refuses; always returns
 # a plausible pixel size, derived from real players already in this frame.
@@ -667,7 +695,10 @@ def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, erase_m
     dest = composite[py1:py2, px1:px2]
     dest[region_mask] = resized_rgb[sy1:sy2, sx1:sx2][region_mask]
     composite[py1:py2, px1:px2] = dest
-    draw_hypothetical_badge(composite, px1, py1, px2)
+    # No badge, no label, no marker baked in here by design - the moved
+    # player must look exactly like any other real player in the frame,
+    # nothing added to distinguish them (see module docstring's "Real
+    # player, no synthetic overlay" note).
 
     return {
         "composite_img": composite,
@@ -679,37 +710,6 @@ def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, erase_m
         "source_bbox": bbox,
         "error": None,
     }
-
-
-def draw_hypothetical_badge(img, px1, py1, px2):
-    """Small, persistent 'hypothetical position' tag baked directly into
-    the pixels just above a moved player - not an HTML overlay, so it
-    survives anywhere the image itself is used (a saved screenshot, a PDF
-    export) rather than only while viewed inside the live drag component.
-    Deliberately plain text on a solid pill, not styled to resemble any of
-    this project's real CV overlay labels (tactical-event tags, tracking
-    IDs), so it reads unambiguously as something this dashboard added, not
-    something the pipeline measured."""
-    text = HYPOTHETICAL_BADGE_TEXT.upper()
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    scale, thickness = 0.38, 1
-    (tw, th), _ = cv2.getTextSize(text, font, scale, thickness)
-    pill_w = tw + 12
-    cx = (px1 + px2) // 2
-    bx1 = cx - pill_w // 2
-    # shift the whole pill inward rather than clipping it, so the label
-    # stays fully legible even when the player lands right at the frame
-    # edge (confirmed necessary directly - a naive clamp-the-rectangle-only
-    # approach left the text itself cut off past the visible boundary)
-    bx1 = max(0, min(img.shape[1] - pill_w, bx1))
-    bx2 = bx1 + pill_w
-    by1 = max(0, py1 - th - 14)
-    by2 = by1 + th + 8
-    overlay = img.copy()
-    cv2.rectangle(overlay, (bx1, by1), (bx2, by2), (30, 30, 30), -1)
-    cv2.addWeighted(overlay, 0.75, img, 0.25, 0, img)
-    cv2.rectangle(img, (bx1, by1), (bx2, by2), (0, 200, 255), 1, cv2.LINE_AA)
-    cv2.putText(img, text, (bx1 + 6, by2 - 5), font, scale, (0, 200, 255), thickness, cv2.LINE_AA)
 
 
 # ==========================================================================
