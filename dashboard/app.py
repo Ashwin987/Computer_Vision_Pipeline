@@ -1836,9 +1836,6 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
   .pr-board-svg, .pr-board-canvas { position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
   .pr-board-svg { border-radius:10px; border:1px solid #2a3142; }
   .pr-board-canvas { touch-action:none; }
-  .pr-pitch-bg { fill:#2e7d32; }
-  .pr-pitch-line { stroke:#eafaf0; stroke-width:2.5; fill:none; }
-  .pr-pitch-spot { fill:#eafaf0; }
   .pr-board-dot { stroke:#fff; stroke-width:2.5; cursor:grab; }
   .pr-board-dot:active { cursor:grabbing; }
 </style>
@@ -1922,41 +1919,33 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     setHeight();
   }
 
-  function buildPitchSVG(args) {
-    var scale = 10; // viewBox units per metre
-    var L = (args.pitch_length_m || 105) * scale, W = (args.pitch_width_m || 68) * scale;
-    var boxDepth = (args.box_depth_m || 16.5) * scale, sixDepth = (args.sixbox_depth_m || 5.5) * scale;
-    var boxY = args.box_y_m || [13.84, 54.16], sixY = args.sixbox_y_m || [24.84, 43.16];
-    var boxY0 = boxY[0] * scale, boxY1 = boxY[1] * scale, sixY0 = sixY[0] * scale, sixY1 = sixY[1] * scale;
-    var cx = L / 2, cy = W / 2;
-    var r = (args.center_circle_r_m || 9.15) * scale;
-    var spotDist = (args.penalty_spot_dist_m || 11.0) * scale;
+  // The board's background is the real paused frame itself (with every
+  // tracked player already erased server-side) rather than a schematic
+  // pitch diagram - a dot's pixel position and this image come from the
+  // exact same frame in the exact same pixel coordinate system, so they
+  // align by construction. viewBox uses the frame's own native pixel
+  // dimensions directly (scale is always 1) rather than a metre-based
+  // conversion, since there's no reprojection step left to need one.
+  function buildFrameSVG(args) {
+    var w = args.frame_w || 1920, h = args.frame_h || 1080;
     var svgns = "http://www.w3.org/2000/svg";
 
     var svg = document.createElementNS(svgns, "svg");
-    svg.setAttribute("viewBox", "0 0 " + L + " " + W);
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
     svg.setAttribute("class", "pr-board-svg");
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-    function el(tag, attrs) {
-      var e = document.createElementNS(svgns, tag);
-      Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
-      svg.appendChild(e);
-      return e;
-    }
-    el("rect", { x: 0, y: 0, width: L, height: W, class: "pr-pitch-bg" });
-    el("rect", { x: 0, y: 0, width: L, height: W, class: "pr-pitch-line" });
-    el("line", { x1: L / 2, y1: 0, x2: L / 2, y2: W, class: "pr-pitch-line" });
-    el("circle", { cx: cx, cy: cy, r: r, class: "pr-pitch-line" });
-    el("circle", { cx: cx, cy: cy, r: 3, class: "pr-pitch-spot" });
-    el("rect", { x: 0, y: boxY0, width: boxDepth, height: boxY1 - boxY0, class: "pr-pitch-line" });
-    el("rect", { x: L - boxDepth, y: boxY0, width: boxDepth, height: boxY1 - boxY0, class: "pr-pitch-line" });
-    el("rect", { x: 0, y: sixY0, width: sixDepth, height: sixY1 - sixY0, class: "pr-pitch-line" });
-    el("rect", { x: L - sixDepth, y: sixY0, width: sixDepth, height: sixY1 - sixY0, class: "pr-pitch-line" });
-    el("circle", { cx: spotDist, cy: cy, r: 3, class: "pr-pitch-spot" });
-    el("circle", { cx: L - spotDist, cy: cy, r: 3, class: "pr-pitch-spot" });
+    var img = document.createElementNS(svgns, "image");
+    var href = 'data:image/jpeg;base64,' + (args.frame_b64 || '');
+    img.setAttributeNS("http://www.w3.org/1999/xlink", "href", href);
+    img.setAttribute("href", href);
+    img.setAttribute("x", 0);
+    img.setAttribute("y", 0);
+    img.setAttribute("width", w);
+    img.setAttribute("height", h);
+    svg.appendChild(img);
 
-    return { svg: svg, vbW: L, vbH: W, scale: scale };
+    return { svg: svg, vbW: w, vbH: h, scale: 1 };
   }
 
   function setTool(t, canvas) {
@@ -1973,9 +1962,7 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       var msg = document.createElement('div');
       msg.className = 'pr-hint';
       msg.style.marginTop = '10px';
-      msg.textContent = args.board_unavailable
-        ? "No pitch calibration is available near this frame, so the board can't place anyone here — try a different moment."
-        : "No players resolved to an on-pitch position for this frame.";
+      msg.textContent = "No players are tracked in this frame.";
       host.appendChild(msg);
       return;
     }
@@ -2001,7 +1988,7 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     wrap.className = 'pr-board-wrap';
     host.appendChild(wrap);
 
-    var geo = buildPitchSVG(args);
+    var geo = buildFrameSVG(args);
     var svg = geo.svg, scale = geo.scale;
     wrap.style.aspectRatio = geo.vbW + ' / ' + geo.vbH;
     wrap.appendChild(svg);
@@ -2030,8 +2017,8 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       var p = positions[tid];
       var dot = document.createElementNS(svgns, "circle");
       dot.setAttribute("r", 14);
-      dot.setAttribute("cx", p.x_m * scale);
-      dot.setAttribute("cy", p.y_m * scale);
+      dot.setAttribute("cx", p.x * scale);
+      dot.setAttribute("cy", p.y * scale);
       dot.setAttribute("fill", p.hex || '#888');
       dot.setAttribute("class", "pr-board-dot");
       dot.dataset.tid = tid;
@@ -2069,7 +2056,7 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       var pt = svgPoint(e);
       var tid = dragging.dataset.tid;
       dragging = null;
-      sendValue({ action: 'board_drop', tid: tid, x_m: pt.x / scale, y_m: pt.y / scale, t: Date.now() });
+      sendValue({ action: 'board_drop', tid: tid, x: pt.x / scale, y: pt.y / scale, t: Date.now() });
     }
     svg.addEventListener('pointerup', endDrag);
     svg.addEventListener('pointercancel', endDrag);
@@ -2202,6 +2189,35 @@ def _load_game_board_drawing_b64(cache_dir, match_key, frame_idx):
         return None
 
 
+def _game_board_clean_frame_path(cache_dir, match_key, frame_idx):
+    return Path(cache_dir) / "game_board_clean_frames" / f"{match_key}_{frame_idx}.jpg"
+
+
+def _save_game_board_clean_frame(cache_dir, match_key, frame_idx, jpg_bytes):
+    """Non-destructive per-(match, frame) cache of the erased-players
+    background - same discipline as _save_game_board_drawing. Worth
+    persisting to disk, not just session_state: erasing ~20 players from
+    one frame (each its own clean-plate search) measured 20-35 seconds on
+    real data, so this is the difference between a one-time cost per frame
+    and paying it again on every session/page reload."""
+    path = _game_board_clean_frame_path(cache_dir, match_key, frame_idx)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = str(path) + ".tmp"
+    with open(tmp, "wb") as f:
+        f.write(jpg_bytes)
+    os.replace(tmp, path)
+
+
+def _load_game_board_clean_frame_b64(cache_dir, match_key, frame_idx):
+    path = _game_board_clean_frame_path(cache_dir, match_key, frame_idx)
+    if not path.exists():
+        return None
+    try:
+        return base64.b64encode(path.read_bytes()).decode("ascii")
+    except OSError:
+        return None
+
+
 def _resolve_color_hex(name, fallback):
     """CSS-name-or-hex -> a real hex string, via matplotlib's own CSS4/X11
     color table (already a hard dependency of this app) - covers ordinary
@@ -2256,21 +2272,28 @@ def _game_board_team_color_resolver(cv_output_dir, team_mapping, color_a, color_
 
 def render_game_board_tab():
     """The real broadcast clip, played natively and scrubbable, with a
-    tactical board panel appearing underneath once a frame is captured:
-    every tracked player's REAL pitch position for that frame (see
-    player_repositioning.frame_player_pitch_positions), drawn as a plain
-    team-colored dot on a flat 2D pitch diagram - a real coach's
-    whiteboard, not a doctored photo. See player_repositioning.py's module
-    docstring for why this replaced an earlier design that composited onto
-    the real broadcast frame, and pen/eraser drawing tools apply to this
-    board. See _get_reposition_component's docstring for why this needs a
-    real bidirectional component rather than st.components.v1.html."""
+    game board panel appearing underneath once a frame is captured: every
+    tracked player's REAL PIXEL position for that exact frame (see
+    player_repositioning.frame_player_pixel_positions - straight from the
+    tracker's own bbox, no homography or world-coordinate round trip at
+    all) drawn as a team-colored dot directly on that same frame with
+    every player erased (player_repositioning.clean_frame_no_players, the
+    same clean-plate reconstruction already proven for the original drag
+    feature). A dot and the real player it represents come from the exact
+    same tracked bbox in the exact same frame's pixel space, so they are
+    aligned by construction - see player_repositioning.py's module
+    docstring for the direct, real-data root-cause check that led here
+    (this match's own per-frame homography measured genuinely inaccurate;
+    not a bug in how an earlier version of this board used it). Pen/eraser
+    drawing tools apply to this board, unchanged. See
+    _get_reposition_component's docstring for why this needs a real
+    bidirectional component rather than st.components.v1.html."""
     st.subheader("🧩 Game Board")
     st.caption(
-        "Play the real broadcast clip below, then use the button to bring up the tactical board "
-        "for whatever moment you've paused on: every player on the pitch at that instant, as a "
-        "team-colored dot you can drag around like a real coach's whiteboard. Draw over it with "
-        "the pen and eraser tools too."
+        "Play the real broadcast clip below, then use the button to bring up the game board for "
+        "whatever moment you've paused on: every real player, erased from their original spot and "
+        "redrawn as a team-colored dot at that exact same pixel position — drag any dot around, or "
+        "draw over it with the pen and eraser tools."
     )
 
     source, key = _get_active_match_identity()
@@ -2306,9 +2329,11 @@ def render_game_board_tab():
     frame_key = f"reposition_frame_idx_{match_key}"
     nonce_key = f"reposition_last_nonce_{match_key}"
     drawing_key = f"game_board_drawings_{source}_{match_key}"
+    clean_key = f"game_board_clean_{source}_{match_key}"
     st.session_state.setdefault(frame_key, None)  # None = board not shown yet
     st.session_state.setdefault(nonce_key, None)
     st.session_state.setdefault(drawing_key, {})  # {frame_idx: png_b64}
+    st.session_state.setdefault(clean_key, {})  # {frame_idx: jpg_b64}
 
     component_func = _get_reposition_component()
     video_url = _reposition_video_url(video_path)
@@ -2324,40 +2349,51 @@ def render_game_board_tab():
         st.session_state.get('color_a'), st.session_state.get('color_b'),
     )
 
-    args = {
-        "video_url": video_url, "fps": fps, "n_frames": n_frames, "has_board": has_board,
-        "pitch_length_m": pr.PITCH_LENGTH_M, "pitch_width_m": pr.PITCH_WIDTH_M,
-        "center_circle_r_m": pr.CENTER_CIRCLE_R_M, "box_depth_m": pr.BOX_DEPTH_M,
-        "sixbox_depth_m": pr.SIXBOX_DEPTH_M, "penalty_spot_dist_m": pr.PENALTY_SPOT_DIST_M,
-        "box_y_m": list(pr.BOX_Y_M), "sixbox_y_m": list(pr.SIXBOX_Y_M),
-    }
-
+    args = {"video_url": video_url, "fps": fps, "n_frames": n_frames, "has_board": has_board}
     frame_moves = {}
-    homography_note = None
-    board_unavailable = False
 
     if has_board:
         args["frame_idx"] = frame_idx
         args["start_time"] = frame_idx / fps
+        args["frame_w"] = ctx.frame_w
+        args["frame_h"] = ctx.frame_h
         frame_moves = {m["track_id"]: m for m in moves if m.get("frame_idx", 0) == frame_idx}
 
-        positions, used_frame = pr.frame_player_pitch_positions(ctx, frame_idx)
-        if positions is None:
-            board_unavailable = True
-        else:
-            if used_frame != frame_idx:
-                homography_note = (
-                    f"This exact frame doesn't have its own pitch calibration, so these positions "
-                    f"are approximated from frame {used_frame} ({abs(used_frame - frame_idx)} frames away)."
-                )
-            board_positions = {}
-            for tid, (X, Y) in positions.items():
-                move = frame_moves.get(tid)
-                if move is not None:
-                    X, Y = move["target_pitch_x"], move["target_pitch_y"]
-                board_positions[tid] = {"x_m": X, "y_m": Y, "hex": color_for_track(tid)}
-            args["board_positions"] = board_positions
-        args["board_unavailable"] = board_unavailable
+        # The cleaned (all-players-erased) background - real clean-plate
+        # reconstruction over ~20 players measures 20-35s on real data, so
+        # this is cached hard: session_state first, then a non-destructive
+        # disk cache (same discipline as the drawing cache) so it survives
+        # a page reload without recomputing, and only a spinner on the
+        # actual first computation for a given frame.
+        clean_b64 = st.session_state[clean_key].get(frame_idx)
+        if clean_b64 is None and source:
+            clean_b64 = _load_game_board_clean_frame_b64(CACHE_DIR, match_key, frame_idx)
+            if clean_b64:
+                st.session_state[clean_key][frame_idx] = clean_b64
+        if clean_b64 is None:
+            with st.spinner("Erasing tracked players from this frame (one-time per frame, up to ~30s)..."):
+                cleaned_img, n_erase_failed = pr.clean_frame_no_players(ctx, frame_idx)
+                ok, buf = cv2.imencode('.jpg', cleaned_img, [cv2.IMWRITE_JPEG_QUALITY, 92])
+                clean_b64 = base64.b64encode(buf).decode('ascii') if ok else ""
+            st.session_state[clean_key][frame_idx] = clean_b64
+            if source and clean_b64:
+                try:
+                    _save_game_board_clean_frame(CACHE_DIR, match_key, frame_idx, base64.b64decode(clean_b64))
+                except (OSError, ValueError):
+                    pass
+        args["frame_b64"] = clean_b64
+
+        # Real tracked pixel position for everyone, with any dragged
+        # player's position overridden by their stored move - no
+        # homography anywhere in this path.
+        positions = pr.frame_player_pixel_positions(ctx, frame_idx)
+        board_positions = {}
+        for tid, (x, y) in positions.items():
+            move = frame_moves.get(tid)
+            if move is not None:
+                x, y = move["target_x"], move["target_y"]
+            board_positions[tid] = {"x": x, "y": y, "hex": color_for_track(tid)}
+        args["board_positions"] = board_positions
 
         drawing_b64 = st.session_state[drawing_key].get(frame_idx)
         if drawing_b64 is None and source:
@@ -2377,11 +2413,11 @@ def render_game_board_tab():
             st.rerun()
         elif action == "board_drop":
             tid = value.get("tid")
-            qx, qy = value.get("x_m"), value.get("y_m")
+            qx, qy = value.get("x"), value.get("y")
             if tid is not None and qx is not None and qy is not None:
                 moves = [m for m in moves
                          if not (m["track_id"] == tid and m.get("frame_idx", 0) == frame_idx)]
-                moves.append({"track_id": tid, "target_pitch_x": float(qx), "target_pitch_y": float(qy),
+                moves.append({"track_id": tid, "target_x": float(qx), "target_y": float(qy),
                                "frame_idx": frame_idx})
                 st.session_state[state_key] = moves
                 if source:
@@ -2397,9 +2433,6 @@ def render_game_board_tab():
                     except (OSError, ValueError):
                         pass
             st.rerun()
-
-    if has_board and homography_note:
-        st.caption(f"ℹ️ {homography_note}")
 
     bcol1, bcol2 = st.columns([1, 3])
     with bcol1:
@@ -2418,18 +2451,21 @@ def render_game_board_tab():
         st.markdown("**Active repositions on this frame**")
         for tid, move in frame_moves.items():
             label = pl.player_label(tid, None, player_labels)
-            target_pitch = (move["target_pitch_x"], move["target_pitch_y"])
+            # This one stat is still homography-derived (an openly-
+            # approximate real-world-distance estimate for the caption
+            # only) - the dot's actual drawn position above never is.
+            target_pitch = pr.pixel_to_pitch(ctx, frame_idx, move["target_x"], move["target_y"])
             with st.container(border=True):
                 cols = st.columns([2, 5])
                 cols[0].markdown(f"**{label}**")
-                pstats = pr.compute_placement_stats(ctx, frame_idx, tid, target_pitch)
+                pstats = pr.compute_placement_stats(ctx, frame_idx, tid, target_pitch) if target_pitch else None
                 if pstats:
                     cols[1].caption(
-                        f"Nearest player: {pstats['nearest_player_distance_m']}m · "
+                        f"Nearest player (approx.): {pstats['nearest_player_distance_m']}m · "
                         f"within 5m: {pstats['n_players_within_5m']} · within 10m: {pstats['n_players_within_10m']}"
                     )
                 else:
-                    cols[1].caption("Off the pitch, or no other player position to compare against.")
+                    cols[1].caption("No distance estimate available for this position.")
 
 
 def render_cv_completed_state(status, cv_output_dir):
