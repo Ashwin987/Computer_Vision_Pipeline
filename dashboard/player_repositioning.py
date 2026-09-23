@@ -27,17 +27,32 @@ players, clamped to a plausible pixel-size range also derived from those
 same real players. A placement can therefore always be composited; the
 worst case is a size that's merely approximate, never one that's absurd.
 
-Real player, no synthetic overlay: this module operates on, and only ever
-displays, the raw broadcast frame (the same clean, unannotated source the
-clean-plate reconstruction work has used as its input from round one) - the
-UI it feeds draws real segmented player pixels as the draggable element,
-never an ID-labeled marker icon standing in for one, and the moved result
-carries no badge, label, or other baked-in text distinguishing it from a
-real, untouched player. A first version of this feature's UI used simple
-circular ID markers instead, which - even though the underlying frame was
-already the correct raw one - visually resembled this project's own
-"Tracking + Speed & Distance" rendered output (which does bake in ID-
-labeled circles) closely enough to be mistaken for it. Corrected directly.
+Real broadcast frame, team-colored marker: this module operates on, and
+only ever displays, the raw broadcast frame (the same clean, unannotated
+source the clean-plate reconstruction work has used as its input from
+round one) - the original player is genuinely erased from their old spot
+via the same clean-plate reconstruction, and a plain, team-colored circular
+marker (no ID text, no badge) is drawn at the new spot.
+
+This module went through two earlier designs before landing here, in
+order: (1) pasting real, background-differencing-segmented player pixels
+at the new spot, and, before that, (0) a simple ID-labeled circular marker
+that visually resembled this project's own "Tracking + Speed & Distance"
+rendered output closely enough to be mistaken for it. Design (1) was
+broadly audited against every tracked player across several real frames
+(not just the one case each fix was first tried against) and found to have
+a genuine, structural ~10% failure rate - a dark kit against a shadowed
+pitch can put a real player's legs below Otsu's single global diff
+threshold entirely, and separately, clean-plate reconstruction's own
+~2% residual misalignment (already a known, disclosed limit elsewhere in
+this module) can produce a false blob larger than the real player. Neither
+is a bug that more mask post-processing fixes - it's a structural limit of
+background-differencing segmentation on broadcast football footage, and
+was reported as such rather than shipped with the failure rate hidden.
+A team-colored marker has no segmentation dependency at all, so it has
+none of that failure mode - it costs the real, "this is genuinely that
+player's own pixels" quality design (1) had when it worked, in exchange
+for being reliably correct on every player, every frame.
 
 Storage: a per-match list of active repositions, layered non-destructively
 under CACHE_DIR (same pattern as corner_kicks.py / training_plan.py /
@@ -444,68 +459,6 @@ def composite_patch(dest_img, patch_img, rect, feather_px=10):
     return result, "feather"
 
 
-def segment_player(ctx, frame_idx, rect):
-    """Background-differencing segmentation, identical method to the
-    investigation's Step 2 - clean plate for `rect`, diff against the real
-    frame, Otsu threshold, keep only the largest connected component.
-
-    Dark kit against a shadowed pitch (verified directly against real
-    frames - a navy shorts/socks region can read within ~10-15px/gray-level
-    of the clean-plate background there) regularly produces a diff band
-    that falls entirely below Otsu's single global threshold, splitting one
-    real player into a torso component and separate, smaller leg/boot
-    fragments - "keep only the largest" then silently drops the real legs,
-    not because they aren't there but because they aren't CONNECTED to the
-    torso blob. A small 3x3 closing kernel (this function's own first
-    version) doesn't bridge that gap - it was typically 5-10px tall in
-    every real case checked. A tall, narrow closing kernel applied before
-    largest-component selection - not after - merges those fragments back
-    into one blob first, so "largest connected component" then correctly
-    keeps the whole player rather than only whichever single piece of them
-    happened to be biggest."""
-    found = find_clean_patch(ctx, frame_idx, rect, search_radius=150, max_blend_frames=3)
-    if found is None:
-        return None
-    real = extract_patch(ctx.get_frame(frame_idx), rect)
-    bg = found["patch"]
-    if bg.shape[:2] != real.shape[:2]:
-        bg = cv2.resize(bg, (real.shape[1], real.shape[0]))
-    diff = cv2.absdiff(real, bg)
-    diff_gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-    _, mask = cv2.threshold(diff_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    # Bridge low-contrast gaps (dark kit, shadow) between real, separately-
-    # detected body parts BEFORE picking "the largest" component, sized
-    # tall/narrow since these gaps run vertically along the body, not
-    # sideways toward a different player.
-    bridge_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 21))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, bridge_kernel)
-    open_kernel = np.ones((3, 3), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, open_kernel)
-    n, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
-    if n > 1:
-        largest = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
-        mask = np.where(labels == largest, 255, 0).astype(np.uint8)
-    return {"real": real, "mask": mask, "background_patch": found}
-
-
-def encode_cutout_png(real_bgr, mask):
-    """A real player's segmented pixels as a base64 PNG with the
-    segmentation mask as its alpha channel - transparent everywhere except
-    the real, visible silhouette. This, not an ID-labeled marker icon, is
-    what the drag UI should render and drag: a real player, cropped to
-    their real outline, nothing synthetic added. Returns None if the crop
-    is degenerate (can happen right at a frame edge)."""
-    if real_bgr is None or real_bgr.size == 0:
-        return None
-    b, g, r = cv2.split(real_bgr)
-    bgra = cv2.merge([b, g, r, mask])
-    ok, buf = cv2.imencode('.png', bgra)
-    if not ok:
-        return None
-    import base64
-    return base64.b64encode(buf).decode('ascii')
-
-
 # ==========================================================================
 # BOUNDED SCALE — replaces the earlier gate. Never refuses; always returns
 # a plausible pixel size, derived from real players already in this frame.
@@ -581,8 +534,9 @@ def _frame_scale_trend(ctx, frame_idx):
 
 def bounded_scale_for_target(ctx, frame_idx, source_bbox, target_pixel_xy):
     """The core replacement for the old scale-gate. Never returns a
-    rejection - always a usable (new_width_px, new_height_px) for the
-    resized cutout, plus metadata about how it was derived.
+    rejection - always a usable scale ratio (and, for backward-compatible
+    callers, an implied new_width_px/new_height_px for the source bbox's
+    own size), plus metadata about how it was derived.
 
     Tries the real homography first (only when the target position both
     resolves to a pitch coordinate AND passes the self-consistency check);
@@ -636,10 +590,20 @@ def bounded_scale_for_target(ctx, frame_idx, source_bbox, target_pixel_xy):
 # FULL PIPELINE
 # ==========================================================================
 
-def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, erase_margin=6, cutout_margin=15, base_img=None):
+_MARKER_BASE_RADIUS_PX = 16  # "big dot", tuned against this project's real ~1920px-wide broadcast frames
+_MARKER_MIN_RADIUS_PX = 7
+_MARKER_MAX_RADIUS_PX = 34
+
+
+def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, color_bgr=(60, 60, 220),
+                        erase_margin=6, base_img=None):
     """Full pipeline for one drag-and-drop move: erase the player from
-    their original position (clean-plate), segment them out, resize per
-    bounded_scale_for_target, and composite at the new position. Always
+    their original position (clean-plate - unaffected by the marker-vs-
+    cutout design change, since erasing only ever needed a clean
+    BACKGROUND patch, never player segmentation), then draw a plain,
+    team-colored circular marker at the new position, sized by
+    bounded_scale_for_target's depth-aware ratio so a marker further from
+    camera reads smaller, like the real players around it. Always
     succeeds - see module docstring for why - the only failure path is
     genuinely missing input data (no clean patch findable at all for the
     erase step, which the investigation measured at under 2% even with a
@@ -649,16 +613,14 @@ def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, erase_m
     `base_img`, when given, is composited onto INSTEAD of a fresh read of
     the pristine frame - required for applying more than one move to the
     same frame (each subsequent move must build on the previous one's
-    result, not silently discard it by re-reading the original frame).
-    Every clean-plate SEARCH step (finding a background patch to erase
-    into, or to segment a cutout against) still always reads real,
-    untouched video frames regardless of base_img - only the two final
-    "paint onto the canvas" steps (erasing the original position, pasting
-    the resized cutout) use base_img as their destination. This is safe
-    precisely because the search steps never look at the composite itself.
+    result, not silently discard it by re-reading the original frame). The
+    clean-plate SEARCH step still always reads real, untouched video frames
+    regardless of base_img - only the "paint onto the canvas" steps (erase,
+    then draw the marker) use base_img as their destination. This is safe
+    precisely because the search step never looks at the composite itself.
 
-    Returns dict(composite_img, mask_debug, placement_info) or
-    dict(error=...) for the rare missing-clean-patch case."""
+    Returns dict(composite_img, ...) or dict(error=...) for the rare
+    missing-clean-patch case."""
     bbox = ctx.players[frame_idx].get(str(source_track_id), {}).get("bbox")
     if bbox is None:
         return {"error": f"player {source_track_id} has no tracked position in frame {frame_idx}"}
@@ -676,11 +638,6 @@ def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, erase_m
 
     x1, y1, x2, y2 = bbox
     erase_rect = (x1 - erase_margin, y1 - erase_margin, x2 + erase_margin, y2 + erase_margin)
-    cutout_rect = (x1 - cutout_margin, y1 - cutout_margin, x2 + cutout_margin, y2 + cutout_margin)
-
-    seg = segment_player(ctx, frame_idx, cutout_rect)
-    if seg is None:
-        return {"error": "no clean background patch available near this player - can't erase or cut them out"}
 
     erase_patch_result = find_clean_patch(ctx, frame_idx, erase_rect, search_radius=150, max_blend_frames=3)
     if erase_patch_result is None:
@@ -690,46 +647,23 @@ def propose_reposition(ctx, frame_idx, source_track_id, target_pixel_xy, erase_m
     composite, erase_method = composite_patch(frame_img, erase_patch_result["patch"], erase_rect)
 
     scale_info = bounded_scale_for_target(ctx, frame_idx, bbox, target_pixel_xy)
-    ratio = scale_info["ratio"]
-    new_w = max(1, int(round(seg["real"].shape[1] * ratio)))
-    new_h = max(1, int(round(seg["real"].shape[0] * ratio)))
-    resized_rgb = cv2.resize(seg["real"], (new_w, new_h))
-    resized_mask = cv2.resize(seg["mask"], (new_w, new_h), interpolation=cv2.INTER_NEAREST)
+    radius = int(round(max(_MARKER_MIN_RADIUS_PX, min(_MARKER_MAX_RADIUS_PX,
+                                                        _MARKER_BASE_RADIUS_PX * scale_info["ratio"]))))
+    tx, ty = int(round(target_pixel_xy[0])), int(round(target_pixel_xy[1]))
+    # A thin white outline keeps the marker readable against grass, crowd,
+    # or a same-colored kit standing nearby - the same reason a real
+    # player's own silhouette reads clearly against either background; no
+    # ID text, no badge, nothing baked in beyond the marker itself.
+    cv2.circle(composite, (tx, ty), radius, color_bgr, thickness=-1, lineType=cv2.LINE_AA)
+    cv2.circle(composite, (tx, ty), radius, (255, 255, 255), thickness=2, lineType=cv2.LINE_AA)
 
-    foot_x_in_crop = (x1 + x2) / 2 - cutout_rect[0]
-    foot_y_in_crop = y2 - cutout_rect[1]
-    tx, ty = target_pixel_xy
-    paste_x = int(round(tx - foot_x_in_crop * ratio))
-    paste_y = int(round(ty - foot_y_in_crop * ratio))
-
-    px1, py1 = max(0, paste_x), max(0, paste_y)
-    px2, py2 = min(ctx.frame_w, paste_x + new_w), min(ctx.frame_h, paste_y + new_h)
-    if px2 <= px1 or py2 <= py1:
-        return {"error": "target position is entirely outside the visible frame"}
-
-    sx1, sy1 = px1 - paste_x, py1 - paste_y
-    sx2, sy2 = sx1 + (px2 - px1), sy1 + (py2 - py1)
-    region_mask = resized_mask[sy1:sy2, sx1:sx2] > 0
-
-    # mask-based paste (not seamlessClone) for the player cutout itself -
-    # the cutout's own silhouette edge, not a rectangle, is the true
-    # boundary here, and seamlessClone's rectangular mask assumption (used
-    # for the ERASE step above, where the whole rect is real background)
-    # doesn't fit a non-rectangular subject the same way; matches exactly
-    # what the investigation's Step 3 already verified renders plausibly.
-    dest = composite[py1:py2, px1:px2]
-    dest[region_mask] = resized_rgb[sy1:sy2, sx1:sx2][region_mask]
-    composite[py1:py2, px1:px2] = dest
-    # No badge, no label, no marker baked in here by design - the moved
-    # player must look exactly like any other real player in the frame,
-    # nothing added to distinguish them (see module docstring's "Real
-    # player, no synthetic overlay" note).
+    px1, py1 = max(0, tx - radius - 4), max(0, ty - radius - 4)
+    px2, py2 = min(ctx.frame_w, tx + radius + 4), min(ctx.frame_h, ty + radius + 4)
 
     return {
         "composite_img": composite,
         "erase_method": erase_method,
         "erase_sources": erase_patch_result["sources"],
-        "cutout_sources": seg["background_patch"]["sources"],
         "paste_rect": (px1, py1, px2, py2),
         "scale_info": scale_info,
         "source_bbox": bbox,

@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import seaborn as sns
 import plotly.graph_objects as go
 import plotly.express as px
@@ -1828,9 +1829,10 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
   video { width:100%; max-width:900px; display:block; border-radius:10px; border:1px solid #2a3142; background:#000; }
   .pr-wrap { position:relative; display:inline-block; border-radius:10px; overflow:hidden; border:1px solid #2a3142; }
   .pr-wrap img#prBase { display:block; max-width:900px; width:100%; height:auto; }
-  .pr-cutout { position:absolute; cursor:grab; -webkit-user-drag:element; }
-  .pr-cutout:hover { filter:drop-shadow(0 0 6px rgba(79,140,255,0.9)); }
-  .pr-cutout:active { cursor:grabbing; }
+  .pr-marker { position:absolute; cursor:grab; border-radius:50%; border:2px solid #fff;
+               box-shadow:0 1px 4px rgba(0,0,0,0.5); -webkit-user-drag:element; }
+  .pr-marker:hover { filter:brightness(1.15); box-shadow:0 0 0 3px rgba(255,255,255,0.5); }
+  .pr-marker:active { cursor:grabbing; }
   .pr-wrap.pr-over { outline:3px dashed #4f8cff; outline-offset:-3px; }
   .pr-draw-canvas { position:absolute; left:0; top:0; touch-action:none; }
   .pr-tool { background:#1c2333; color:#e6e6e6; border:1px solid #2a3142; border-radius:8px;
@@ -1908,10 +1910,10 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     topRow.appendChild(label);
     root.appendChild(topRow);
 
-    // Toolbar: Move (drag real players) vs draw tools (Paint-style: a red
-    // pen, a black pen, an eraser) - mutually exclusive, since a drag
+    // Toolbar: Move (drag player markers) vs draw tools (Paint-style: a
+    // red pen, a black pen, an eraser) - mutually exclusive, since a drag
     // gesture and a freehand stroke can't both claim the same pointer
-    // event. Selecting a draw tool disables pointer-events on the cutout
+    // event. Selecting a draw tool disables pointer-events on the marker
     // layer's drag handling by putting the canvas (which DOES capture
     // pointer events while a draw tool is active) on top of it.
     var toolRow = document.createElement('div');
@@ -1958,27 +1960,29 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     }
     setTool('move');
 
-    function layoutCutouts() {
+    function layoutMarkers() {
       var scale = base.clientWidth / (base.naturalWidth || 1);
       wrap.dataset.scale = scale;
-      var cutouts = args.cutouts || {};
-      Object.keys(cutouts).forEach(function(tid) {
-        var c = cutouts[tid];
-        var img = document.createElement('img');
-        img.className = 'pr-cutout';
-        img.draggable = true;
-        img.dataset.tid = tid;
-        img.src = 'data:image/png;base64,' + c.png_b64;
-        img.style.left = (c.x1 * scale) + 'px';
-        img.style.top = (c.y1 * scale) + 'px';
-        img.style.width = ((c.x2 - c.x1) * scale) + 'px';
-        img.style.height = ((c.y2 - c.y1) * scale) + 'px';
-        wrap.appendChild(img);
+      var markers = args.markers || {};
+      var r = args.marker_radius || 16;
+      Object.keys(markers).forEach(function(tid) {
+        var m = markers[tid];
+        var d = document.createElement('div');
+        d.className = 'pr-marker';
+        d.draggable = true;
+        d.dataset.tid = tid;
+        d.style.background = m.hex || '#888';
+        var diameter = 2 * r * scale;
+        d.style.left = (m.x * scale - diameter / 2) + 'px';
+        d.style.top = (m.y * scale - diameter / 2) + 'px';
+        d.style.width = diameter + 'px';
+        d.style.height = diameter + 'px';
+        wrap.appendChild(d);
       });
 
       // Canvas draws in the REAL frame's native pixel space (like the
-      // cutouts' own x1/y1/x2/y2) so a saved drawing round-trips through
-      // Python and back at full, consistent resolution regardless of the
+      // markers' own x/y) so a saved drawing round-trips through Python
+      // and back at full, consistent resolution regardless of the
       // viewer's actual on-screen width - CSS handles the visual scale-down.
       canvas.width = base.naturalWidth;
       canvas.height = base.naturalHeight;
@@ -1991,10 +1995,10 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
       }
       setHeight();
     }
-    if (base.complete && base.naturalWidth) { layoutCutouts(); } else { base.addEventListener('load', layoutCutouts); }
+    if (base.complete && base.naturalWidth) { layoutMarkers(); } else { base.addEventListener('load', layoutMarkers); }
 
     wrap.addEventListener('dragstart', function(e) {
-      if (e.target.classList.contains('pr-cutout')) { e.dataTransfer.setData('text/plain', e.target.dataset.tid); }
+      if (e.target.classList.contains('pr-marker')) { e.dataTransfer.setData('text/plain', e.target.dataset.tid); }
     });
     wrap.addEventListener('dragover', function(e) { e.preventDefault(); wrap.classList.add('pr-over'); });
     wrap.addEventListener('dragleave', function() { wrap.classList.remove('pr-over'); });
@@ -2143,22 +2147,80 @@ def _load_game_board_drawing_b64(cache_dir, match_key, frame_idx):
         return None
 
 
+def _resolve_color_hex(name, fallback):
+    """CSS-name-or-hex -> a real hex string, via matplotlib's own CSS4/X11
+    color table (already a hard dependency of this app) - covers ordinary
+    English color words directly and multi-word ones ("Sky Blue") once
+    spaces are stripped, since that's the CSS keyword spelling
+    ("skyblue"). Falls back to `fallback` for anything matplotlib doesn't
+    recognize, rather than crashing or rendering an invalid color."""
+    if not name:
+        return fallback
+    try:
+        return mcolors.to_hex(str(name).replace(" ", "").lower())
+    except (ValueError, AttributeError):
+        return fallback
+
+
+def _hex_to_bgr(hex_str):
+    r, g, b = (int(round(c * 255)) for c in mcolors.to_rgb(hex_str))
+    return (b, g, r)
+
+
+def _game_board_team_color_resolver(cv_output_dir, team_mapping, color_a, color_b):
+    """Returns a track_id -> real team hex-color function. Team affiliation
+    for a track comes from this match's own stats.json (players[].team, the
+    CV pipeline's numeric team1/team2), cross-referenced through the
+    already-confirmed team_mapping the rest of this app already uses (see
+    _cv_team_label) - the same real per-player team assignment this app
+    already displays elsewhere, not re-derived here."""
+    player_team_num = {}
+    status = get_cv_job_status_safe(cv_output_dir)
+    stats_file = status.get('stats_file')
+    if stats_file:
+        resolved = _resolve_cv_path(stats_file)
+        if resolved.exists():
+            try:
+                with open(resolved, 'r') as f:
+                    stats = json.load(f)
+                player_team_num = {str(p.get('player_id')): p.get('team') for p in stats.get('players', [])}
+            except (json.JSONDecodeError, OSError):
+                pass
+
+    hex_a = _resolve_color_hex(color_a, "#e63946")
+    hex_b = _resolve_color_hex(color_b, "#1d3557")
+
+    def color_for(tid):
+        team_num = player_team_num.get(str(tid))
+        team_key = None
+        if team_mapping and team_num is not None:
+            team_key = team_mapping.get(str(team_num)) or team_mapping.get(team_num)
+        if team_key == 'team_a':
+            return hex_a
+        if team_key == 'team_b':
+            return hex_b
+        return "#888888"
+
+    return color_for
+
+
 def render_game_board_tab():
     """The real broadcast clip, played natively and pausable at any frame,
-    with two independent tools on top of whichever frame is paused: drag
-    any real player (their actual segmented cutout - see
-    player_repositioning.py's module docstring) to a new spot anywhere in
-    the frame, and/or freehand-draw over it (red pen, black pen, eraser -
-    a telestrator, not a synthetic overlay baked into any saved data). See
+    with two independent tools on top of whichever frame is paused: drag a
+    plain, team-colored marker for any tracked player to a new spot
+    anywhere in the frame (see player_repositioning.py's module docstring
+    for why this uses a marker rather than a real-pixel cutout), and/or
+    freehand-draw over it (red pen, black pen, eraser - a telestrator, not
+    a synthetic overlay baked into any saved data). See
     _get_reposition_component's docstring for why this needs a real
     bidirectional component rather than st.components.v1.html."""
     st.subheader("🧩 Game Board")
     st.caption(
-        "Play the real broadcast clip below, pause it wherever you like, then drag any real "
-        "player to a new spot on that frame — anywhere, including off the pitch — and/or draw "
-        "over it with the pen and eraser tools. Every drop is honored: size always stays "
-        "plausible (derived from real players already visible in that frame), even where the "
-        "calibration can't be trusted directly."
+        "Play the real broadcast clip below, pause it wherever you like, then drag any "
+        "player's team-colored marker to a new spot on that frame — anywhere, including off "
+        "the pitch — and/or draw over it with the pen and eraser tools. Every drop is honored: "
+        "size always stays plausible (derived from real players already visible in that frame), "
+        "even where the calibration can't be trusted directly."
     )
 
     source, key = _get_active_match_identity()
@@ -2209,10 +2271,15 @@ def render_game_board_tab():
 
     player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
     frame_moves = [m for m in moves if m.get("frame_idx", 0) == frame_idx]
+    color_for_track = _game_board_team_color_resolver(
+        cv_output_dir, st.session_state.get('cv_team_mapping'),
+        st.session_state.get('color_a'), st.session_state.get('color_b'),
+    )
 
     args = {
         "mode": mode, "video_url": video_url, "fps": fps, "n_frames": n_frames,
         "frame_idx": frame_idx, "start_time": frame_idx / fps,
+        "marker_radius": pr._MARKER_BASE_RADIUS_PX,
     }
 
     composite = None
@@ -2223,7 +2290,9 @@ def render_game_board_tab():
     if mode == "edit":
         for move in frame_moves:
             result = pr.propose_reposition(ctx, frame_idx, move["track_id"],
-                                            (move["target_x"], move["target_y"]), base_img=composite)
+                                            (move["target_x"], move["target_y"]),
+                                            color_bgr=_hex_to_bgr(color_for_track(move["track_id"])),
+                                            base_img=composite)
             if result.get("error"):
                 failed.append((move["track_id"], result["error"]))
                 continue
@@ -2231,39 +2300,25 @@ def render_game_board_tab():
             moved_ids.add(move["track_id"])
             placements.append((move["track_id"], result))
 
-        # Real segmented cutouts for every currently-tracked player on THIS
-        # frame, not a marker/ID standing in for one (see
-        # player_repositioning.py's module docstring for why a first version
-        # got this wrong). Computed once per (match, frame) and cached in
-        # session_state - a given real frame's players and their real pixels
-        # never change between reruns, only which of them are still shown
-        # (moved players are filtered out below, by id, not by recomputing).
-        cutout_cache_key = f"reposition_cutouts_{source}_{match_key}_{frame_idx}"
-        if cutout_cache_key not in st.session_state:
-            cutouts = {}
-            with st.spinner("Segmenting tracked players on this frame..."):
-                for tid, info in ctx.players[frame_idx].items():
-                    x1, y1, x2, y2 = info["bbox"]
-                    if (x2 - x1) < 10 or (y2 - y1) < 20:
-                        continue
-                    margin = 10
-                    crop_rect = (x1 - margin, y1 - margin, x2 + margin, y2 + margin)
-                    seg = pr.segment_player(ctx, frame_idx, crop_rect)
-                    if seg is None:
-                        continue
-                    png_b64 = pr.encode_cutout_png(seg["real"], seg["mask"])
-                    if png_b64 is None:
-                        continue
-                    cx1, cy1, cx2, cy2 = crop_rect
-                    cutouts[tid] = {"png_b64": png_b64, "x1": cx1, "y1": cy1, "x2": cx2, "y2": cy2}
-            st.session_state[cutout_cache_key] = cutouts
-        all_cutouts = st.session_state[cutout_cache_key]
-        visible_cutouts = {tid: c for tid, c in all_cutouts.items() if tid not in moved_ids}
+        # A plain team-colored marker position for every currently-tracked
+        # player on this frame who hasn't been moved yet - just their real
+        # tracked bbox center/foot point, no segmentation involved at all
+        # (see player_repositioning.py's module docstring for why this
+        # feature moved off real-pixel cutouts), so this is trivial to
+        # recompute on every rerun and needs no caching or spinner.
+        markers = {}
+        for tid, info in ctx.players[frame_idx].items():
+            if tid in moved_ids:
+                continue
+            x1, y1, x2, y2 = info["bbox"]
+            if (x2 - x1) < 10 or (y2 - y1) < 20:
+                continue
+            markers[tid] = {"x": (x1 + x2) / 2.0, "y": y2, "hex": color_for_track(tid)}
 
         display_img = composite if composite is not None else ctx.get_frame(frame_idx)
         ok, buf = cv2.imencode('.jpg', display_img, [cv2.IMWRITE_JPEG_QUALITY, 90])
         args["frame_b64"] = base64.b64encode(buf).decode('ascii') if ok else ""
-        args["cutouts"] = visible_cutouts
+        args["markers"] = markers
 
         drawing_b64 = st.session_state[drawing_key].get(frame_idx)
         if drawing_b64 is None and source:
