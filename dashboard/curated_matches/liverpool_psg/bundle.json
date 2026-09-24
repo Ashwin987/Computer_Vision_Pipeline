@@ -1033,5 +1033,6 @@
   "cv_team_mapping": {
     "1": "team_a",
     "2": "team_b"
-  }
+  },
+  "ai_report_prompt_version": "7f5e2ee089e4"
 }

@@ -854,5 +854,6 @@
   "source_video": "BarcaMadridPT1.mp4",
   "curated_at": "2026-09-05T02:23:36Z",
   "display_name": "Real Madrid vs Barcelona (PT1, Gemini+CV verified aligned)",
-  "verification_note": "CV analysis window (180-210s, 752 frames @ 25fps=30.1s per stats.json) confirmed to exactly match the Gemini-identified peak-momentum window (minute 3, 03:00-04:00) - both extracted from the same BarcaMadridPT1.mp4 source, in that order (Gemini first, then CV on the exact same window). Not a filename-based pairing."
+  "verification_note": "CV analysis window (180-210s, 752 frames @ 25fps=30.1s per stats.json) confirmed to exactly match the Gemini-identified peak-momentum window (minute 3, 03:00-04:00) - both extracted from the same BarcaMadridPT1.mp4 source, in that order (Gemini first, then CV on the exact same window). Not a filename-based pairing.",
+  "ai_report_prompt_version": "7f5e2ee089e4"
 }

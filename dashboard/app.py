@@ -1150,6 +1150,11 @@ def _activate_match_bundle(bundle, source=None, key=None):
     st.session_state.color_a = bundle["color_a"]
     st.session_state.color_b = bundle["color_b"]
     st.session_state.ai_report = bundle["ai_report"]
+    # A bundle saved before this version-tracking safeguard existed simply
+    # has no key here - .get(...) defaults it to None, which the Coach
+    # Report tab's staleness check already treats as "definitely stale"
+    # (same as a real mismatch), not silently trusted.
+    st.session_state.ai_report_prompt_version = bundle.get("ai_report_prompt_version")
     # Found during the repo-consolidation fresh-clone check: curated bundle.json
     # files shipped in this repo store cv_output_dir as a path relative to
     # CV_PIPELINE_DIR (e.g. "output_videos/liverpool_psg_verified"), not an
@@ -3046,6 +3051,36 @@ def render_cv_deep_analysis_tab():
     else:
         st.warning(f"Unrecognized CV job status: {job_status}")
 
+_COACH_REPORT_PROMPT_VERSION_START = "CRITICAL INSTRUCTION FOR WRITING:"
+_COACH_REPORT_PROMPT_VERSION_END = "2. [Second specific tactical change paragraph.]"
+
+
+def _coach_report_prompt_version():
+    """A short hash of the coach-report prompt's own static instructional
+    text (the "how to write" rules and the structural template - the exact
+    section this project's own real incident showed goes stale silently:
+    an ai_report cached before a wording edit kept serving the old prose
+    forever, since nothing recorded which prompt version produced it).
+    Deliberately hashes only that static slice of writing_prompt, not the
+    real per-match data interpolated around it (which legitimately differs
+    every time and would make every match look "stale" against every
+    other) - and deliberately does NOT hash the whole enclosing function
+    the way training_plan.py's _prompt_version does for its own generate_*
+    functions, because writing_prompt lives inline inside this app's large
+    dashboard-rendering function, alongside a great deal of unrelated UI
+    code; hashing that whole function would flag ai_report stale on any
+    unrelated edit anywhere in it. Reads its own last-known-good markers
+    directly from this file's source (matching the same technique already
+    proven for the Game Board component's own content-hash cache-busting,
+    see _get_reposition_component) - self-contained, no refactor of the
+    working prompt-building code required."""
+    src = Path(__file__).read_text(encoding="utf-8")
+    start = src.index(_COACH_REPORT_PROMPT_VERSION_START)
+    end = src.rindex(_COACH_REPORT_PROMPT_VERSION_END) + len(_COACH_REPORT_PROMPT_VERSION_END)
+    static_text = src[start:end]
+    return hashlib.sha256(static_text.encode("utf-8")).hexdigest()[:12]
+
+
 def _get_active_match_identity():
     """(source, key) for the currently-active match, for training-plan
     persistence - reuses the same identity Phase C's team-mapping
@@ -3190,6 +3225,13 @@ def _render_team_plan_subtab(source, key, team_key):
                     st.rerun()
         return
 
+    if tp.is_plan_piece_stale(team_plan, tp.generate_team_plan):
+        st.warning(
+            f"⚠️ {team_name}'s plan was generated with an older version of the report logic — "
+            "the wording below may not match how new plans are written. Use "
+            f"**Regenerate {team_name}'s plan from AI** below to bring it up to date."
+        )
+
     cv_insights = st.session_state.training_plan_draft.get("cv_insights") or {}
     # cv_insights' team_insights are keyed by real team label (e.g. "PSG"),
     # from the same cv_team_label_fn resolution used everywhere else - not
@@ -3201,8 +3243,8 @@ def _render_team_plan_subtab(source, key, team_key):
         {k: (pl.substitute_player_labels(v, player_labels) if isinstance(v, str) else v) for k, v in ti.items()}
         for ti in team_insights
     ]
-    st.components.v1.html(
-        tp.render_team_calendar_html(team_plan, team_insights), height=560 + (170 * len(team_insights)), scrolling=True
+    st.iframe(
+        tp.render_team_calendar_html(team_plan, team_insights), height=560 + (170 * len(team_insights))
     )
 
     # Keyed per-team (not just per-match) - these widget keys used to be
@@ -3317,6 +3359,16 @@ def _render_player_plan_subtab(source, key):
         st.info("No players with sufficient tracking confidence in this window.")
         return
 
+    cv_insights_piece = st.session_state.training_plan_draft.get("cv_insights")
+    player_plan_stale = tp.is_plan_piece_stale(player_plan, tp.generate_player_plan)
+    insights_stale = tp.is_plan_piece_stale(cv_insights_piece, tp.generate_cv_insights)
+    if player_plan_stale or insights_stale:
+        st.warning(
+            "⚠️ These player plans were generated with an older version of the report logic — "
+            "the wording below may not match how new plans are written. Use "
+            "**Regenerate player plans from AI** below to bring them up to date."
+        )
+
     # match_prefix scopes every widget key below to this specific match, not
     # just this render - without it, switching matches (or a player landing
     # at the same list position as a previously-viewed player in another
@@ -3344,8 +3396,8 @@ def _render_player_plan_subtab(source, key):
         {k: pl.substitute_player_labels(v, player_labels) for k, v in ins.items()}
         for ins in player_insights
     ]
-    st.components.v1.html(
-        tp.render_player_card_html(player, player_insights), height=440 + (170 * len(player_insights)), scrolling=True
+    st.iframe(
+        tp.render_player_card_html(player, player_insights), height=440 + (170 * len(player_insights))
     )
 
     st.markdown("---")
@@ -3899,6 +3951,7 @@ if st.session_state.step == 1:
                     st.session_state.color_a = cached["color_a"]
                     st.session_state.color_b = cached["color_b"]
                     st.session_state.ai_report = cached["ai_report"]
+                    st.session_state.ai_report_prompt_version = cached.get("ai_report_prompt_version")
                     log_entries.append(
                         f"Cached tactical dataset found for this exact video — "
                         f"{master_team_a_color} vs {master_team_b_color} — skipping AI analysis"
@@ -4457,11 +4510,13 @@ elif st.session_state.step == 3:
                         )
                         st.session_state.ai_report = response.text
                         ai_report_text = st.session_state.ai_report
+                        st.session_state.ai_report_prompt_version = _coach_report_prompt_version()
                         # PART 3: write-through the freshly generated report into
                         # the cache entry the Gemini extraction already created,
                         # so the next upload of this exact video gets a full hit.
                         if st.session_state.get('video_hash'):
-                            _cache_upsert(st.session_state.video_hash, ai_report=ai_report_text)
+                            _cache_upsert(st.session_state.video_hash, ai_report=ai_report_text,
+                                          ai_report_prompt_version=st.session_state.ai_report_prompt_version)
                         break
                     except Exception as e:
                         if attempt < max_report_retries - 1:
@@ -4520,6 +4575,7 @@ elif st.session_state.step == 3:
                             team_a=st.session_state.team_a, team_b=st.session_state.team_b,
                             color_a=st.session_state.color_a, color_b=st.session_state.color_b,
                             raw_data=st.session_state.raw_data, ai_report=st.session_state.ai_report,
+                            ai_report_prompt_version=st.session_state.get('ai_report_prompt_version'),
                             display_name=(cache_name_input or f"{st.session_state.team_a} vs {st.session_state.team_b}").strip(),
                             cv_output_dir=st.session_state.get('cv_job_output_dir'),
                             cv_segment_timestamp=st.session_state.get('cv_segment_timestamp'),
@@ -4794,6 +4850,30 @@ elif st.session_state.step == 3:
                 )
             with tab_coach:
                 st.header("🤖 In-Depth AI Diagnostic Report")
+                # Same staleness safeguard as training_plan.json's pieces
+                # (see training_plan._prompt_version) - a real, already-
+                # confirmed incident: this exact report kept serving
+                # pre-rewrite wording after the prompt was edited, because
+                # nothing recorded which prompt version produced it. Covers
+                # every place ai_report is generated/loaded from in this
+                # session (bundle.json, the .cache manifest, "Save to
+                # Cache") - the one place NOT covered is the in-session
+                # sidebar `history` list, left out deliberately: it can't
+                # outlive a single running session, so it can't hit this
+                # specific "survived a prompt-code deploy" bug by
+                # construction.
+                if st.session_state.ai_report and st.session_state.get('ai_report_prompt_version') != _coach_report_prompt_version():
+                    rcol1, rcol2 = st.columns([3, 1])
+                    with rcol1:
+                        st.warning(
+                            "⚠️ This report was generated with an older version of the report logic — "
+                            "the wording below may not match how new reports are written."
+                        )
+                    with rcol2:
+                        if st.button("🔄 Regenerate this report", key="coach_report_regenerate"):
+                            st.session_state.ai_report = None
+                            st.session_state.ai_report_prompt_version = None
+                            st.rerun()
                 # The stored report has literal {TEAM_A}/{TEAM_B} tokens baked in
                 # instead of real names (see the writing_prompt in Step 3) so a
                 # rename never requires regenerating it - substitute at display
