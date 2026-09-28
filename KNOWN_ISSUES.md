@@ -128,3 +128,46 @@ Madrid's numbers as Barcelona's and vice versa. Fixed by adding an explicit
 `reference_team1_is_team_a` flag, resolved once per match (from real jersey/on-screen
 evidence, not guessed) and stored on each mark itself — never touches `bundle.json`,
 never hardcodes a team name in the metric-display code.
+
+## `PITCH_KP_WORLD` correction attempt — tried, empirically rejected
+
+**Status:** attempted, does not work as a partial fix — do not adopt without
+further work. `cv_pipeline/pitch_kp_world_candidate_REJECTED.json` is the
+result, kept only as reference/backup, never wired into `pitch_calibrator.py`.
+
+First, a real, previously-undocumented bug: the table shipped in
+`pitch_calibrator.py` does not actually match the values `diag_minimal_h3.py`
+had already independently confirmed (near-zero back-projection residual) for
+indices 13/14/15/16 — those corrections were apparently never applied to the
+live file.
+
+Attempted a broader fix: built a real-geometry landmark catalogue from
+standard FIFA 105×68m pitch dimensions (corners, box edges, penalty spots,
+centre-circle points, D-arc tangents, goal posts), matched `diag_inliers.py`'s
+`PROPOSED` table against it, and cross-checked every match using real labeled
+training images (not assumption) — including catching 15 cases where two
+indices matched the same catalogue landmark but real same-frame images proved
+they're genuinely distinct points hundreds of pixels apart, left unresolved
+rather than guessed. Result: 31 of 48 indices corrected with real geometric
+grounding, 17 left untouched.
+
+**Tested empirically against real frames on both curated matches (the exact
+scale-ratio self-consistency method already used elsewhere in this
+project) — it performed dramatically worse than the current table, not
+better:** liverpool_psg dropped from 77.0% self-consistent to 0.0%;
+barca_madrid_pt1 from 99.8% to 28.0%. Fewer frames produced a usable
+homography at all under the corrected table, and `_validate`'s `out_of_bounds`
+rejection became the dominant failure mode. Likely cause: the shipped table's
+values, while not matching real pitch geometry, appear internally
+self-consistent with each other in a way that still lets RANSAC fit a
+coherent (if globally wrong) homography — correcting only some of 48 indices
+while leaving nearby ones at their old, differently-wrong values breaks that
+internal consistency, which matters more to the solver than any single
+point's individual accuracy.
+
+**Implication for the next attempt**: a viable fix likely needs to resolve
+all 48 indices coherently in one pass (including the 17 left unresolved
+here), not incrementally — which favors the manual/semi-manual per-frame
+correction path over a fully-automated table rewrite. The landmark catalogue
+and same-frame collision-detection method built for this attempt are
+reusable for that next pass.

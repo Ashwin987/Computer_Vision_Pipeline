@@ -62,6 +62,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+import corner_kicks as ck
+
 PITCH_LENGTH_M = 105.0
 PITCH_WIDTH_M = 68.0
 _BOUNDS_MARGIN_M = 2.0  # matches corner_kicks.py's own _BOUNDS_MARGIN_M
@@ -152,7 +154,15 @@ def load_context(cv_output_dir, video_path):
             data = json.load(f)
     except (json.JSONDecodeError, OSError):
         return None
-    return RepositioningContext(data, video_path)
+    ctx = RepositioningContext(data, video_path)
+    # Manual per-frame calibration corrections (manual_calibration_tool.py)
+    # always win over the automatic homography for that exact frame - same
+    # calibration_status.json every other consumer (Corner Kicks' reliable
+    # flag) already reads, so a correction made once is picked up here with
+    # no extra wiring per feature.
+    calibration_status = ck.load_calibration_status_from_path(cv_output_dir)
+    ctx.homography = ck.apply_frame_overrides(ctx.homography, calibration_status)
+    return ctx
 
 
 # ==========================================================================

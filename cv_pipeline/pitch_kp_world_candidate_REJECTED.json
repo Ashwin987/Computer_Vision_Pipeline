@@ -1,0 +1,674 @@
+{
+  "0": {
+    "shipped_value": [
+      26.18,
+      0.56
+    ],
+    "candidate_value": [
+      16.5,
+      13.84
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 279,
+    "note": "L_pen_front_top (dist=0.00m)"
+  },
+  "1": {
+    "shipped_value": [
+      0.0,
+      0.0
+    ],
+    "candidate_value": [
+      0.0,
+      0.0
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 232,
+    "note": "L_pen_front_top (dist=5.50m)"
+  },
+  "2": {
+    "shipped_value": [
+      35.42,
+      6.87
+    ],
+    "candidate_value": [
+      5.5,
+      24.84
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 189,
+    "note": "L_6yd_front_top (dist=0.00m)"
+  },
+  "3": {
+    "shipped_value": [
+      0.0,
+      68.0
+    ],
+    "candidate_value": [
+      0.0,
+      13.84
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 102,
+    "note": "L_goalline_pen_top (dist=0.00m)"
+  },
+  "4": {
+    "shipped_value": [
+      5.5,
+      68.0
+    ],
+    "candidate_value": [
+      0.0,
+      0.0
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 50,
+    "note": "corner_TL (dist=0.00m)"
+  },
+  "5": {
+    "shipped_value": [
+      12.32,
+      50.75
+    ],
+    "candidate_value": [
+      0.0,
+      68.0
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 13,
+    "note": "corner_BL (dist=0.00m)"
+  },
+  "6": {
+    "shipped_value": [
+      26.74,
+      15.7
+    ],
+    "candidate_value": [
+      5.5,
+      43.16
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 217,
+    "note": "L_6yd_front_bot (dist=0.00m)"
+  },
+  "7": {
+    "shipped_value": [
+      30.94,
+      27.34
+    ],
+    "candidate_value": [
+      30.94,
+      27.34
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 135,
+    "note": "COLLISION with idx 2 at (5.5, 24.84) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "8": {
+    "shipped_value": [
+      16.5,
+      0.0
+    ],
+    "candidate_value": [
+      16.5,
+      54.16
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 336,
+    "note": "L_pen_front_bot (dist=0.00m)"
+  },
+  "9": {
+    "shipped_value": [
+      16.5,
+      13.84
+    ],
+    "candidate_value": [
+      20.15,
+      34.0
+    ],
+    "touched": true,
+    "confidence": "MEDIUM",
+    "n_training_labels": 303,
+    "note": "L_Darc_apex (dist=0.00m)"
+  },
+  "10": {
+    "shipped_value": [
+      16.5,
+      54.16
+    ],
+    "candidate_value": [
+      11.0,
+      34.0
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 236,
+    "note": "L_pen_spot (dist=0.00m)"
+  },
+  "11": {
+    "shipped_value": [
+      16.5,
+      68.0
+    ],
+    "candidate_value": [
+      16.5,
+      68.0
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 153,
+    "note": "COLLISION with idx 6 at (5.5, 43.16) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "12": {
+    "shipped_value": [
+      0.0,
+      24.84
+    ],
+    "candidate_value": [
+      0.0,
+      24.84
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 223,
+    "note": "COLLISION with idx 0 at (16.5, 13.84) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "13": {
+    "shipped_value": [
+      53.9,
+      0.42
+    ],
+    "candidate_value": [
+      52.5,
+      0.0
+    ],
+    "touched": true,
+    "confidence": "CONFIRMED",
+    "n_training_labels": 454,
+    "note": "geometric back-projection (diag_minimal_h3.py)"
+  },
+  "14": {
+    "shipped_value": [
+      54.74,
+      23.98
+    ],
+    "candidate_value": [
+      52.5,
+      34.0
+    ],
+    "touched": true,
+    "confidence": "CONFIRMED",
+    "n_training_labels": 459,
+    "note": "geometric back-projection (diag_minimal_h3.py)"
+  },
+  "15": {
+    "shipped_value": [
+      52.5,
+      43.15
+    ],
+    "candidate_value": [
+      43.35,
+      34.0
+    ],
+    "touched": true,
+    "confidence": "CONFIRMED",
+    "n_training_labels": 453,
+    "note": "geometric back-projection (diag_minimal_h3.py)"
+  },
+  "16": {
+    "shipped_value": [
+      54.88,
+      39.82
+    ],
+    "candidate_value": [
+      52.5,
+      68.0
+    ],
+    "touched": true,
+    "confidence": "CONFIRMED",
+    "n_training_labels": 462,
+    "note": "geometric back-projection (diag_minimal_h3.py)"
+  },
+  "17": {
+    "shipped_value": [
+      37.94,
+      28.32
+    ],
+    "candidate_value": [
+      61.65,
+      34.0
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 381,
+    "note": "centrecircle_right (dist=0.00m)"
+  },
+  "18": {
+    "shipped_value": [
+      28.42,
+      66.88
+    ],
+    "candidate_value": [
+      0.0,
+      43.16
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 101,
+    "note": "L_goalline_6yd_bot (dist=0.00m)"
+  },
+  "19": {
+    "shipped_value": [
+      32.48,
+      41.64
+    ],
+    "candidate_value": [
+      105.0,
+      0.0
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 1,
+    "note": "corner_TR (dist=0.00m)"
+  },
+  "20": {
+    "shipped_value": [
+      48.16,
+      30.99
+    ],
+    "candidate_value": [
+      105.0,
+      68.0
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 34,
+    "note": "corner_BR (dist=0.00m)"
+  },
+  "21": {
+    "shipped_value": [
+      25.76,
+      22.85
+    ],
+    "candidate_value": [
+      105.0,
+      54.16
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 81,
+    "note": "R_goalline_pen_bot (dist=0.00m)"
+  },
+  "22": {
+    "shipped_value": [
+      33.04,
+      10.09
+    ],
+    "candidate_value": [
+      33.04,
+      10.09
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 168,
+    "note": "COLLISION with idx 26 at (88.5, 13.84) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "23": {
+    "shipped_value": [
+      22.68,
+      7.29
+    ],
+    "candidate_value": [
+      22.68,
+      7.29
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 205,
+    "note": "COLLISION with idx 29 at (88.5, 54.16) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "24": {
+    "shipped_value": [
+      31.92,
+      0.56
+    ],
+    "candidate_value": [
+      31.92,
+      0.56
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 227,
+    "note": "COLLISION with idx 17 at (61.65, 34.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "25": {
+    "shipped_value": [
+      88.5,
+      54.16
+    ],
+    "candidate_value": [
+      88.5,
+      54.16
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 117,
+    "note": "R_goalline_pen_top (dist=5.50m)"
+  },
+  "26": {
+    "shipped_value": [
+      88.5,
+      68.0
+    ],
+    "candidate_value": [
+      88.5,
+      13.84
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 196,
+    "note": "R_pen_front_top (dist=0.00m)"
+  },
+  "27": {
+    "shipped_value": [
+      46.0,
+      0.0
+    ],
+    "candidate_value": [
+      46.0,
+      0.0
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 273,
+    "note": "COLLISION with idx 33 at (52.5, 24.85) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "28": {
+    "shipped_value": [
+      42.28,
+      23.13
+    ],
+    "candidate_value": [
+      52.5,
+      43.15
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 250,
+    "note": "centrecircle_bot (dist=0.00m)"
+  },
+  "29": {
+    "shipped_value": [
+      47.0,
+      43.15
+    ],
+    "candidate_value": [
+      88.5,
+      54.16
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 209,
+    "note": "R_pen_front_bot (dist=0.00m)"
+  },
+  "30": {
+    "shipped_value": [
+      35.84,
+      36.87
+    ],
+    "candidate_value": [
+      35.84,
+      36.87
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 134,
+    "note": "COLLISION with idx 46 at (99.5, 43.16) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "31": {
+    "shipped_value": [
+      88.5,
+      34.0
+    ],
+    "candidate_value": [
+      88.5,
+      34.0
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 199,
+    "note": "COLLISION with idx 29 at (88.5, 54.16) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "32": {
+    "shipped_value": [
+      16.5,
+      0.0
+    ],
+    "candidate_value": [
+      16.5,
+      26.687510683768487
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 370,
+    "note": "L_Darc_tan_top (dist=0.00m)"
+  },
+  "33": {
+    "shipped_value": [
+      58.0,
+      0.0
+    ],
+    "candidate_value": [
+      52.5,
+      24.85
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 459,
+    "note": "centrecircle_top (dist=0.00m)"
+  },
+  "34": {
+    "shipped_value": [
+      40.6,
+      1.26
+    ],
+    "candidate_value": [
+      40.6,
+      1.26
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 397,
+    "note": "COLLISION with idx 13 at (52.5, 0.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "35": {
+    "shipped_value": [
+      88.5,
+      13.84
+    ],
+    "candidate_value": [
+      88.5,
+      13.84
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 284,
+    "note": "COLLISION with idx 41 at (88.5, 0.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "36": {
+    "shipped_value": [
+      30.38,
+      53.28
+    ],
+    "candidate_value": [
+      30.38,
+      53.28
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 47,
+    "note": "COLLISION with idx 37 at (16.5, 68.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "37": {
+    "shipped_value": [
+      33.6,
+      64.07
+    ],
+    "candidate_value": [
+      16.5,
+      68.0
+    ],
+    "touched": true,
+    "confidence": "MEDIUM",
+    "n_training_labels": 108,
+    "note": "L_pen_touchline_near (dist=0.00m)"
+  },
+  "38": {
+    "shipped_value": [
+      36.4,
+      61.97
+    ],
+    "candidate_value": [
+      36.4,
+      61.97
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 92,
+    "note": "COLLISION with idx 42 at (88.5, 68.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "39": {
+    "shipped_value": [
+      31.36,
+      53.84
+    ],
+    "candidate_value": [
+      31.36,
+      53.84
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 48,
+    "note": "COLLISION with idx 37 at (16.5, 68.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "40": {
+    "shipped_value": [
+      64.0,
+      0.0
+    ],
+    "candidate_value": [
+      64.0,
+      0.0
+    ],
+    "touched": false,
+    "confidence": "LOW",
+    "n_training_labels": 418,
+    "note": "COLLISION with idx 13 at (52.5, 0.0) - left UNASSIGNED (kept out of corrected table to avoid a duplicate-coordinate degeneracy)"
+  },
+  "41": {
+    "shipped_value": [
+      88.5,
+      0.0
+    ],
+    "candidate_value": [
+      88.5,
+      0.0
+    ],
+    "touched": true,
+    "confidence": "MEDIUM",
+    "n_training_labels": 358,
+    "note": "R_pen_touchline_far (dist=0.00m)"
+  },
+  "42": {
+    "shipped_value": [
+      38.08,
+      57.91
+    ],
+    "candidate_value": [
+      88.5,
+      68.0
+    ],
+    "touched": true,
+    "confidence": "MEDIUM",
+    "n_training_labels": 98,
+    "note": "R_pen_touchline_near (dist=0.00m)"
+  },
+  "43": {
+    "shipped_value": [
+      35.84,
+      59.73
+    ],
+    "candidate_value": [
+      5.5,
+      0.0
+    ],
+    "touched": true,
+    "confidence": "MEDIUM",
+    "n_training_labels": 97,
+    "note": "L_6yd_touchline_far (dist=0.00m)"
+  },
+  "44": {
+    "shipped_value": [
+      0.0,
+      13.84
+    ],
+    "candidate_value": [
+      5.5,
+      68.0
+    ],
+    "touched": true,
+    "confidence": "MEDIUM",
+    "n_training_labels": 157,
+    "note": "L_6yd_touchline_near (dist=0.00m)"
+  },
+  "45": {
+    "shipped_value": [
+      0.0,
+      54.16
+    ],
+    "candidate_value": [
+      0.0,
+      30.34
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 127,
+    "note": "L_post_top (dist=0.00m)"
+  },
+  "46": {
+    "shipped_value": [
+      105.0,
+      13.84
+    ],
+    "candidate_value": [
+      99.5,
+      43.16
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 142,
+    "note": "R_6yd_front_bot (dist=0.00m)"
+  },
+  "47": {
+    "shipped_value": [
+      105.0,
+      54.16
+    ],
+    "candidate_value": [
+      99.5,
+      24.84
+    ],
+    "touched": true,
+    "confidence": "HIGH",
+    "n_training_labels": 110,
+    "note": "R_6yd_front_top (dist=0.00m)"
+  }
+}

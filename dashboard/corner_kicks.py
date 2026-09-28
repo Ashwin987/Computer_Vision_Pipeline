@@ -146,6 +146,34 @@ def load_player_positions(cv_pipeline_dir, cv_output_dir):
         return None
 
 
+_CALIBRATION_STATUS_DEFAULT = {"reliable": True, "note": None, "frame_overrides": {}}
+
+
+def load_calibration_status_from_path(output_dir_path):
+    """Same file/schema load_calibration_status uses, but taking an
+    already-resolved output directory path directly - the convention
+    player_repositioning.py's cv_output_dir already follows (a full path,
+    not a cv_pipeline_dir + bare-name pair). Both this and
+    load_calibration_status read the same calibration_status.json; this is
+    the lower-level, path-based version the other builds on, and the one
+    manual_calibration_tool.py's frame_overrides are read back through."""
+    if not output_dir_path:
+        return dict(_CALIBRATION_STATUS_DEFAULT)
+    path = Path(output_dir_path) / "calibration_status.json"
+    if not path.exists():
+        return dict(_CALIBRATION_STATUS_DEFAULT)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return {
+                "reliable": bool(data.get("reliable", True)),
+                "note": data.get("note"),
+                "frame_overrides": data.get("frame_overrides", {}) or {},
+            }
+    except (json.JSONDecodeError, OSError):
+        return dict(_CALIBRATION_STATUS_DEFAULT)
+
+
 def load_calibration_status(cv_pipeline_dir, cv_output_dir):
     """Whether this corner's own calibration has been verified reliable, per
     the real-coordinate back-projection spot-check (see KNOWN_ISSUES.md) -
@@ -165,15 +193,26 @@ def load_calibration_status(cv_pipeline_dir, cv_output_dir):
     detect, not to replace that check."""
     if not cv_output_dir:
         return {"reliable": True, "note": None}
-    path = Path(cv_pipeline_dir) / "output_videos" / cv_output_dir / "calibration_status.json"
-    if not path.exists():
-        return {"reliable": True, "note": None}
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return {"reliable": bool(data.get("reliable", True)), "note": data.get("note")}
-    except (json.JSONDecodeError, OSError):
-        return {"reliable": True, "note": None}
+    data = load_calibration_status_from_path(Path(cv_pipeline_dir) / "output_videos" / cv_output_dir)
+    return {"reliable": data["reliable"], "note": data["note"]}
+
+
+def apply_frame_overrides(homography_per_frame, calibration_status):
+    """Merges manually-corrected per-frame homographies (from
+    manual_calibration_tool.py, stored under calibration_status.json's
+    "frame_overrides") on top of a {frame_idx: (H, H_inv)} dict - an
+    override always wins over the automatic homography for that exact
+    frame. Any consumer of a per-frame homography dict (Game Board,
+    speed/distance reprocessing, the future 2D map) picks up a manual
+    correction automatically just by loading calibration_status through
+    this same path, with no per-feature-specific wiring."""
+    overrides = calibration_status.get("frame_overrides") or {}
+    if not overrides:
+        return homography_per_frame
+    merged = dict(homography_per_frame)
+    for frame_str, entry in overrides.items():
+        merged[int(frame_str)] = (entry["H"], entry["H_inv"])
+    return merged
 
 
 def resolve_corner_team_mapping(positions_data, reference_team_colors_bgr, reference_team1_is_team_a=True):
