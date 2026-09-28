@@ -19,6 +19,7 @@ import chatbot as cb
 import corner_kicks as ck
 import player_labels as pl
 import player_repositioning as pr
+import tactical_view as tv
 import base64
 import numpy as np
 import random
@@ -2567,6 +2568,128 @@ def render_game_board_tab():
     )
 
 
+def _hex_to_bgr(hex_str, fallback=(136, 136, 136)):
+    """Inverse of _bgr_to_hex — a CSS hex color -> an OpenCV BGR tuple."""
+    try:
+        h = hex_str.lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return (b, g, r)
+    except (ValueError, IndexError, AttributeError):
+        return fallback
+
+
+def _tactical_view_player_team_map(cv_output_dir):
+    """{str(player_id): team_num (1 or 2)} from this match's stats.json,
+    resolved through this app's own status.json/_resolve_cv_path plumbing —
+    the exact same source and lookup _game_board_team_color_resolver
+    already uses for Game Board's dot colors, so team assignment is
+    consistent across both features rather than a second, parallel read."""
+    status = get_cv_job_status_safe(cv_output_dir)
+    stats_file = status.get('stats_file')
+    if not stats_file:
+        return {}
+    resolved = _resolve_cv_path(stats_file)
+    if not resolved.exists():
+        return {}
+    try:
+        with open(resolved, 'r') as f:
+            stats = json.load(f)
+        return {str(p.get('player_id')): p.get('team') for p in stats.get('players', [])}
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def render_tactical_view_tab():
+    """The Tactical Map tab: a 2D top-down schematic view of the whole
+    pitch — every player as a team-colored dot at their real calibrated
+    position, a per-team convex-hull shape outline, the ball, and each
+    player's current speed as a label. See tactical_view.py's own module
+    docstring for why this is a genuinely different (and, for a flat
+    diagram, more appropriate) design choice than Game Board's real-frame,
+    no-homography approach."""
+    st.subheader("🗺️ Tactical Map")
+    st.caption(
+        "A top-down schematic view of the pitch at a chosen moment — every tracked player as a "
+        "team-colored dot at their real calibrated position, each team's shape as a convex-hull "
+        "outline, the ball's position, and each player's current speed (km/h) next to their dot."
+    )
+
+    cv_output_dir = st.session_state.get('cv_job_output_dir')
+    if not cv_output_dir:
+        st.info("This match doesn't have a completed CV Deep Analysis job yet — the tactical map needs that first.")
+        return
+
+    source, key = _get_active_match_identity()
+    video_path = _repositioning_video_path(source, key)
+    if not video_path:
+        st.info("This match's original CV analysis clip isn't available in this session, so the tactical map can't be built.")
+        return
+
+    ctx = pr.load_context(cv_output_dir, video_path)
+    if ctx is None:
+        st.warning(
+            "This match hasn't been exported for the tactical map yet — it needs "
+            "`export_repositioning_data.py` run once against its CV output (the same one-time "
+            "offline step Game Board already depends on)."
+        )
+        return
+
+    player_team = _tactical_view_player_team_map(cv_output_dir)
+    if not player_team:
+        st.warning("No team-assignment data found for this match (stats.json missing or empty) — can't color players by team.")
+        return
+
+    team_mapping = st.session_state.get('cv_team_mapping')
+    color_a = _resolve_color_hex(st.session_state.get('color_a'), "#e63946")
+    color_b = _resolve_color_hex(st.session_state.get('color_b'), "#1d3557")
+    # team_mapping keys are the CV pipeline's own numeric team1/team2 tokens
+    # ("1"/"2"), confirmed against this match's own team_resolution during
+    # Part 3 — same mapping _cv_team_label already uses everywhere else.
+    team1_key = (team_mapping or {}).get('1')
+    team2_key = (team_mapping or {}).get('2')
+    team_bgr = {
+        1: _hex_to_bgr(color_a if team1_key == 'team_a' else color_b if team1_key == 'team_b' else color_a),
+        2: _hex_to_bgr(color_b if team2_key == 'team_b' else color_a if team2_key == 'team_a' else color_b),
+    }
+
+    match_key = key or "session"
+    frame_key = f"tactical_view_frame_{source}_{match_key}"
+    play_key = f"tactical_view_playing_{source}_{match_key}"
+    st.session_state.setdefault(frame_key, 0)
+    st.session_state.setdefault(play_key, False)
+
+    ctrl_col1, ctrl_col2 = st.columns([1, 4])
+    with ctrl_col1:
+        playing = st.checkbox("▶ Auto-play", value=st.session_state[play_key], key=f"{play_key}_cb")
+        st.session_state[play_key] = playing
+    if playing:
+        st_autorefresh(interval=200, key=f"{frame_key}_autorefresh")
+        st.session_state[frame_key] = (st.session_state[frame_key] + 2) % ctx.n_frames
+
+    with ctrl_col2:
+        frame_idx = st.slider(
+            "Frame", 0, ctx.n_frames - 1, value=st.session_state[frame_key],
+            key=f"{frame_key}_slider", disabled=playing,
+        )
+        if not playing:
+            st.session_state[frame_key] = frame_idx
+        else:
+            frame_idx = st.session_state[frame_key]
+    st.caption(f"t = {frame_idx / ctx.fps:.1f}s (frame {frame_idx} / {ctx.n_frames - 1})")
+
+    goalkeeper_ids = {tid for tid, info in ctx.players[frame_idx].items() if info.get("is_goalkeeper")}
+    canvas, meta = tv.render_topdown_frame(ctx, frame_idx, player_team, team_bgr, goalkeeper_ids=goalkeeper_ids)
+    st.image(canvas, channels="BGR", width='stretch')
+
+    off_pitch_note = f", {meta['n_off_pitch']} off-pitch/unresolved" if meta['n_off_pitch'] else ""
+    ball_note = "ball visible" if meta['ball_visible'] else "ball not detected this frame"
+    st.caption(
+        f"{meta['n_on_pitch']} of {meta['n_tracked']} tracked players shown{off_pitch_note} · "
+        f"team hulls: {meta['team1_hull_pts']} / {meta['team2_hull_pts']} points · {ball_note} · "
+        "goalkeepers are drawn but excluded from their team's hull shape."
+    )
+
+
 def render_cv_completed_state(status, cv_output_dir):
     outputs = status.get('outputs', {})
     stats_file = status.get('stats_file')
@@ -4661,8 +4784,8 @@ elif st.session_state.step == 3:
 
             st.header("Match Segment Overview")
 
-            tab_dashboard, tab_coach, tab_game, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
-                ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
+            tab_dashboard, tab_coach, tab_game, tab_tactical, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
+                ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🗺️ Tactical Map", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
                 st.subheader("Global Control")
@@ -4912,6 +5035,9 @@ elif st.session_state.step == 3:
 
             with tab_game:
                 render_game_board_tab()
+
+            with tab_tactical:
+                render_tactical_view_tab()
 
             with tab_cv:
                 render_cv_deep_analysis_tab()

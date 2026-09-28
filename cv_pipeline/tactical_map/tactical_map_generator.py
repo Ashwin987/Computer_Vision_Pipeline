@@ -6,20 +6,32 @@ from .formation_detector import FormationDetector
 from .voronoi_control import VoronoiPitchControl
 
 # ── Canvas / pitch layout ────────────────────────────────────────────────────
+# Orientation: pitch LENGTH (position_transformed axis-0, 0-105m) runs
+# horizontally across the canvas; pitch WIDTH (axis-1, 0-68m) runs
+# vertically - the standard top-down "radar" layout, and the actual
+# 0-105 x 0-68 convention pitch_calibrator.py's real (RANSAC-fit)
+# homography produces (see speed_and_distance_estimator.py's own
+# PITCH_X_MAX=105/PITCH_Y_MAX=68 bounds check for the same convention
+# used elsewhere in this pipeline). This canvas used to be built around
+# the fixed ViewTransformer fallback matrix's 0-23.32 "visible depth"
+# window instead - a deterministic axis/units mismatch that misplaced
+# every player whenever the real calibrated homography was used,
+# independent of keypoint-detection accuracy (audited and fixed as part
+# of the football-tactics-repo product-readiness audit, Item 8).
 CANVAS_W  = 1100
-CANVAS_H  = 600
 HEADER_H  = 70
 FOOTER_H  = 70
-PITCH_PAD = 25        # horizontal gap between canvas edge and pitch edge
+PITCH_PAD = 25        # gap between canvas edge and pitch edge, each side
 
-PITCH_W_M = 68.0      # pitch width in metres (full width)
-PITCH_D_M = 23.32     # visible depth in metres (view-transformer section)
+PITCH_W_M = 105.0     # pitch length in metres (position_transformed axis-0) - horizontal
+PITCH_D_M = 68.0      # pitch width in metres (position_transformed axis-1) - vertical
 
-SCALE      = (CANVAS_W - 2 * PITCH_PAD) / PITCH_W_M   # ≈ 15.44 px/m
+SCALE      = (CANVAS_W - 2 * PITCH_PAD) / PITCH_W_M   # = 10.0 px/m
 PITCH_W_PX = CANVAS_W - 2 * PITCH_PAD                  # 1050
-PITCH_D_PX = int(PITCH_D_M * SCALE)                    # ≈ 360
+PITCH_D_PX = int(PITCH_D_M * SCALE)                    # 680
 PITCH_LEFT = PITCH_PAD
-PITCH_TOP  = HEADER_H + ((CANVAS_H - HEADER_H - FOOTER_H - PITCH_D_PX) // 2)
+PITCH_TOP  = HEADER_H
+CANVAS_H   = HEADER_H + PITCH_D_PX + FOOTER_H          # 820
 
 # Voronoi blend alpha (0 = no Voronoi, 1 = full Voronoi)
 VORONOI_ALPHA = 0.42
@@ -32,9 +44,9 @@ VEL_SMOOTH = 3
 
 
 def _pitch_to_canvas(pitch_x, pitch_y):
-    """Pitch (x=depth 0..23.32, y=width 0..68) → canvas (cx, cy)."""
-    cx = int(PITCH_LEFT + pitch_y * SCALE)
-    cy = int(PITCH_TOP  + pitch_x * SCALE)
+    """Pitch (x=length 0..105, y=width 0..68) → canvas (cx, cy)."""
+    cx = int(PITCH_LEFT + pitch_x * SCALE)
+    cy = int(PITCH_TOP  + pitch_y * SCALE)
     return cx, cy
 
 
@@ -56,16 +68,17 @@ def _build_pitch_bg():
     # Pitch border
     cv2.rectangle(canvas, (pr[0], pr[1]), (pr[2], pr[3]), (220, 220, 220), 2)
 
-    # Halfway line (depth midpoint)
-    mid_y = int(PITCH_TOP + (PITCH_D_M / 2) * SCALE)
-    cv2.line(canvas, (PITCH_LEFT, mid_y),
-             (PITCH_LEFT + PITCH_W_PX, mid_y), (180, 180, 180), 1)
+    # Halfway line (length midpoint) - a vertical line, since pitch length
+    # now runs horizontally across the canvas.
+    mid_x = int(PITCH_LEFT + (PITCH_W_M / 2) * SCALE)
+    cv2.line(canvas, (mid_x, PITCH_TOP),
+             (mid_x, PITCH_TOP + PITCH_D_PX), (180, 180, 180), 1)
 
     # Centre circle (approximate)
-    cx_pitch = PITCH_LEFT + PITCH_W_PX // 2
+    cy_pitch = PITCH_TOP + PITCH_D_PX // 2
     r_m = 9.15   # standard centre-circle radius
-    cv2.circle(canvas, (cx_pitch, mid_y), int(r_m * SCALE), (160, 160, 160), 1)
-    cv2.circle(canvas, (cx_pitch, mid_y), 3, (200, 200, 200), -1)
+    cv2.circle(canvas, (mid_x, cy_pitch), int(r_m * SCALE), (160, 160, 160), 1)
+    cv2.circle(canvas, (mid_x, cy_pitch), 3, (200, 200, 200), -1)
 
     return canvas
 
@@ -184,8 +197,8 @@ class TacticalMapGenerator:
                 vx, vy = float(p['vel'][0]), float(p['vel'][1])
 
                 # Arrow tip (vel in pitch coords → canvas offsets)
-                ex = int(cx + vy * SCALE * ARROW_T)
-                ey = int(cy + vx * SCALE * ARROW_T)
+                ex = int(cx + vx * SCALE * ARROW_T)
+                ey = int(cy + vy * SCALE * ARROW_T)
                 if (ex, ey) != (cx, cy):
                     cv2.arrowedLine(canvas, (cx, cy), (ex, ey),
                                     color, 1, tipLength=0.45, line_type=cv2.LINE_AA)

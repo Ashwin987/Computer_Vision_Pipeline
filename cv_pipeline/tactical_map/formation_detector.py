@@ -9,7 +9,7 @@ class FormationDetector:
         """
         Cluster players into formation lines using natural gaps in depth (x).
 
-        positions_x : list of float  (pitch-x = depth, 0..23.32 m)
+        positions_x : list of float  (pitch-x = length, 0..105 m)
 
         Returns
         -------
@@ -49,8 +49,9 @@ class FormationDetector:
 
         return formation_str, assignments, line_centers
 
-    def get_phase(self, positions_x, midpoint=11.66):
-        """Return 'ATK' if the team's average depth > midpoint, else 'DEF'."""
+    def get_phase(self, positions_x, midpoint=52.5):
+        """Return 'ATK' if the team's average pitch-length position >
+        midpoint (52.5m = the halfway line on a 105m pitch), else 'DEF'."""
         if not positions_x:
             return "N/A"
         return "ATK" if float(np.mean(positions_x)) > midpoint else "DEF"

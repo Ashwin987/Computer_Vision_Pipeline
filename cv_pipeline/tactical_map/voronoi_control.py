@@ -20,8 +20,8 @@ class VoronoiPitchControl:
         self.time_horizon = time_horizon
 
         # Pre-compute pixel coordinate grids for the pitch sub-region.
-        # xg[r,c] = absolute canvas-x of column c  (maps to pitch-y / width)
-        # yg[r,c] = absolute canvas-y of row r      (maps to pitch-x / depth)
+        # xg[r,c] = absolute canvas-x of column c  (maps to pitch-x / length)
+        # yg[r,c] = absolute canvas-y of row r      (maps to pitch-y / width)
         canvas_xs = np.arange(pitch_left, pitch_left + pitch_w_px, dtype=np.float32)
         canvas_ys = np.arange(pitch_top,  pitch_top  + pitch_d_px, dtype=np.float32)
         self.xg, self.yg = np.meshgrid(canvas_xs, canvas_ys)  # (D, W)
@@ -33,7 +33,7 @@ class VoronoiPitchControl:
         ----------
         players_with_team : list of (team, (px_m, py_m), (vx_ms, vy_ms))
             team    : 1 or 2
-            px_m    : pitch-x in metres (depth)
+            px_m    : pitch-x in metres (length)
             py_m    : pitch-y in metres (width)
             vx_ms   : velocity in pitch-x direction (m/s)
             vy_ms   : velocity in pitch-y direction (m/s)
@@ -57,12 +57,12 @@ class VoronoiPitchControl:
 
         for team, (px_m, py_m), (vx, vy) in players_with_team:
             # Project position forward
-            proj_x = px_m + vx * self.time_horizon   # depth (pitch-x)
+            proj_x = px_m + vx * self.time_horizon   # length (pitch-x)
             proj_y = py_m + vy * self.time_horizon   # width (pitch-y)
 
             # Convert to canvas coords
-            cx = pitch_left + proj_y * scale   # horizontal
-            cy = pitch_top  + proj_x * scale   # vertical
+            cx = pitch_left + proj_x * scale   # horizontal
+            cy = pitch_top  + proj_y * scale   # vertical
 
             d2 = (self.xg - cx) ** 2 + (self.yg - cy) ** 2
             mask = d2 < min_d2

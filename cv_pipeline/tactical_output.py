@@ -16,8 +16,21 @@ from math import sqrt
 import warnings
 warnings.filterwarnings('ignore')
 
-# ── Pitch real-world dimensions (from view_transformer) ──────────────────────
-PITCH_W_M = 23.32   # visible depth  (position_transformed axis-0)
+# ── Pitch real-world dimensions ───────────────────────────────────────────────
+# Matches pitch_calibrator.py's real (RANSAC-fit) homography convention -
+# position_transformed axis-0 spans the full 0-105m pitch length, axis-1
+# the full 0-68m width (see speed_and_distance_estimator.py's own
+# PITCH_X_MAX=105/PITCH_Y_MAX=68 bounds check for the same convention used
+# elsewhere in this pipeline). This used to be pinned to the fixed
+# ViewTransformer fallback matrix's 0-23.32 "visible depth" window instead -
+# a deterministic axis/units mismatch that squeezed real, full-pitch-length
+# positions into a 23.32m-wide canvas whenever the real calibrated
+# homography was in play, independent of keypoint-detection accuracy
+# (audited and fixed as part of the football-tactics-repo product-readiness
+# audit, Item 8). draw_pitch_markings below already used real penalty-box
+# metre offsets (16.5/13.85/54.15 etc.), so it renders correctly as soon as
+# this constant is fixed - no other change needed there.
+PITCH_W_M = 105.0   # pitch length  (position_transformed axis-0)
 PITCH_H_M = 68.0    # pitch width    (position_transformed axis-1)
 SIDEBAR_W = 220
 
@@ -130,7 +143,7 @@ def draw_pitch_markings(zone, zone_w, zone_h, margin=20):
     # Outer boundary
     cv2.rectangle(overlay, tp(0, 0), tp(PITCH_W_M, PITCH_H_M), PITCH_LINE, 2)
 
-    # Halfway line (depth mid)
+    # Halfway line (length mid)
     mid = PITCH_W_M / 2
     cv2.line(overlay, tp(mid, 0), tp(mid, PITCH_H_M), PITCH_LINE, 1)
 
