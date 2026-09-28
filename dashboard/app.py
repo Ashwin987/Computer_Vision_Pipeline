@@ -1796,7 +1796,7 @@ def _render_player_labeler(stats, team_mapping, source, key, player_labels):
                     str(p.get('player_id')): row.get("Name", "")
                     for p, row in zip(players, edited_rows)
                 }
-                pl.save_labels(CACHE_DIR, key, new_labels)
+                pl.save_labels(CACHE_DIR, key, new_labels, source=source, curated_matches_dir=CURATED_MATCHES_DIR)
                 st.success("Saved.")
                 st.rerun()
 
@@ -2373,7 +2373,8 @@ def _render_game_board_core(key_suffix=""):
     match_key = key or "session"
     state_key = f"reposition_moves_{source}_{match_key}"
     if state_key not in st.session_state:
-        st.session_state[state_key] = pr.load_repositions(CACHE_DIR, match_key) if source else []
+        st.session_state[state_key] = pr.load_repositions(
+            CACHE_DIR, match_key, source=source, curated_matches_dir=CURATED_MATCHES_DIR) if source else []
     moves = st.session_state[state_key]
 
     frame_key = f"reposition_frame_idx_{match_key}{key_suffix}"
@@ -2393,7 +2394,8 @@ def _render_game_board_core(key_suffix=""):
     has_board = raw_frame_idx is not None
     frame_idx = max(0, min(n_frames - 1, raw_frame_idx)) if has_board else 0
 
-    player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+    player_labels = pl.load_labels(
+        CACHE_DIR, key, source=source, curated_matches_dir=CURATED_MATCHES_DIR) if key else {}
     color_for_track = _game_board_team_color_resolver(
         cv_output_dir, st.session_state.get('cv_team_mapping'),
         st.session_state.get('color_a'), st.session_state.get('color_b'),
@@ -2492,7 +2494,7 @@ def _render_game_board_core(key_suffix=""):
                                "frame_idx": frame_idx})
                 st.session_state[state_key] = moves
                 if source:
-                    pr.save_repositions(CACHE_DIR, match_key, moves)
+                    pr.save_repositions(CACHE_DIR, match_key, moves, source=source, curated_matches_dir=CURATED_MATCHES_DIR)
             st.rerun()
         elif action == "draw":
             png_b64 = value.get("png")
@@ -2708,7 +2710,8 @@ def render_cv_completed_state(status, cv_output_dir):
     team_mapping = st.session_state.get('cv_team_mapping')
 
     source, key = _get_active_match_identity()
-    player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+    player_labels = pl.load_labels(
+        CACHE_DIR, key, source=source, curated_matches_dir=CURATED_MATCHES_DIR) if key else {}
 
     video_col, side_col = st.columns([2.2, 1])
 
@@ -3361,7 +3364,8 @@ def _render_team_plan_subtab(source, key, team_key):
     # by "team_a"/"team_b" tokens - so this team's tab only shows its own
     # card, never the other team's.
     team_insights = [ti for ti in (cv_insights.get("team_insights") or []) if ti.get("team") == team_name]
-    player_labels = pl.load_labels(CACHE_DIR, key) if key else {}
+    player_labels = pl.load_labels(
+        CACHE_DIR, key, source=source, curated_matches_dir=CURATED_MATCHES_DIR) if key else {}
     team_insights = [
         {k: (pl.substitute_player_labels(v, player_labels) if isinstance(v, str) else v) for k, v in ti.items()}
         for ti in team_insights
@@ -3501,7 +3505,7 @@ def _render_player_plan_subtab(source, key):
     # value= argument the very first time that key appears; once a key has
     # session-state, value= is ignored on every later rerun.
     match_prefix = f"{source}_{key}"
-    player_labels = pl.load_labels(CACHE_DIR, key)
+    player_labels = pl.load_labels(CACHE_DIR, key, source=source, curated_matches_dir=CURATED_MATCHES_DIR)
 
     labels = [pl.player_label(p['player_id'], p.get('team_label', '?'), player_labels) for p in players]
     chosen_label = st.selectbox("Choose a player:", labels, key=f"tp_player_select_{match_prefix}")
@@ -5059,7 +5063,8 @@ elif st.session_state.step == 3:
                             with open(resolved_chat, 'r') as f:
                                 stats_json_for_chat = json.load(f)
                 chat_source, chat_key = _get_active_match_identity()
-                chat_player_labels = pl.load_labels(CACHE_DIR, chat_key) if chat_key else {}
+                chat_player_labels = pl.load_labels(
+                    CACHE_DIR, chat_key, source=chat_source, curated_matches_dir=CURATED_MATCHES_DIR) if chat_key else {}
                 cb.render_chatbot_tab(
                     df, stats_json_for_chat, team_a, team_b, ai_report_text,
                     valid_keys[0] if valid_keys else None, chat_source, chat_key,

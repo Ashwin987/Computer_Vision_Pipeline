@@ -1,800 +1,1187 @@
 {
-  "team_plan": {
-    "days": [
-      {
-        "day": "Monday",
-        "focus_label": "Active Recovery",
-        "focus_category": "rest",
-        "drills": [
-          {
-            "title": "Light Jog & Stretch",
-            "duration_min": 30,
-            "note": "Focus on gentle movement to aid muscle recovery and reduce stiffness after the match."
-          }
-        ],
-        "why_stat": "PHASE E TEST manually edited why stat",
-        "edited_fields": [
-          "why_stat"
-        ]
-      },
-      {
-        "day": "Tuesday",
-        "focus_label": "Rapid Transitions",
-        "focus_category": "trans",
-        "drills": [
-          {
-            "title": "Counter-Attack Drills (3v2, 4v3)",
-            "duration_min": 45,
-            "note": "Practice quick ball recovery and immediate vertical passes to exploit defensive disorganization."
-          },
-          {
-            "title": "Finishing from Fast Breaks",
-            "duration_min": 30,
-            "note": "Refine decision-making and accuracy in front of goal after rapid transitions."
-          }
-        ],
-        "why_stat": "Red was involved in a counter-attack or fast vertical transition in 7 minutes, highlighting this as their primary offensive outlet.",
-        "edited_fields": []
-      },
-      {
-        "day": "Wednesday",
-        "focus_label": "Progressive Build-Up",
-        "focus_category": "build",
-        "drills": [
-          {
-            "title": "Possession Rondo with Progression Gates",
-            "duration_min": 40,
-            "note": "Develop controlled possession with a focus on breaking lines and advancing the ball into attacking zones."
-          },
-          {
-            "title": "Attacking Third Overload Play",
-            "duration_min": 35,
-            "note": "Work on creating numerical advantages and intelligent movement in the opponent's final third."
-          }
-        ],
-        "why_stat": "Red's engagement in the attacking third was severely limited, registering only 3.2 minutes of fractional time in attack, indicating a need to improve sustained offensive pressure.",
-        "edited_fields": []
-      },
-      {
-        "day": "Thursday",
-        "focus_label": "Defensive Pressing & Shape",
-        "focus_category": "press",
-        "drills": [
-          {
-            "title": "Gegenpress Scenarios (Small-Sided Games)",
-            "duration_min": 40,
-            "note": "Train immediate high-intensity pressing upon losing possession to win the ball back quickly in advanced areas."
-          },
-          {
-            "title": "Defensive Block & Mid-Block Transition",
-            "duration_min": 35,
-            "note": "Practice shifting from a deep defensive line to a more aggressive mid-block when appropriate opportunities arise."
-          },
-          {
-            "title": "Recovery Session",
-            "duration_min": 15,
-            "note": "Focus on light activity and regeneration after high number of recovery events in the last match."
-          }
-        ],
-        "why_stat": "Red dropped its defensive line deep in 15 minutes, while also using gegenpress in 12 of 29 minutes, indicating a need to integrate these defensive actions more effectively.",
-        "edited_fields": [],
-        "chat_confirmed_fields": [
-          "drills"
-        ]
-      },
-      {
-        "day": "Friday",
-        "focus_label": "Fullback Attacking Runs",
-        "focus_category": "build",
-        "drills": [
-          {
-            "title": "Wide Play & Crossing Drills",
-            "duration_min": 40,
-            "note": "Focus on fullbacks making overlapping runs to provide width and deliver quality crosses into the box."
-          },
-          {
-            "title": "Attacking Combinations with Fullbacks",
-            "duration_min": 30,
-            "note": "Integrate fullbacks into attacking sequences with wingers and central midfielders to create varied threats."
-          }
-        ],
-        "why_stat": "Red's fullbacks played defensive in 15 minutes and overlapping in 14, suggesting an opportunity to increase their attacking contribution.",
-        "edited_fields": []
-      },
-      {
-        "day": "Saturday",
-        "focus_label": "Tactical Review & Set Pieces",
-        "focus_category": "build",
-        "drills": [
-          {
-            "title": "Light Tactical Walkthrough",
-            "duration_min": 30,
-            "note": "Review opponent's tendencies and Red's tactical plan for the upcoming match, focusing on key movements."
-          },
-          {
-            "title": "Set Piece Practice (Offensive & Defensive)",
-            "duration_min": 20,
-            "note": "Refine routines for corners, free kicks, and defensive positioning during opponent's set pieces."
-          }
-        ],
-        "why_stat": "This light session ensures players are mentally prepared and tactically aligned for the upcoming match, minimizing physical exertion.",
-        "edited_fields": []
-      },
-      {
-        "day": "Sunday",
-        "focus_label": "Complete Rest",
-        "focus_category": "rest",
-        "drills": [],
-        "why_stat": "This day provides essential complete rest for physical and mental rejuvenation, allowing players to fully recover before the start of the next training cycle.",
-        "edited_fields": []
-      }
-    ],
-    "_original_days": [
-      {
-        "day": "Monday",
-        "focus_label": "Active Recovery",
-        "focus_category": "rest",
-        "drills": [
-          {
-            "title": "Light Jog & Stretch",
-            "duration_min": 30,
-            "note": "Focus on gentle movement to aid muscle recovery and reduce stiffness after the match."
-          }
-        ],
-        "why_stat": "This day is dedicated to physical and mental recovery, crucial for player well-being and readiness for the demanding week ahead.",
-        "edited_fields": []
-      },
-      {
-        "day": "Tuesday",
-        "focus_label": "Rapid Transitions",
-        "focus_category": "trans",
-        "drills": [
-          {
-            "title": "Counter-Attack Drills (3v2, 4v3)",
-            "duration_min": 45,
-            "note": "Practice quick ball recovery and immediate vertical passes to exploit defensive disorganization."
-          },
-          {
-            "title": "Finishing from Fast Breaks",
-            "duration_min": 30,
-            "note": "Refine decision-making and accuracy in front of goal after rapid transitions."
-          }
-        ],
-        "why_stat": "Red was involved in a counter-attack or fast vertical transition in 7 minutes, highlighting this as their primary offensive outlet.",
-        "edited_fields": []
-      },
-      {
-        "day": "Wednesday",
-        "focus_label": "Progressive Build-Up",
-        "focus_category": "build",
-        "drills": [
-          {
-            "title": "Possession Rondo with Progression Gates",
-            "duration_min": 40,
-            "note": "Develop controlled possession with a focus on breaking lines and advancing the ball into attacking zones."
-          },
-          {
-            "title": "Attacking Third Overload Play",
-            "duration_min": 35,
-            "note": "Work on creating numerical advantages and intelligent movement in the opponent's final third."
-          }
-        ],
-        "why_stat": "Red's engagement in the attacking third was severely limited, registering only 3.2 minutes of fractional time in attack, indicating a need to improve sustained offensive pressure.",
-        "edited_fields": []
-      },
-      {
-        "day": "Thursday",
-        "focus_label": "Defensive Pressing & Shape",
-        "focus_category": "press",
-        "drills": [
-          {
-            "title": "Gegenpress Scenarios (Small-Sided Games)",
-            "duration_min": 40,
-            "note": "Train immediate high-intensity pressing upon losing possession to win the ball back quickly in advanced areas."
-          },
-          {
-            "title": "Defensive Block & Mid-Block Transition",
-            "duration_min": 35,
-            "note": "Practice shifting from a deep defensive line to a more aggressive mid-block when appropriate opportunities arise."
-          },
-          {
-            "title": "Recovery Session",
-            "duration_min": 15,
-            "note": "Focus on light activity and regeneration after high number of recovery events in the last match."
-          }
-        ],
-        "why_stat": "Red dropped its defensive line deep in 15 minutes, while also using gegenpress in 12 of 29 minutes, indicating a need to integrate these defensive actions more effectively.",
-        "edited_fields": []
-      },
-      {
-        "day": "Friday",
-        "focus_label": "Fullback Attacking Runs",
-        "focus_category": "build",
-        "drills": [
-          {
-            "title": "Wide Play & Crossing Drills",
-            "duration_min": 40,
-            "note": "Focus on fullbacks making overlapping runs to provide width and deliver quality crosses into the box."
-          },
-          {
-            "title": "Attacking Combinations with Fullbacks",
-            "duration_min": 30,
-            "note": "Integrate fullbacks into attacking sequences with wingers and central midfielders to create varied threats."
-          }
-        ],
-        "why_stat": "Red's fullbacks played defensive in 15 minutes and overlapping in 14, suggesting an opportunity to increase their attacking contribution.",
-        "edited_fields": []
-      },
-      {
-        "day": "Saturday",
-        "focus_label": "Tactical Review & Set Pieces",
-        "focus_category": "build",
-        "drills": [
-          {
-            "title": "Light Tactical Walkthrough",
-            "duration_min": 30,
-            "note": "Review opponent's tendencies and Red's tactical plan for the upcoming match, focusing on key movements."
-          },
-          {
-            "title": "Set Piece Practice (Offensive & Defensive)",
-            "duration_min": 20,
-            "note": "Refine routines for corners, free kicks, and defensive positioning during opponent's set pieces."
-          }
-        ],
-        "why_stat": "This light session ensures players are mentally prepared and tactically aligned for the upcoming match, minimizing physical exertion.",
-        "edited_fields": []
-      },
-      {
-        "day": "Sunday",
-        "focus_label": "Complete Rest",
-        "focus_category": "rest",
-        "drills": [],
-        "why_stat": "This day provides essential complete rest for physical and mental rejuvenation, allowing players to fully recover before the start of the next training cycle.",
-        "edited_fields": []
-      }
-    ],
-    "source_note": "Generated from real per-minute tactical patterns across the 29 analyzed minutes of this match.",
-    "generated_at": "2026-09-06T21:24:08.426127+00:00"
+  "team_plans": {
+    "team_a": {
+      "days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Pool & Gym Recovery",
+              "duration_min": 60,
+              "note": "Light swimming, stretching, and mobility exercises to aid muscle recovery and reduce soreness."
+            },
+            {
+              "title": "Tactical Debrief",
+              "duration_min": 30,
+              "note": "Video analysis of the previous match, focusing on individual and collective performance without intense physical exertion."
+            }
+          ],
+          "why_stat": "A dedicated recovery day is essential for player regeneration after a demanding match, ensuring physical and mental readiness for the upcoming training week.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Pressing & Defensive Line",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "High Pressing Drills (4v4 + 2)",
+              "duration_min": 45,
+              "note": "Focus on coordinated triggers, intensity, and immediate counter-pressing after loss of possession in the attacking half."
+            },
+            {
+              "title": "Defensive Line Movement",
+              "duration_min": 45,
+              "note": "Drills to practice consistent defensive line height, stepping up and dropping deep in unison, and maintaining compactness."
+            }
+          ],
+          "why_stat": "Liverpool used a counter-press trigger in 12 of 29 minutes, but the tactical timeline shows frequent shifts to 'none' or 'loss_of_possession' triggers, indicating inconsistency. Liverpool dropped its defensive line deep in 15 minutes, highlighting a tendency to concede territory.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Offensive Build-up & Possession",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Possession Rondo with Progression",
+              "duration_min": 50,
+              "note": "Focus on establishing clear build-up shapes (e.g., 2-3, 3-2) from the back, ball retention, and progressing through midfield."
+            },
+            {
+              "title": "Attacking Third Overloads",
+              "duration_min": 40,
+              "note": "Drills to create and exploit numerical advantages in the final third, improving sustained attacking tempo and chance creation."
+            }
+          ],
+          "why_stat": "Liverpool's build-up shape frequently showed 'none' in the tactical timeline (e.g., min 3, 5-6, 8-9, 12, 25, 28), indicating difficulty in establishing clear offensive structures.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Transition Effectiveness",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Counter-Attack to Finish",
+              "duration_min": 45,
+              "note": "Rapid transition drills from defensive recovery to quick vertical attacks, emphasizing speed, decision-making, and clinical finishing."
+            },
+            {
+              "title": "Defensive Transition & Restructuring",
+              "duration_min": 45,
+              "note": "Drills focusing on immediate defensive shape after losing possession, preventing counter-attacks, and regaining compactness."
+            }
+          ],
+          "why_stat": "Liverpool was involved in a counter-attack or fast vertical transition in 7 minutes, demonstrating its importance as an offensive outlet that needs refinement for consistency.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Fullback Offensive Integration",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Fullback Overlap & Crosses",
+              "duration_min": 40,
+              "note": "Drills focusing on timing and quality of fullback overlaps, combining with wingers/midfielders, and delivering effective crosses."
+            },
+            {
+              "title": "Wide Play & Half-Space Exploitation",
+              "duration_min": 40,
+              "note": "Small-sided games emphasizing the use of width from fullbacks and exploiting half-spaces with central players to create attacking opportunities."
+            }
+          ],
+          "why_stat": "Liverpool's fullbacks played defensive in 15 minutes and overlapping in 14, suggesting a need to enhance their offensive contribution and integration into attacks.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Matchday Minus 1 Prep",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "Set Piece Review & Practice",
+              "duration_min": 30,
+              "note": "Light walk-through and practice of offensive and defensive set pieces for the upcoming opponent."
+            },
+            {
+              "title": "Tactical Walk-Through (Defensive Shape)",
+              "duration_min": 30,
+              "note": "Low-intensity session reinforcing defensive block shape, pressing triggers, and collective movement against anticipated opponent tactics."
+            }
+          ],
+          "why_stat": "Liverpool used a counter-press trigger in 12 of 29 minutes, but the tactical timeline shows frequent shifts to 'none' or 'loss_of_possession' triggers, indicating inconsistency that needs constant reinforcement.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Match Day Activation",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Pre-Match Activation & Rondo",
+              "duration_min": 30,
+              "note": "Light dynamic warm-up, passing drills, and a short rondo to activate muscles and sharpen touch before the match."
+            },
+            {
+              "title": "Quick Attack Patterns",
+              "duration_min": 20,
+              "note": "Brief, high-intensity drills focusing on 2-3 quick attacking patterns to prime offensive players for rapid transitions."
+            }
+          ],
+          "why_stat": "Liverpool was involved in a counter-attack or fast vertical transition in 7 minutes, highlighting a key offensive strength that needs light activation to ensure sharpness for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "_original_days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Pool & Gym Recovery",
+              "duration_min": 60,
+              "note": "Light swimming, stretching, and mobility exercises to aid muscle recovery and reduce soreness."
+            },
+            {
+              "title": "Tactical Debrief",
+              "duration_min": 30,
+              "note": "Video analysis of the previous match, focusing on individual and collective performance without intense physical exertion."
+            }
+          ],
+          "why_stat": "A dedicated recovery day is essential for player regeneration after a demanding match, ensuring physical and mental readiness for the upcoming training week.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Pressing & Defensive Line",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "High Pressing Drills (4v4 + 2)",
+              "duration_min": 45,
+              "note": "Focus on coordinated triggers, intensity, and immediate counter-pressing after loss of possession in the attacking half."
+            },
+            {
+              "title": "Defensive Line Movement",
+              "duration_min": 45,
+              "note": "Drills to practice consistent defensive line height, stepping up and dropping deep in unison, and maintaining compactness."
+            }
+          ],
+          "why_stat": "Liverpool used a counter-press trigger in 12 of 29 minutes, but the tactical timeline shows frequent shifts to 'none' or 'loss_of_possession' triggers, indicating inconsistency. Liverpool dropped its defensive line deep in 15 minutes, highlighting a tendency to concede territory.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Offensive Build-up & Possession",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Possession Rondo with Progression",
+              "duration_min": 50,
+              "note": "Focus on establishing clear build-up shapes (e.g., 2-3, 3-2) from the back, ball retention, and progressing through midfield."
+            },
+            {
+              "title": "Attacking Third Overloads",
+              "duration_min": 40,
+              "note": "Drills to create and exploit numerical advantages in the final third, improving sustained attacking tempo and chance creation."
+            }
+          ],
+          "why_stat": "Liverpool's build-up shape frequently showed 'none' in the tactical timeline (e.g., min 3, 5-6, 8-9, 12, 25, 28), indicating difficulty in establishing clear offensive structures.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Transition Effectiveness",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Counter-Attack to Finish",
+              "duration_min": 45,
+              "note": "Rapid transition drills from defensive recovery to quick vertical attacks, emphasizing speed, decision-making, and clinical finishing."
+            },
+            {
+              "title": "Defensive Transition & Restructuring",
+              "duration_min": 45,
+              "note": "Drills focusing on immediate defensive shape after losing possession, preventing counter-attacks, and regaining compactness."
+            }
+          ],
+          "why_stat": "Liverpool was involved in a counter-attack or fast vertical transition in 7 minutes, demonstrating its importance as an offensive outlet that needs refinement for consistency.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Fullback Offensive Integration",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Fullback Overlap & Crosses",
+              "duration_min": 40,
+              "note": "Drills focusing on timing and quality of fullback overlaps, combining with wingers/midfielders, and delivering effective crosses."
+            },
+            {
+              "title": "Wide Play & Half-Space Exploitation",
+              "duration_min": 40,
+              "note": "Small-sided games emphasizing the use of width from fullbacks and exploiting half-spaces with central players to create attacking opportunities."
+            }
+          ],
+          "why_stat": "Liverpool's fullbacks played defensive in 15 minutes and overlapping in 14, suggesting a need to enhance their offensive contribution and integration into attacks.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Matchday Minus 1 Prep",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "Set Piece Review & Practice",
+              "duration_min": 30,
+              "note": "Light walk-through and practice of offensive and defensive set pieces for the upcoming opponent."
+            },
+            {
+              "title": "Tactical Walk-Through (Defensive Shape)",
+              "duration_min": 30,
+              "note": "Low-intensity session reinforcing defensive block shape, pressing triggers, and collective movement against anticipated opponent tactics."
+            }
+          ],
+          "why_stat": "Liverpool used a counter-press trigger in 12 of 29 minutes, but the tactical timeline shows frequent shifts to 'none' or 'loss_of_possession' triggers, indicating inconsistency that needs constant reinforcement.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Match Day Activation",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Pre-Match Activation & Rondo",
+              "duration_min": 30,
+              "note": "Light dynamic warm-up, passing drills, and a short rondo to activate muscles and sharpen touch before the match."
+            },
+            {
+              "title": "Quick Attack Patterns",
+              "duration_min": 20,
+              "note": "Brief, high-intensity drills focusing on 2-3 quick attacking patterns to prime offensive players for rapid transitions."
+            }
+          ],
+          "why_stat": "Liverpool was involved in a counter-attack or fast vertical transition in 7 minutes, highlighting a key offensive strength that needs light activation to ensure sharpness for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "team": "team_a",
+      "source_note": "Generated for Liverpool from real per-minute tactical patterns across the 29 analyzed minutes of this match.",
+      "generated_at": "2026-09-25T21:56:42.430431+00:00",
+      "_prompt_version": "28771e15972c"
+    },
+    "team_b": {
+      "days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Light Stretching & Foam Rolling",
+              "duration_min": 30,
+              "note": "Focus on muscle recovery and flexibility after the match."
+            },
+            {
+              "title": "Pool Session / Light Cycling",
+              "duration_min": 45,
+              "note": "Low-impact cardiovascular work to aid blood flow and reduce soreness."
+            }
+          ],
+          "why_stat": "Standard post-match recovery is crucial for physical and mental regeneration, preparing players for the upcoming week's intense training.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Defending Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Transition Games (4v4+2)",
+              "duration_min": 40,
+              "note": "Practice quick defensive reactions and shape retention immediately after losing possession."
+            },
+            {
+              "title": "Counter-Attack Simulation",
+              "duration_min": 35,
+              "note": "Drill specific scenarios where opponents launch fast vertical attacks, focusing on delaying and recovering."
+            }
+          ],
+          "why_stat": "PSG was involved in a counter-attack or fast vertical transition in 7 minutes, the same number as Liverpool, indicating a need to improve defensive solidity against quick breaks.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Sustaining Gegenpress",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "High-Intensity Pressing Drills",
+              "duration_min": 45,
+              "note": "Focus on coordinated pressing triggers and maintaining intensity for longer periods to win the ball back quickly."
+            },
+            {
+              "title": "Pressing & Recovery Runs",
+              "duration_min": 30,
+              "note": "Simulate scenarios where the initial press is bypassed, emphasizing immediate recovery and defensive shape."
+            }
+          ],
+          "why_stat": "PSG used a counter-press trigger in 11 of 29 minutes, but the timeline shows `gegenpress` often followed by `none` or `loss_of_possession` in subsequent minutes (e.g., min 14-16 gegenpress, then min 17 none, min 18 loss_of_possession), indicating a need for better sustainment.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Defensive Line Cohesion",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Back Four/Five Movement Drills",
+              "duration_min": 40,
+              "note": "Practice stepping up and dropping deep in unison, maintaining compactness and communication."
+            },
+            {
+              "title": "Offside Trap & Depth Control",
+              "duration_min": 35,
+              "note": "Work on collective decision-making for offside traps and managing defensive depth against different attacking threats."
+            }
+          ],
+          "why_stat": "PSG dropped its defensive line deep in 10 minutes, and the timeline shows periods of extended `drop_deep` (e.g., min 17-21), highlighting the importance of consistent collective action and communication.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Fullback Att/Def Balance",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Wide Play & Overlapping Runs",
+              "duration_min": 40,
+              "note": "Integrate fullbacks into attacking patterns, focusing on timing of runs and delivery."
+            },
+            {
+              "title": "Fullback Recovery & 1v1 Defending",
+              "duration_min": 35,
+              "note": "Emphasize immediate defensive transition for fullbacks after attacking, including 1v1 defensive scenarios."
+            }
+          ],
+          "why_stat": "PSG's fullbacks were overlapping in 20 minutes, compared to defensive in 9 minutes, highlighting their significant attacking contribution and the need to manage potential defensive exposure.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Tactical Review & Set Pieces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Opponent Analysis Walk-Through",
+              "duration_min": 30,
+              "note": "Review the next opponent's likely formations and key tactical tendencies."
+            },
+            {
+              "title": "Offensive & Defensive Set Pieces",
+              "duration_min": 30,
+              "note": "Practice corner kicks, free kicks, and throw-ins for both attacking and defensive situations."
+            }
+          ],
+          "why_stat": "A light tactical review and set piece practice are crucial for fine-tuning strategies and ensuring readiness for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Full Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Optional Light Activity",
+              "duration_min": 30,
+              "note": "Players can choose light, self-directed activities like walking or stretching if desired."
+            }
+          ],
+          "why_stat": "A full recovery day is essential for physical and mental regeneration, allowing players to absorb training loads and prevent injury before the next training cycle.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "_original_days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Light Stretching & Foam Rolling",
+              "duration_min": 30,
+              "note": "Focus on muscle recovery and flexibility after the match."
+            },
+            {
+              "title": "Pool Session / Light Cycling",
+              "duration_min": 45,
+              "note": "Low-impact cardiovascular work to aid blood flow and reduce soreness."
+            }
+          ],
+          "why_stat": "Standard post-match recovery is crucial for physical and mental regeneration, preparing players for the upcoming week's intense training.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Defending Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Transition Games (4v4+2)",
+              "duration_min": 40,
+              "note": "Practice quick defensive reactions and shape retention immediately after losing possession."
+            },
+            {
+              "title": "Counter-Attack Simulation",
+              "duration_min": 35,
+              "note": "Drill specific scenarios where opponents launch fast vertical attacks, focusing on delaying and recovering."
+            }
+          ],
+          "why_stat": "PSG was involved in a counter-attack or fast vertical transition in 7 minutes, the same number as Liverpool, indicating a need to improve defensive solidity against quick breaks.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Sustaining Gegenpress",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "High-Intensity Pressing Drills",
+              "duration_min": 45,
+              "note": "Focus on coordinated pressing triggers and maintaining intensity for longer periods to win the ball back quickly."
+            },
+            {
+              "title": "Pressing & Recovery Runs",
+              "duration_min": 30,
+              "note": "Simulate scenarios where the initial press is bypassed, emphasizing immediate recovery and defensive shape."
+            }
+          ],
+          "why_stat": "PSG used a counter-press trigger in 11 of 29 minutes, but the timeline shows `gegenpress` often followed by `none` or `loss_of_possession` in subsequent minutes (e.g., min 14-16 gegenpress, then min 17 none, min 18 loss_of_possession), indicating a need for better sustainment.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Defensive Line Cohesion",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Back Four/Five Movement Drills",
+              "duration_min": 40,
+              "note": "Practice stepping up and dropping deep in unison, maintaining compactness and communication."
+            },
+            {
+              "title": "Offside Trap & Depth Control",
+              "duration_min": 35,
+              "note": "Work on collective decision-making for offside traps and managing defensive depth against different attacking threats."
+            }
+          ],
+          "why_stat": "PSG dropped its defensive line deep in 10 minutes, and the timeline shows periods of extended `drop_deep` (e.g., min 17-21), highlighting the importance of consistent collective action and communication.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Fullback Att/Def Balance",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Wide Play & Overlapping Runs",
+              "duration_min": 40,
+              "note": "Integrate fullbacks into attacking patterns, focusing on timing of runs and delivery."
+            },
+            {
+              "title": "Fullback Recovery & 1v1 Defending",
+              "duration_min": 35,
+              "note": "Emphasize immediate defensive transition for fullbacks after attacking, including 1v1 defensive scenarios."
+            }
+          ],
+          "why_stat": "PSG's fullbacks were overlapping in 20 minutes, compared to defensive in 9 minutes, highlighting their significant attacking contribution and the need to manage potential defensive exposure.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Tactical Review & Set Pieces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Opponent Analysis Walk-Through",
+              "duration_min": 30,
+              "note": "Review the next opponent's likely formations and key tactical tendencies."
+            },
+            {
+              "title": "Offensive & Defensive Set Pieces",
+              "duration_min": 30,
+              "note": "Practice corner kicks, free kicks, and throw-ins for both attacking and defensive situations."
+            }
+          ],
+          "why_stat": "A light tactical review and set piece practice are crucial for fine-tuning strategies and ensuring readiness for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Full Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Optional Light Activity",
+              "duration_min": 30,
+              "note": "Players can choose light, self-directed activities like walking or stretching if desired."
+            }
+          ],
+          "why_stat": "A full recovery day is essential for physical and mental regeneration, allowing players to absorb training loads and prevent injury before the next training cycle.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "team": "team_b",
+      "source_note": "Generated for PSG from real per-minute tactical patterns across the 29 analyzed minutes of this match.",
+      "generated_at": "2026-09-25T21:57:04.680113+00:00",
+      "_prompt_version": "28771e15972c"
+    }
   },
   "player_plan": {
     "players": [
       {
         "player_id": 8,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 34.26,
         "avg_speed_kmh": 14.57,
         "total_distance_m": 80.6,
         "confidence": "high",
+        "frames_tracked": 747,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Focus on maintaining and improving the peak speed of 34.26 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration Drills",
+            "note": "Focus on improving initial burst, building on an average speed of 14.57 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
             "title": "High-Intensity Interval Runs",
-            "note": "Work on sustaining high average speeds, aiming to exceed 14.57 km/h over repeated short efforts.",
+            "note": "Maintain high work capacity, aiming to exceed the 80.6 meters covered in the peak window.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Dynamic Movement & Mobility",
-            "note": "Enhance movement efficiency to support covering distances similar to 80.6 meters with ease.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Active Recovery & Mobility",
+            "note": "Light session to aid recovery, preparing for further high-intensity work.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Plyometric Power Development",
-            "note": "Build explosive power to further enhance the ability to reach a top speed of 34.26 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Max Speed Sprints",
+            "note": "Challenge and improve the top speed of 34.26 km/h with short, maximal effort sprints.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Short Burst Acceleration Drills",
-            "note": "Improve the ability to rapidly accelerate and maintain an average speed around 14.57 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Change of Direction & Agility",
+            "note": "Incorporate rapid changes of direction, reflecting dynamic play at high average speeds.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 22,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 35.24,
         "avg_speed_kmh": 14.05,
         "total_distance_m": 75.2,
         "confidence": "high",
+        "frames_tracked": 748,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Target pushing beyond the impressive top speed of 35.24 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Speed Endurance Runs",
+            "note": "Focus on sustaining high speeds for longer durations, building on the 35.24 km/h top speed.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
             "title": "Repeated High-Intensity Efforts",
-            "note": "Focus on consistently covering more distance than 75.2 meters in peak momentum windows.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "note": "Drills to maintain high work output over multiple bursts, aiming to cover more than 75.2 meters.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency Drills",
-            "note": "Optimize movement patterns to maintain high average speeds like 14.05 km/h with less effort.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Technical Skill & Movement",
+            "note": "Combine light technical work with movement patterns, supporting an average speed of 14.05 km/h.",
+            "tag": "Technical Movement",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Power Training",
-            "note": "Develop power to support and enhance the already high top speed of 35.24 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Training",
+            "note": "Perform short, maximal sprints to reinforce and potentially increase the 35.24 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Agility & Quickness",
-            "note": "Improve rapid changes of direction while maintaining an average speed close to 14.05 km/h.",
+            "title": "Agility & Explosiveness",
+            "note": "Incorporate quick changes of direction and explosive movements to complement high speeds.",
             "tag": "Agility",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 21,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 34.28,
         "avg_speed_kmh": 15.55,
         "total_distance_m": 75.1,
         "confidence": "high",
+        "frames_tracked": 737,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Development Sprints",
-            "note": "Work on enhancing the top speed, aiming to consistently exceed 34.28 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "High-Intensity Acceleration",
+            "note": "Focus on rapid acceleration and deceleration, leveraging the impressive 15.55 km/h average speed.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Sustained Runs",
-            "note": "Focus on maintaining the exceptional average speed of 15.55 km/h over longer short bursts.",
+            "title": "Game-Specific Work Rate",
+            "note": "Drills designed to replicate match intensity, aiming to consistently cover more than 75.1 meters.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Active Recovery & Dynamic Stretching",
-            "note": "Promote recovery and flexibility to support covering distances like 75.1 meters effectively.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Active Recovery & Flexibility",
+            "note": "Light session to aid recovery and maintain range of motion.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Reactive Strength Training",
-            "note": "Improve reactive power to quickly reach and sustain the high average speed of 15.55 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Top Speed Development",
+            "note": "Dedicated drills to challenge and improve the 34.28 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration & Deceleration Drills",
-            "note": "Enhance the ability to rapidly accelerate to speeds near 34.28 km/h and control deceleration.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Reactive Agility Drills",
+            "note": "Incorporate reactive movements to enhance quickness and decision-making at high average speeds.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 15,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.76,
         "avg_speed_kmh": 12.67,
         "total_distance_m": 74.7,
         "confidence": "high",
+        "frames_tracked": 752,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Overload",
-            "note": "Challenge the body to push beyond the impressive top speed of 35.76 km/h.",
+            "title": "Linear Speed & Form",
+            "note": "Focus on refining running mechanics to maximize efficiency at speeds approaching 35.76 km/h.",
             "tag": "Top Speed",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Repeated Efforts",
-            "note": "Focus on increasing the average speed from 12.67 km/h during sustained short bursts.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Positional Drills",
+            "note": "Integrate high-speed movements into game-like scenarios to increase the average speed from 12.67 km/h.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Quality & Mobility",
-            "note": "Improve overall movement efficiency to better utilize the distance covered, which was 74.7 meters.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Stability",
+            "note": "Light session to support recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Power Endurance Drills",
-            "note": "Develop the ability to sustain explosive power, supporting the high top speed of 35.76 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.76 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Short Burst Acceleration",
-            "note": "Work on rapidly accelerating to higher average speeds than 12.67 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Work Rate Development",
+            "note": "Structured drills to increase total distance covered in peak moments, aiming beyond 74.7 meters.",
+            "tag": "Work Rate",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 20,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 34.99,
         "avg_speed_kmh": 14.23,
         "total_distance_m": 68.1,
         "confidence": "medium",
+        "frames_tracked": 723,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Maintenance Sprints",
-            "note": "Maintain and slightly improve the strong top speed of 34.99 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Deceleration",
+            "note": "Focus on rapid changes in pace, building on a top speed of 34.99 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "Interval Training for Work Rate",
-            "note": "Increase the total distance covered beyond 68.1 meters in similar high-intensity windows.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "Repeated High-Intensity Efforts",
+            "note": "Drills to improve the ability to perform multiple high-speed actions, aiming to cover more than 68.1 meters.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Active Recovery & Core Stability",
-            "note": "Support efficient movement to maintain an average speed of 14.23 km/h.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Active Recovery & Movement Prep",
+            "note": "Light session to aid recovery and prepare the body for subsequent training.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Plyometric Jumps & Bounds",
-            "note": "Enhance explosive power to support reaching and sustaining speeds near 34.99 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Max Speed Development",
+            "note": "Dedicated drills to challenge and improve the 34.99 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Multi-Directional Acceleration",
-            "note": "Improve quick changes of direction while maintaining an average speed around 14.23 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Work Capacity & Agility",
+            "note": "Combine agility drills with sustained efforts to increase overall work rate and distance covered.",
+            "tag": "Work Capacity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 19,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 30.75,
         "avg_speed_kmh": 12.58,
         "total_distance_m": 65.1,
         "confidence": "high",
+        "frames_tracked": 748,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Development Sprints",
-            "note": "Focus on improving the top speed, aiming to consistently exceed 30.75 km/h.",
+            "title": "Linear Speed Development",
+            "note": "Dedicated drills to increase maximum velocity, targeting improvement on the 30.75 km/h top speed.",
             "tag": "Top Speed",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "Repeated High-Effort Runs",
-            "note": "Increase the capacity to cover more distance than 65.1 meters in similar intense bursts.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "Repeated Sprint Ability",
+            "note": "Focus on maintaining high intensity over multiple efforts, aiming to cover more than 65.1 meters in similar peak windows.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Pattern Drills",
-            "note": "Refine running mechanics to improve efficiency and support higher average speeds than 12.58 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Technical Ball Work & Movement",
+            "note": "Combine light technical drills with movement patterns, supporting an average speed of 12.58 km/h.",
+            "tag": "Technical Movement",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength Training",
-            "note": "Develop lower body power to enhance acceleration and increase the top speed beyond 30.75 km/h.",
+            "title": "Plyometrics & Power Training",
+            "note": "Develop explosive power to enhance acceleration and overall speed capabilities.",
             "tag": "Power",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Short Distance Acceleration",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 12.58 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "High-Speed Running Intervals",
+            "note": "Practice running at higher speeds for short bursts to push beyond the 30.75 km/h recorded.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 7,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 35.77,
         "avg_speed_kmh": 11.91,
         "total_distance_m": 62.9,
         "confidence": "medium",
+        "frames_tracked": 751,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Maintain and challenge the impressive top speed of 35.77 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Explosiveness",
+            "note": "Focus on rapid bursts to leverage the impressive 35.77 km/h top speed more frequently.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Work Rate Drills",
-            "note": "Focus on increasing the average speed from 11.91 km/h during intense short bursts.",
+            "title": "High-Intensity Work Rate",
+            "note": "Drills designed to increase the average speed from 11.91 km/h and total distance covered.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Recovery",
-            "note": "Improve overall movement economy to cover more distance than 62.9 meters with greater ease.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Mobility",
+            "note": "Light session to aid recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Power Development for Acceleration",
-            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.91 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.77 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Repeated Sprint Ability",
-            "note": "Work on repeating high-speed efforts, building on the 35.77 km/h top speed.",
-            "tag": "Repeated Sprint",
-            "edited_fields": []
+            "title": "Game-Specific Movement Patterns",
+            "note": "Integrate high-speed movements into tactical drills, aiming to cover more than 62.9 meters.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 18,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 32.13,
         "avg_speed_kmh": 11.41,
         "total_distance_m": 61.2,
         "confidence": "high",
+        "frames_tracked": 750,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Development Sprints",
-            "note": "Concentrate on improving the top speed, aiming to consistently exceed 32.13 km/h.",
+            "title": "Linear Speed Development",
+            "note": "Dedicated drills to increase maximum velocity, targeting improvement on the 32.13 km/h top speed.",
             "tag": "Top Speed",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
             "title": "High-Intensity Interval Training",
-            "note": "Increase the total distance covered beyond 61.2 meters in similar peak momentum windows.",
+            "note": "Focus on increasing work output and average speed from 11.41 km/h over sustained efforts.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Pattern & Agility",
-            "note": "Refine movement patterns to support higher average speeds than 11.41 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Strength",
+            "note": "Light session to support recovery and build foundational strength.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength & Power",
-            "note": "Develop power to enhance acceleration and increase the top speed beyond 32.13 km/h.",
+            "title": "Plyometrics & Speed Power",
+            "note": "Develop explosive power to enhance acceleration and overall speed capabilities.",
             "tag": "Power",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration Drills",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.41 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Repeated Sprint Drills",
+            "note": "Practice performing multiple high-speed efforts, aiming to cover more than 61.2 meters.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 16,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.81,
         "avg_speed_kmh": 11.68,
         "total_distance_m": 60.3,
         "confidence": "high",
+        "frames_tracked": 752,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Maintain and challenge the exceptional top speed of 35.81 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Deceleration Drills",
+            "note": "Focus on rapid changes in pace, building on the impressive 35.81 km/h top speed.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Work Rate Drills",
-            "note": "Focus on increasing the average speed from 11.68 km/h during intense short bursts.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Positional Drills",
+            "note": "Integrate high-speed movements into game-like scenarios to increase the average speed from 11.68 km/h.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Recovery",
-            "note": "Improve overall movement economy to cover more distance than 60.3 meters with greater ease.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Stability",
+            "note": "Light session to support recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Power Development for Acceleration",
-            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.68 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.81 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Repeated Sprint Ability",
-            "note": "Work on repeating high-speed efforts, building on the 35.81 km/h top speed.",
-            "tag": "Repeated Sprint",
-            "edited_fields": []
+            "title": "Work Rate Development",
+            "note": "Structured drills to increase total distance covered in peak moments, aiming beyond 60.3 meters.",
+            "tag": "Work Rate",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 171,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.48,
         "avg_speed_kmh": 15.23,
         "total_distance_m": 51.3,
         "confidence": "high",
+        "frames_tracked": 493,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Overload",
-            "note": "Challenge the body to push beyond the already high top speed of 35.48 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Explosive Acceleration",
+            "note": "Focus on rapid bursts to leverage the high average speed of 15.23 km/h over shorter durations.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "Sustained High-Intensity Drills",
-            "note": "Focus on increasing the total distance covered beyond 51.3 meters while maintaining high average speed.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Short Sprints",
+            "note": "Perform repeated short, sharp sprints to maintain the high top speed of 35.48 km/h.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Active Recovery & Movement Flow",
-            "note": "Promote continuous movement patterns to support covering more distance than 51.3 meters.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Technical Movement & Agility",
+            "note": "Incorporate quick changes of direction and ball work, reflecting dynamic play within limited frames.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Reactive Power Development",
-            "note": "Enhance the ability to quickly transition into high-speed movements, leveraging the 15.23 km/h average speed.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Max Speed Development",
+            "note": "Dedicated drills to challenge and potentially exceed the 35.48 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Repeated Sprint Ability",
-            "note": "Improve the capacity to repeat high-intensity efforts, building on the impressive 15.23 km/h average speed.",
-            "tag": "Repeated Sprint",
-            "edited_fields": []
+            "title": "Work Capacity Integration",
+            "note": "Drills designed to increase involvement and total distance covered, building on the 51.3 meters recorded.",
+            "tag": "Work Capacity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 158,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 35.34,
         "avg_speed_kmh": 11.23,
         "total_distance_m": 45.9,
         "confidence": "high",
+        "frames_tracked": 521,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Maintenance Sprints",
-            "note": "Maintain and slightly improve the strong top speed of 35.34 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Deceleration",
+            "note": "Focus on rapid bursts to leverage the impressive 35.34 km/h top speed more effectively.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Interval Training",
-            "note": "Focus on significantly increasing the total distance covered beyond 45.9 meters in peak momentum windows.",
+            "title": "High-Intensity Work Rate",
+            "note": "Drills designed to increase the average speed from 11.23 km/h and total distance covered.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Agility",
-            "note": "Refine movement patterns to support higher average speeds than 11.23 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Mobility",
+            "note": "Light session to aid recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength & Power",
-            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.23 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.34 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration Drills",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.23 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Game-Specific Movement Patterns",
+            "note": "Integrate high-speed movements into tactical drills, aiming to cover more than 45.9 meters.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 10,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.55,
         "avg_speed_kmh": 11.48,
         "total_distance_m": 42.7,
         "confidence": "high",
+        "frames_tracked": 536,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Maintenance Sprints",
-            "note": "Maintain and slightly improve the strong top speed of 35.55 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Explosive Acceleration",
+            "note": "Focus on rapid bursts to leverage the impressive 35.55 km/h top speed more frequently.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Interval Training",
-            "note": "Focus on significantly increasing the total distance covered beyond 42.7 meters in peak momentum windows.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Work Capacity",
+            "note": "Drills designed to increase the average speed from 11.48 km/h and total distance covered.",
+            "tag": "Work Capacity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Agility",
-            "note": "Refine movement patterns to support higher average speeds than 11.48 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Stability",
+            "note": "Light session to support recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength & Power",
-            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.48 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.55 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration Drills",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.48 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Game-Specific Movement Integration",
+            "note": "Integrate high-speed movements into tactical drills, aiming to cover more than 42.7 meters.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       }
@@ -802,546 +1189,705 @@
     "_original_players": [
       {
         "player_id": 8,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 34.26,
         "avg_speed_kmh": 14.57,
         "total_distance_m": 80.6,
         "confidence": "high",
+        "frames_tracked": 747,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Focus on maintaining and improving the peak speed of 34.26 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration Drills",
+            "note": "Focus on improving initial burst, building on an average speed of 14.57 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
             "title": "High-Intensity Interval Runs",
-            "note": "Work on sustaining high average speeds, aiming to exceed 14.57 km/h over repeated short efforts.",
+            "note": "Maintain high work capacity, aiming to exceed the 80.6 meters covered in the peak window.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Dynamic Movement & Mobility",
-            "note": "Enhance movement efficiency to support covering distances similar to 80.6 meters with ease.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Active Recovery & Mobility",
+            "note": "Light session to aid recovery, preparing for further high-intensity work.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Plyometric Power Development",
-            "note": "Build explosive power to further enhance the ability to reach a top speed of 34.26 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Max Speed Sprints",
+            "note": "Challenge and improve the top speed of 34.26 km/h with short, maximal effort sprints.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Short Burst Acceleration Drills",
-            "note": "Improve the ability to rapidly accelerate and maintain an average speed around 14.57 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Change of Direction & Agility",
+            "note": "Incorporate rapid changes of direction, reflecting dynamic play at high average speeds.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 22,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 35.24,
         "avg_speed_kmh": 14.05,
         "total_distance_m": 75.2,
         "confidence": "high",
+        "frames_tracked": 748,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Target pushing beyond the impressive top speed of 35.24 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Speed Endurance Runs",
+            "note": "Focus on sustaining high speeds for longer durations, building on the 35.24 km/h top speed.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
             "title": "Repeated High-Intensity Efforts",
-            "note": "Focus on consistently covering more distance than 75.2 meters in peak momentum windows.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "note": "Drills to maintain high work output over multiple bursts, aiming to cover more than 75.2 meters.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency Drills",
-            "note": "Optimize movement patterns to maintain high average speeds like 14.05 km/h with less effort.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Technical Skill & Movement",
+            "note": "Combine light technical work with movement patterns, supporting an average speed of 14.05 km/h.",
+            "tag": "Technical Movement",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Power Training",
-            "note": "Develop power to support and enhance the already high top speed of 35.24 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Training",
+            "note": "Perform short, maximal sprints to reinforce and potentially increase the 35.24 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Agility & Quickness",
-            "note": "Improve rapid changes of direction while maintaining an average speed close to 14.05 km/h.",
+            "title": "Agility & Explosiveness",
+            "note": "Incorporate quick changes of direction and explosive movements to complement high speeds.",
             "tag": "Agility",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 21,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 34.28,
         "avg_speed_kmh": 15.55,
         "total_distance_m": 75.1,
         "confidence": "high",
+        "frames_tracked": 737,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Development Sprints",
-            "note": "Work on enhancing the top speed, aiming to consistently exceed 34.28 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "High-Intensity Acceleration",
+            "note": "Focus on rapid acceleration and deceleration, leveraging the impressive 15.55 km/h average speed.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Sustained Runs",
-            "note": "Focus on maintaining the exceptional average speed of 15.55 km/h over longer short bursts.",
+            "title": "Game-Specific Work Rate",
+            "note": "Drills designed to replicate match intensity, aiming to consistently cover more than 75.1 meters.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Active Recovery & Dynamic Stretching",
-            "note": "Promote recovery and flexibility to support covering distances like 75.1 meters effectively.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Active Recovery & Flexibility",
+            "note": "Light session to aid recovery and maintain range of motion.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Reactive Strength Training",
-            "note": "Improve reactive power to quickly reach and sustain the high average speed of 15.55 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Top Speed Development",
+            "note": "Dedicated drills to challenge and improve the 34.28 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration & Deceleration Drills",
-            "note": "Enhance the ability to rapidly accelerate to speeds near 34.28 km/h and control deceleration.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Reactive Agility Drills",
+            "note": "Incorporate reactive movements to enhance quickness and decision-making at high average speeds.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 15,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.76,
         "avg_speed_kmh": 12.67,
         "total_distance_m": 74.7,
         "confidence": "high",
+        "frames_tracked": 752,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Overload",
-            "note": "Challenge the body to push beyond the impressive top speed of 35.76 km/h.",
+            "title": "Linear Speed & Form",
+            "note": "Focus on refining running mechanics to maximize efficiency at speeds approaching 35.76 km/h.",
             "tag": "Top Speed",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Repeated Efforts",
-            "note": "Focus on increasing the average speed from 12.67 km/h during sustained short bursts.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Positional Drills",
+            "note": "Integrate high-speed movements into game-like scenarios to increase the average speed from 12.67 km/h.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Quality & Mobility",
-            "note": "Improve overall movement efficiency to better utilize the distance covered, which was 74.7 meters.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Stability",
+            "note": "Light session to support recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Power Endurance Drills",
-            "note": "Develop the ability to sustain explosive power, supporting the high top speed of 35.76 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.76 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Short Burst Acceleration",
-            "note": "Work on rapidly accelerating to higher average speeds than 12.67 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Work Rate Development",
+            "note": "Structured drills to increase total distance covered in peak moments, aiming beyond 74.7 meters.",
+            "tag": "Work Rate",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 20,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 34.99,
         "avg_speed_kmh": 14.23,
         "total_distance_m": 68.1,
         "confidence": "medium",
+        "frames_tracked": 723,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Maintenance Sprints",
-            "note": "Maintain and slightly improve the strong top speed of 34.99 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Deceleration",
+            "note": "Focus on rapid changes in pace, building on a top speed of 34.99 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "Interval Training for Work Rate",
-            "note": "Increase the total distance covered beyond 68.1 meters in similar high-intensity windows.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "Repeated High-Intensity Efforts",
+            "note": "Drills to improve the ability to perform multiple high-speed actions, aiming to cover more than 68.1 meters.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Active Recovery & Core Stability",
-            "note": "Support efficient movement to maintain an average speed of 14.23 km/h.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Active Recovery & Movement Prep",
+            "note": "Light session to aid recovery and prepare the body for subsequent training.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Plyometric Jumps & Bounds",
-            "note": "Enhance explosive power to support reaching and sustaining speeds near 34.99 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Max Speed Development",
+            "note": "Dedicated drills to challenge and improve the 34.99 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Multi-Directional Acceleration",
-            "note": "Improve quick changes of direction while maintaining an average speed around 14.23 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Work Capacity & Agility",
+            "note": "Combine agility drills with sustained efforts to increase overall work rate and distance covered.",
+            "tag": "Work Capacity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 19,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 30.75,
         "avg_speed_kmh": 12.58,
         "total_distance_m": 65.1,
         "confidence": "high",
+        "frames_tracked": 748,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Development Sprints",
-            "note": "Focus on improving the top speed, aiming to consistently exceed 30.75 km/h.",
+            "title": "Linear Speed Development",
+            "note": "Dedicated drills to increase maximum velocity, targeting improvement on the 30.75 km/h top speed.",
             "tag": "Top Speed",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "Repeated High-Effort Runs",
-            "note": "Increase the capacity to cover more distance than 65.1 meters in similar intense bursts.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "Repeated Sprint Ability",
+            "note": "Focus on maintaining high intensity over multiple efforts, aiming to cover more than 65.1 meters in similar peak windows.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Pattern Drills",
-            "note": "Refine running mechanics to improve efficiency and support higher average speeds than 12.58 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Technical Ball Work & Movement",
+            "note": "Combine light technical drills with movement patterns, supporting an average speed of 12.58 km/h.",
+            "tag": "Technical Movement",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength Training",
-            "note": "Develop lower body power to enhance acceleration and increase the top speed beyond 30.75 km/h.",
+            "title": "Plyometrics & Power Training",
+            "note": "Develop explosive power to enhance acceleration and overall speed capabilities.",
             "tag": "Power",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Short Distance Acceleration",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 12.58 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "High-Speed Running Intervals",
+            "note": "Practice running at higher speeds for short bursts to push beyond the 30.75 km/h recorded.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 7,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 35.77,
         "avg_speed_kmh": 11.91,
         "total_distance_m": 62.9,
         "confidence": "medium",
+        "frames_tracked": 751,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Maintain and challenge the impressive top speed of 35.77 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Explosiveness",
+            "note": "Focus on rapid bursts to leverage the impressive 35.77 km/h top speed more frequently.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Work Rate Drills",
-            "note": "Focus on increasing the average speed from 11.91 km/h during intense short bursts.",
+            "title": "High-Intensity Work Rate",
+            "note": "Drills designed to increase the average speed from 11.91 km/h and total distance covered.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Recovery",
-            "note": "Improve overall movement economy to cover more distance than 62.9 meters with greater ease.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Mobility",
+            "note": "Light session to aid recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Power Development for Acceleration",
-            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.91 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.77 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Repeated Sprint Ability",
-            "note": "Work on repeating high-speed efforts, building on the 35.77 km/h top speed.",
-            "tag": "Repeated Sprint",
-            "edited_fields": []
+            "title": "Game-Specific Movement Patterns",
+            "note": "Integrate high-speed movements into tactical drills, aiming to cover more than 62.9 meters.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 18,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 32.13,
         "avg_speed_kmh": 11.41,
         "total_distance_m": 61.2,
         "confidence": "high",
+        "frames_tracked": 750,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Development Sprints",
-            "note": "Concentrate on improving the top speed, aiming to consistently exceed 32.13 km/h.",
+            "title": "Linear Speed Development",
+            "note": "Dedicated drills to increase maximum velocity, targeting improvement on the 32.13 km/h top speed.",
             "tag": "Top Speed",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
             "title": "High-Intensity Interval Training",
-            "note": "Increase the total distance covered beyond 61.2 meters in similar peak momentum windows.",
+            "note": "Focus on increasing work output and average speed from 11.41 km/h over sustained efforts.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Pattern & Agility",
-            "note": "Refine movement patterns to support higher average speeds than 11.41 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Strength",
+            "note": "Light session to support recovery and build foundational strength.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength & Power",
-            "note": "Develop power to enhance acceleration and increase the top speed beyond 32.13 km/h.",
+            "title": "Plyometrics & Speed Power",
+            "note": "Develop explosive power to enhance acceleration and overall speed capabilities.",
             "tag": "Power",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration Drills",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.41 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Repeated Sprint Drills",
+            "note": "Practice performing multiple high-speed efforts, aiming to cover more than 61.2 meters.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 16,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.81,
         "avg_speed_kmh": 11.68,
         "total_distance_m": 60.3,
         "confidence": "high",
+        "frames_tracked": 752,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Sprints",
-            "note": "Maintain and challenge the exceptional top speed of 35.81 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Deceleration Drills",
+            "note": "Focus on rapid changes in pace, building on the impressive 35.81 km/h top speed.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Work Rate Drills",
-            "note": "Focus on increasing the average speed from 11.68 km/h during intense short bursts.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Positional Drills",
+            "note": "Integrate high-speed movements into game-like scenarios to increase the average speed from 11.68 km/h.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Recovery",
-            "note": "Improve overall movement economy to cover more distance than 60.3 meters with greater ease.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Stability",
+            "note": "Light session to support recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Power Development for Acceleration",
-            "note": "Enhance explosive power to improve acceleration and sustain higher average speeds than 11.68 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.81 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Repeated Sprint Ability",
-            "note": "Work on repeating high-speed efforts, building on the 35.81 km/h top speed.",
-            "tag": "Repeated Sprint",
-            "edited_fields": []
+            "title": "Work Rate Development",
+            "note": "Structured drills to increase total distance covered in peak moments, aiming beyond 60.3 meters.",
+            "tag": "Work Rate",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 171,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.48,
         "avg_speed_kmh": 15.23,
         "total_distance_m": 51.3,
         "confidence": "high",
+        "frames_tracked": 493,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Max Velocity Overload",
-            "note": "Challenge the body to push beyond the already high top speed of 35.48 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Explosive Acceleration",
+            "note": "Focus on rapid bursts to leverage the high average speed of 15.23 km/h over shorter durations.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "Sustained High-Intensity Drills",
-            "note": "Focus on increasing the total distance covered beyond 51.3 meters while maintaining high average speed.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Short Sprints",
+            "note": "Perform repeated short, sharp sprints to maintain the high top speed of 35.48 km/h.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Active Recovery & Movement Flow",
-            "note": "Promote continuous movement patterns to support covering more distance than 51.3 meters.",
-            "tag": "Active Recovery",
-            "edited_fields": []
+            "title": "Technical Movement & Agility",
+            "note": "Incorporate quick changes of direction and ball work, reflecting dynamic play within limited frames.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Reactive Power Development",
-            "note": "Enhance the ability to quickly transition into high-speed movements, leveraging the 15.23 km/h average speed.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Max Speed Development",
+            "note": "Dedicated drills to challenge and potentially exceed the 35.48 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Repeated Sprint Ability",
-            "note": "Improve the capacity to repeat high-intensity efforts, building on the impressive 15.23 km/h average speed.",
-            "tag": "Repeated Sprint",
-            "edited_fields": []
+            "title": "Work Capacity Integration",
+            "note": "Drills designed to increase involvement and total distance covered, building on the 51.3 meters recorded.",
+            "tag": "Work Capacity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 158,
-        "team_label": "Red",
+        "team_label": "Liverpool",
         "top_speed_kmh": 35.34,
         "avg_speed_kmh": 11.23,
         "total_distance_m": 45.9,
         "confidence": "high",
+        "frames_tracked": 521,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Maintenance Sprints",
-            "note": "Maintain and slightly improve the strong top speed of 35.34 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Acceleration & Deceleration",
+            "note": "Focus on rapid bursts to leverage the impressive 35.34 km/h top speed more effectively.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Interval Training",
-            "note": "Focus on significantly increasing the total distance covered beyond 45.9 meters in peak momentum windows.",
+            "title": "High-Intensity Work Rate",
+            "note": "Drills designed to increase the average speed from 11.23 km/h and total distance covered.",
             "tag": "Work Rate",
-            "edited_fields": []
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Agility",
-            "note": "Refine movement patterns to support higher average speeds than 11.23 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Mobility",
+            "note": "Light session to aid recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength & Power",
-            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.23 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.34 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration Drills",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.23 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Game-Specific Movement Patterns",
+            "note": "Integrate high-speed movements into tactical drills, aiming to cover more than 45.9 meters.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       },
       {
         "player_id": 10,
-        "team_label": "Blue",
+        "team_label": "PSG",
         "top_speed_kmh": 35.55,
         "avg_speed_kmh": 11.48,
         "total_distance_m": 42.7,
         "confidence": "high",
+        "frames_tracked": 536,
         "sessions": [
           {
             "day": "Monday",
-            "title": "Speed Maintenance Sprints",
-            "note": "Maintain and slightly improve the strong top speed of 35.55 km/h.",
-            "tag": "Top Speed",
-            "edited_fields": []
+            "title": "Explosive Acceleration",
+            "note": "Focus on rapid bursts to leverage the impressive 35.55 km/h top speed more frequently.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Tuesday",
-            "title": "High-Intensity Interval Training",
-            "note": "Focus on significantly increasing the total distance covered beyond 42.7 meters in peak momentum windows.",
-            "tag": "Work Rate",
-            "edited_fields": []
+            "title": "High-Intensity Work Capacity",
+            "note": "Drills designed to increase the average speed from 11.48 km/h and total distance covered.",
+            "tag": "Work Capacity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Wednesday",
-            "title": "Movement Efficiency & Agility",
-            "note": "Refine movement patterns to support higher average speeds than 11.48 km/h.",
-            "tag": "Movement Efficiency",
-            "edited_fields": []
+            "title": "Active Recovery & Core Stability",
+            "note": "Light session to support recovery and maintain physical readiness.",
+            "tag": "Recovery",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Thursday",
-            "title": "Explosive Strength & Power",
-            "note": "Develop power to enhance acceleration and increase the average speed beyond 11.48 km/h.",
-            "tag": "Power",
-            "edited_fields": []
+            "title": "Maximal Velocity Maintenance",
+            "note": "Perform short, maximal sprints to reinforce and maintain the exceptional 35.55 km/h top speed.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           },
           {
             "day": "Friday",
-            "title": "Acceleration Drills",
-            "note": "Focus on rapid acceleration to quickly reach and sustain speeds above 11.48 km/h.",
-            "tag": "Acceleration",
-            "edited_fields": []
+            "title": "Game-Specific Movement Integration",
+            "note": "Integrate high-speed movements into tactical drills, aiming to cover more than 42.7 meters.",
+            "tag": "Game Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
           }
         ]
       }
     ],
     "scope_note": "Based on the match's peak-momentum window only \u2014 not a full-match average. Full-match fatigue tracking is on our roadmap.",
-    "generated_at": "2026-09-06T21:24:57.746264+00:00"
+    "generated_at": "2026-09-25T21:59:35.010880+00:00",
+    "_prompt_version": "512596003c5d"
+  },
+  "cv_insights": {
+    "team_insights": [
+      {
+        "team": "PSG",
+        "observation": "PSG had 6 moments among the top 10 highest-scoring tactical moments recorded in this window.",
+        "so_what": "This suggests PSG was involved in a greater proportion of the most impactful tactical plays during this peak-momentum window, indicating their effectiveness in executing critical actions.",
+        "training_implication": "PSG could review these specific high-scoring moments to identify common tactical patterns and reinforce them in scenario-based drills."
+      },
+      {
+        "team": "Liverpool",
+        "observation": "Liverpool had 4 moments among the top 10 highest-scoring tactical moments recorded in this window.",
+        "so_what": "This indicates Liverpool was also involved in significant tactical plays, though to a slightly lesser extent than their opponent in this specific sample, suggesting areas for increased impact.",
+        "training_implication": "Liverpool might analyze their 4 moments to understand their strengths and focus on increasing their involvement in such critical plays through targeted tactical exercises."
+      },
+      {
+        "team": "Liverpool",
+        "observation": "Liverpool's players had an average tracking coverage of 93.2% during this window.",
+        "so_what": "This high average coverage indicates that the data for Liverpool's players is highly reliable, providing a robust foundation for performance analysis.",
+        "training_implication": "The analysis team can confidently use this data for Liverpool's performance feedback, knowing the underlying tracking is consistent."
+      },
+      {
+        "team": "PSG",
+        "observation": "PSG's players had an average tracking coverage of 90.3% during this window.",
+        "so_what": "This strong average coverage indicates that the data for PSG's players is largely reliable, ensuring a good basis for performance insights.",
+        "training_implication": "Analysts can proceed with confidence in PSG's data, perhaps noting that the slightly lower coverage might warrant a quick check for any specific player's data gaps before deep dives."
+      }
+    ],
+    "player_insights": {
+      "21": [
+        {
+          "observation": "Player 21 was recorded among the top tactical moments for a 'PRESS' event, closing 0.4 meters with 2 pressers, scoring 13.0.",
+          "so_what": "This indicates Player 21 effectively contributed to a high-scoring defensive pressing action, demonstrating good coordination and intensity in closing down opponents.",
+          "training_implication": "Incorporate drills that specifically focus on coordinated two-player pressing triggers and angles, emphasizing the speed and distance of closing down the ball carrier."
+        }
+      ],
+      "20": [
+        {
+          "observation": "Player 20 had a tracking coverage of 96.1% with medium confidence.",
+          "so_what": "The data for Player 20 is largely reliable, with only a small percentage of frames where tracking identity was lost, providing a solid basis for analysis.",
+          "training_implication": "When reviewing Player 20's performance, analysts should be aware of the medium confidence level and cross-reference with other qualitative observations if any specific data points seem anomalous."
+        }
+      ],
+      "7": [
+        {
+          "observation": "Player 7 was recorded among the top tactical moments for a 'PRESS' event, closing 0.6 meters with 2 pressers, scoring 12.97.",
+          "so_what": "This highlights Player 7's effective involvement in a high-scoring defensive pressing action, showcasing their ability to contribute to coordinated pressure.",
+          "training_implication": "Design small-sided games that require quick decision-making for pressing actions, focusing on the timing and coordination of multiple players closing space."
+        },
+        {
+          "observation": "Player 7 had a tracking coverage of 99.9% with medium confidence.",
+          "so_what": "The tracking data for Player 7 is exceptionally reliable, with almost complete coverage, ensuring high fidelity for performance insights.",
+          "training_implication": "Analysts can confidently use Player 7's data for detailed performance feedback, knowing the underlying tracking is robust."
+        }
+      ],
+      "18": [
+        {
+          "observation": "Player 18 was recorded among the top tactical moments for a 'PRESS' event, closing 1.2 meters with 3 pressers, scoring 13.0.",
+          "so_what": "This indicates Player 18's effective participation in a high-scoring defensive pressing action involving multiple teammates, demonstrating good collective defensive effort.",
+          "training_implication": "Implement drills that specifically train three-player pressing schemes, focusing on maintaining defensive shape and coordinated movement to funnel the ball carrier."
+        }
+      ],
+      "171": [
+        {
+          "observation": "Player 171 had a tracking coverage of 65.6% with high confidence.",
+          "so_what": "While the confidence in the identified data points is high, the lower coverage percentage suggests that a significant portion of Player 171's actions during this window might not have been fully captured.",
+          "training_implication": "When analyzing Player 171's performance, analysts should be mindful of the data gaps and consider supplementing with manual video review for a complete picture."
+        }
+      ],
+      "158": [
+        {
+          "observation": "Player 158 had a tracking coverage of 69.3% with high confidence.",
+          "so_what": "The data for Player 158, though highly confident where available, has notable gaps in tracking coverage, meaning some actions might be underrepresented.",
+          "training_implication": "For Player 158, it would be beneficial to prioritize qualitative video analysis alongside the quantitative data to ensure no critical actions are overlooked due to tracking limitations."
+        }
+      ],
+      "10": [
+        {
+          "observation": "Player 10 was recorded among the top tactical moments for a 'BREAK' event, carrying the ball at 25.2 km/h, scoring 13.71.",
+          "so_what": "This highlights Player 10's exceptional ability to carry the ball at high speed, effectively breaking away from defensive pressure and creating offensive opportunities.",
+          "training_implication": "Design transition drills that emphasize quick ball progression and encourage players to drive into space with the ball at high speeds, similar to Player 10's demonstrated capability."
+        }
+      ]
+    },
+    "generated_at": "2026-09-25T21:59:51.191530+00:00",
+    "_prompt_version": "5a110c8a1c85"
   }
 }

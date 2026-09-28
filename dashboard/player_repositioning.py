@@ -507,10 +507,21 @@ def _repositions_path(cache_dir, match_key):
     return Path(cache_dir) / "repositions" / f"{match_key}.json"
 
 
-def load_repositions(cache_dir, match_key):
+def _legacy_repositions_path(curated_matches_dir, match_key):
+    return Path(curated_matches_dir) / match_key / "repositions.json"
+
+
+def load_repositions(cache_dir, match_key, source=None, curated_matches_dir=None):
+    """Writable CACHE_DIR wins once anything's been saved there. Until
+    then, falls back to a committed file under curated_matches/<key>/ if
+    one exists - same "committed default, writable override" shape
+    corner_kicks.py/training_plan.py/player_labels.py already use for the
+    same CACHE_DIR-resets-on-redeploy problem."""
     if not match_key:
         return []
     path = _repositions_path(cache_dir, match_key)
+    if not path.exists() and source == "curated" and curated_matches_dir:
+        path = _legacy_repositions_path(curated_matches_dir, match_key)
     if not path.exists():
         return []
     try:
@@ -520,13 +531,19 @@ def load_repositions(cache_dir, match_key):
         return []
 
 
-def save_repositions(cache_dir, match_key, repositions):
-    path = _repositions_path(cache_dir, match_key)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = str(path) + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(repositions, f, indent=2)
-    os.replace(tmp, path)
+def save_repositions(cache_dir, match_key, repositions, source=None, curated_matches_dir=None):
+    """Writes through to both CACHE_DIR and, for a curated match, the
+    committed curated_matches_dir location - same reasoning as
+    player_labels.save_labels."""
+    paths = [_repositions_path(cache_dir, match_key)]
+    if source == "curated" and curated_matches_dir:
+        paths.append(_legacy_repositions_path(curated_matches_dir, match_key))
+    for path in paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = str(path) + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(repositions, f, indent=2)
+        os.replace(tmp, path)
 
 
 def clear_repositions(cache_dir, match_key):

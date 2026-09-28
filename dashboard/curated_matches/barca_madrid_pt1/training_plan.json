@@ -1,0 +1,1858 @@
+{
+  "team_plans": {
+    "team_a": {
+      "days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Light Aerobic & Mobility",
+              "duration_min": 45,
+              "note": "Focus on low-intensity cardiovascular work and dynamic stretching to aid muscle recovery."
+            },
+            {
+              "title": "Hydrotherapy & Massage",
+              "duration_min": 30,
+              "note": "Utilize cold/hot baths and professional massage to reduce soreness and promote circulation."
+            }
+          ],
+          "why_stat": "This day is dedicated to physical and mental recovery after the match, essential for player well-being and injury prevention.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Gegenpress Activation",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "Pressing Triggers & Zones",
+              "duration_min": 60,
+              "note": "Drills focusing on immediate and coordinated pressing upon loss of possession in various areas of the pitch."
+            },
+            {
+              "title": "Small-Sided Games (SSG) with Counter-Press Rules",
+              "duration_min": 45,
+              "note": "Conditioned games emphasizing quick reactions and collective effort to win the ball back within 3-5 seconds."
+            }
+          ],
+          "why_stat": "White used a counter-press trigger in 12 of 24 minutes, indicating inconsistency that needs refinement for sustained pressure.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Defensive Line & Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Defensive Line Coordination",
+              "duration_min": 50,
+              "note": "Work on synchronized movements of the defensive line, practicing stepping up and dropping deep in response to opponent's play."
+            },
+            {
+              "title": "Transition Defense Drills",
+              "duration_min": 55,
+              "note": "Scenarios simulating quick opponent counter-attacks, focusing on recovery runs, delaying tactics, and regaining defensive shape."
+            }
+          ],
+          "why_stat": "White dropped its defensive line deep in 10 minutes, highlighting a need for better coordination and understanding of when and how to manage space behind the defense during transitions.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Fast Vertical Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Quick Break & Counter-Attack Drills",
+              "duration_min": 50,
+              "note": "Practice rapid transitions from defense to attack, focusing on speed of thought and execution to exploit open spaces."
+            },
+            {
+              "title": "Channel Running & Finishing",
+              "duration_min": 40,
+              "note": "Drills for strikers and wide players to make effective runs into channels and finish opportunities created from quick breaks."
+            }
+          ],
+          "why_stat": "White was involved in a counter-attack or fast vertical transition in 1 minutes, showing a significant area for improvement in offensive versatility.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Build-up & Half-Spaces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Positional Play in Half-Spaces",
+              "duration_min": 60,
+              "note": "Exercises focusing on creating overloads and passing triangles in the half-spaces to penetrate the opponent's defense."
+            },
+            {
+              "title": "Fullback Overlap & Crossing",
+              "duration_min": 45,
+              "note": "Drills to refine the timing and execution of fullback overlaps, combining with central players to deliver quality crosses."
+            }
+          ],
+          "why_stat": "White's fullbacks played overlapping in 18 minutes, indicating a key attacking principle that needs continuous refinement for effective width and penetration.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Tactical Review & Set Pieces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Light Tactical Walkthrough",
+              "duration_min": 30,
+              "note": "Reviewing opponent's likely setup and White's game plan with minimal physical exertion."
+            },
+            {
+              "title": "Offensive & Defensive Set Pieces",
+              "duration_min": 30,
+              "note": "Practice key corner kicks, free kicks, and defensive organization for opponent's set plays."
+            }
+          ],
+          "why_stat": "This light session is crucial for mental preparation and final tactical adjustments, ensuring the team is fresh and focused for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Full Rest Day",
+          "focus_category": "rest",
+          "drills": [],
+          "why_stat": "This day provides essential physical and mental recuperation, allowing players to fully recover and prepare for the demands of the next training week.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "_original_days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Light Aerobic & Mobility",
+              "duration_min": 45,
+              "note": "Focus on low-intensity cardiovascular work and dynamic stretching to aid muscle recovery."
+            },
+            {
+              "title": "Hydrotherapy & Massage",
+              "duration_min": 30,
+              "note": "Utilize cold/hot baths and professional massage to reduce soreness and promote circulation."
+            }
+          ],
+          "why_stat": "This day is dedicated to physical and mental recovery after the match, essential for player well-being and injury prevention.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Gegenpress Activation",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "Pressing Triggers & Zones",
+              "duration_min": 60,
+              "note": "Drills focusing on immediate and coordinated pressing upon loss of possession in various areas of the pitch."
+            },
+            {
+              "title": "Small-Sided Games (SSG) with Counter-Press Rules",
+              "duration_min": 45,
+              "note": "Conditioned games emphasizing quick reactions and collective effort to win the ball back within 3-5 seconds."
+            }
+          ],
+          "why_stat": "White used a counter-press trigger in 12 of 24 minutes, indicating inconsistency that needs refinement for sustained pressure.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Defensive Line & Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Defensive Line Coordination",
+              "duration_min": 50,
+              "note": "Work on synchronized movements of the defensive line, practicing stepping up and dropping deep in response to opponent's play."
+            },
+            {
+              "title": "Transition Defense Drills",
+              "duration_min": 55,
+              "note": "Scenarios simulating quick opponent counter-attacks, focusing on recovery runs, delaying tactics, and regaining defensive shape."
+            }
+          ],
+          "why_stat": "White dropped its defensive line deep in 10 minutes, highlighting a need for better coordination and understanding of when and how to manage space behind the defense during transitions.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Fast Vertical Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Quick Break & Counter-Attack Drills",
+              "duration_min": 50,
+              "note": "Practice rapid transitions from defense to attack, focusing on speed of thought and execution to exploit open spaces."
+            },
+            {
+              "title": "Channel Running & Finishing",
+              "duration_min": 40,
+              "note": "Drills for strikers and wide players to make effective runs into channels and finish opportunities created from quick breaks."
+            }
+          ],
+          "why_stat": "White was involved in a counter-attack or fast vertical transition in 1 minutes, showing a significant area for improvement in offensive versatility.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Build-up & Half-Spaces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Positional Play in Half-Spaces",
+              "duration_min": 60,
+              "note": "Exercises focusing on creating overloads and passing triangles in the half-spaces to penetrate the opponent's defense."
+            },
+            {
+              "title": "Fullback Overlap & Crossing",
+              "duration_min": 45,
+              "note": "Drills to refine the timing and execution of fullback overlaps, combining with central players to deliver quality crosses."
+            }
+          ],
+          "why_stat": "White's fullbacks played overlapping in 18 minutes, indicating a key attacking principle that needs continuous refinement for effective width and penetration.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Tactical Review & Set Pieces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Light Tactical Walkthrough",
+              "duration_min": 30,
+              "note": "Reviewing opponent's likely setup and White's game plan with minimal physical exertion."
+            },
+            {
+              "title": "Offensive & Defensive Set Pieces",
+              "duration_min": 30,
+              "note": "Practice key corner kicks, free kicks, and defensive organization for opponent's set plays."
+            }
+          ],
+          "why_stat": "This light session is crucial for mental preparation and final tactical adjustments, ensuring the team is fresh and focused for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Full Rest Day",
+          "focus_category": "rest",
+          "drills": [],
+          "why_stat": "This day provides essential physical and mental recuperation, allowing players to fully recover and prepare for the demands of the next training week.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "team": "team_a",
+      "source_note": "Generated for White from real per-minute tactical patterns across the 24 analyzed minutes of this match.",
+      "generated_at": "2026-09-25T22:00:11.459881+00:00",
+      "_prompt_version": "28771e15972c"
+    },
+    "team_b": {
+      "days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Pool & Stretching Session",
+              "duration_min": 60,
+              "note": "Light activity to aid muscle recovery and flexibility after the match."
+            }
+          ],
+          "why_stat": "This day is dedicated to physical and mental recovery, essential for player well-being and preventing injury after the recent match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Coordinated Pressing Triggers",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "4v4 + 2 Target Players Pressing Game",
+              "duration_min": 30,
+              "note": "Focus on immediate collective pressure upon loss of possession in specific zones."
+            },
+            {
+              "title": "Zonal Pressing Drills",
+              "duration_min": 25,
+              "note": "Practice triggering the gegenpress based on opponent's body orientation and passing lanes."
+            }
+          ],
+          "why_stat": "Maroon used a counter-press trigger in only 4 of 24 minutes, and the timeline shows frequent instances of `none` for pressing trigger (e.g., min 3-5, 9, 15, 19-22), indicating a lack of consistent collective pressing.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Defensive Shape & Fullback Support",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Defensive Line Movement & Communication",
+              "duration_min": 30,
+              "note": "Drills focusing on synchronized `drop_deep` and `step_up` actions based on ball position and opponent movement."
+            },
+            {
+              "title": "Fullback Overlap/Underlap Decision Making",
+              "duration_min": 25,
+              "note": "Scenario-based training for fullbacks to decide between `defensive` and `overlapping` roles in various attacking and defensive phases."
+            }
+          ],
+          "why_stat": "Maroon's defensive line dropped deep in 15 minutes, but the timeline shows frequent switching between `drop_deep` and `step_up`, and fullbacks were defensive in 14 minutes and overlapping in 9 minutes, suggesting a need for better coordination and clarity in their roles.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Fast Vertical Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Counter-Attack to Finish Drills",
+              "duration_min": 30,
+              "note": "Rapid transitions from defense to attack, focusing on speed, decision-making, and clinical finishing."
+            },
+            {
+              "title": "Exploiting Space in Transition",
+              "duration_min": 25,
+              "note": "Practice identifying and exploiting spaces left by an opponent's attacking posture during `fast_vertical_transition` scenarios."
+            }
+          ],
+          "why_stat": "Maroon was involved in a counter-attack or fast vertical transition in 11 minutes, highlighting this as a primary offensive weapon that can be further optimized for efficiency and threat.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Structured Build-up",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Build-up from the Back (2-3 & 3-2 shapes)",
+              "duration_min": 30,
+              "note": "Practice maintaining possession and progressing the ball through specific `2-3` and `3-2` build-up shapes under pressure."
+            },
+            {
+              "title": "Midfield Possession & Progression",
+              "duration_min": 25,
+              "note": "Drills to improve ball retention and forward progression in the midfield, reducing instances of `unstructured` play."
+            }
+          ],
+          "why_stat": "Maroon's build-up shape was frequently `unstructured` or `none` in several minutes (e.g., min 0, 3, 7, 8, 10, 12, 15-16, 20), indicating a need for more consistent and structured play from the back.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Tactical Review & Set Pieces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Opponent Analysis & Game Plan Walkthrough",
+              "duration_min": 45,
+              "note": "Review the upcoming opponent's strengths and weaknesses, and walk through Maroon's tactical approach."
+            },
+            {
+              "title": "Set Piece Practice (Offensive & Defensive)",
+              "duration_min": 30,
+              "note": "Light practice of corner kicks, free kicks, and defensive set piece organization."
+            }
+          ],
+          "why_stat": "This light session is crucial for mental preparation and tactical alignment, ensuring the team is cohesive and clear on the game plan for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Full Rest Day",
+          "focus_category": "rest",
+          "drills": [],
+          "why_stat": "A full rest day is vital for complete physical and mental recovery, allowing players to recharge and prevent fatigue before the next training week.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "_original_days": [
+        {
+          "day": "Monday",
+          "focus_label": "Active Recovery",
+          "focus_category": "rest",
+          "drills": [
+            {
+              "title": "Pool & Stretching Session",
+              "duration_min": 60,
+              "note": "Light activity to aid muscle recovery and flexibility after the match."
+            }
+          ],
+          "why_stat": "This day is dedicated to physical and mental recovery, essential for player well-being and preventing injury after the recent match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Tuesday",
+          "focus_label": "Coordinated Pressing Triggers",
+          "focus_category": "press",
+          "drills": [
+            {
+              "title": "4v4 + 2 Target Players Pressing Game",
+              "duration_min": 30,
+              "note": "Focus on immediate collective pressure upon loss of possession in specific zones."
+            },
+            {
+              "title": "Zonal Pressing Drills",
+              "duration_min": 25,
+              "note": "Practice triggering the gegenpress based on opponent's body orientation and passing lanes."
+            }
+          ],
+          "why_stat": "Maroon used a counter-press trigger in only 4 of 24 minutes, and the timeline shows frequent instances of `none` for pressing trigger (e.g., min 3-5, 9, 15, 19-22), indicating a lack of consistent collective pressing.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Wednesday",
+          "focus_label": "Defensive Shape & Fullback Support",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Defensive Line Movement & Communication",
+              "duration_min": 30,
+              "note": "Drills focusing on synchronized `drop_deep` and `step_up` actions based on ball position and opponent movement."
+            },
+            {
+              "title": "Fullback Overlap/Underlap Decision Making",
+              "duration_min": 25,
+              "note": "Scenario-based training for fullbacks to decide between `defensive` and `overlapping` roles in various attacking and defensive phases."
+            }
+          ],
+          "why_stat": "Maroon's defensive line dropped deep in 15 minutes, but the timeline shows frequent switching between `drop_deep` and `step_up`, and fullbacks were defensive in 14 minutes and overlapping in 9 minutes, suggesting a need for better coordination and clarity in their roles.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Thursday",
+          "focus_label": "Fast Vertical Transitions",
+          "focus_category": "trans",
+          "drills": [
+            {
+              "title": "Counter-Attack to Finish Drills",
+              "duration_min": 30,
+              "note": "Rapid transitions from defense to attack, focusing on speed, decision-making, and clinical finishing."
+            },
+            {
+              "title": "Exploiting Space in Transition",
+              "duration_min": 25,
+              "note": "Practice identifying and exploiting spaces left by an opponent's attacking posture during `fast_vertical_transition` scenarios."
+            }
+          ],
+          "why_stat": "Maroon was involved in a counter-attack or fast vertical transition in 11 minutes, highlighting this as a primary offensive weapon that can be further optimized for efficiency and threat.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Friday",
+          "focus_label": "Structured Build-up",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Build-up from the Back (2-3 & 3-2 shapes)",
+              "duration_min": 30,
+              "note": "Practice maintaining possession and progressing the ball through specific `2-3` and `3-2` build-up shapes under pressure."
+            },
+            {
+              "title": "Midfield Possession & Progression",
+              "duration_min": 25,
+              "note": "Drills to improve ball retention and forward progression in the midfield, reducing instances of `unstructured` play."
+            }
+          ],
+          "why_stat": "Maroon's build-up shape was frequently `unstructured` or `none` in several minutes (e.g., min 0, 3, 7, 8, 10, 12, 15-16, 20), indicating a need for more consistent and structured play from the back.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Saturday",
+          "focus_label": "Tactical Review & Set Pieces",
+          "focus_category": "build",
+          "drills": [
+            {
+              "title": "Opponent Analysis & Game Plan Walkthrough",
+              "duration_min": 45,
+              "note": "Review the upcoming opponent's strengths and weaknesses, and walk through Maroon's tactical approach."
+            },
+            {
+              "title": "Set Piece Practice (Offensive & Defensive)",
+              "duration_min": 30,
+              "note": "Light practice of corner kicks, free kicks, and defensive set piece organization."
+            }
+          ],
+          "why_stat": "This light session is crucial for mental preparation and tactical alignment, ensuring the team is cohesive and clear on the game plan for the upcoming match.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        },
+        {
+          "day": "Sunday",
+          "focus_label": "Full Rest Day",
+          "focus_category": "rest",
+          "drills": [],
+          "why_stat": "A full rest day is vital for complete physical and mental recovery, allowing players to recharge and prevent fatigue before the next training week.",
+          "edited_fields": [],
+          "chat_confirmed_fields": []
+        }
+      ],
+      "team": "team_b",
+      "source_note": "Generated for Maroon from real per-minute tactical patterns across the 24 analyzed minutes of this match.",
+      "generated_at": "2026-09-25T22:00:33.684672+00:00",
+      "_prompt_version": "28771e15972c"
+    }
+  },
+  "player_plan": {
+    "players": [
+      {
+        "player_id": 12,
+        "team_label": "White",
+        "top_speed_kmh": 35.21,
+        "avg_speed_kmh": 9.64,
+        "total_distance_m": 56.9,
+        "confidence": "high",
+        "frames_tracked": 708,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Drills",
+            "note": "Focus on maintaining and slightly exceeding the top speed of 35.21 km/h achieved in the peak momentum window.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Runs",
+            "note": "Work on sustaining high speeds over distances similar to the 56.9 meters covered in the analysis.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Movement & Agility",
+            "note": "Incorporate drills that challenge movement efficiency, aiming to improve the average speed of 9.64 km/h in dynamic scenarios.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Acceleration & Deceleration Drills",
+            "note": "Practice rapid changes in speed to complement the high top speed of 35.21 km/h.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Small-Sided Game with Speed Focus",
+            "note": "Apply high-speed movements and cover significant ground, building on the 56.9 meters total distance.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 14,
+        "team_label": "Maroon",
+        "top_speed_kmh": 34.44,
+        "avg_speed_kmh": 10.4,
+        "total_distance_m": 56.7,
+        "confidence": "high",
+        "frames_tracked": 671,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Mechanics",
+            "note": "Refine technique to optimize the impressive top speed of 34.44 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Repeated High-Speed Runs",
+            "note": "Focus on maintaining the high average speed of 10.4 km/h across multiple efforts.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Change of Direction",
+            "note": "Integrate the ability to cover 56.7 meters into dynamic, multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Power Development",
+            "note": "Enhance the burst needed to reach and exceed the top speed of 34.44 km/h.",
+            "tag": "Power",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Integrated Speed Drills",
+            "note": "Practice applying the high average speed of 10.4 km/h in game-like scenarios.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 4,
+        "team_label": "Maroon",
+        "top_speed_kmh": 26.95,
+        "avg_speed_kmh": 9.33,
+        "total_distance_m": 53.2,
+        "confidence": "high",
+        "frames_tracked": 694,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Acceleration & Sprint Form",
+            "note": "Work on improving initial acceleration to increase the top speed beyond 26.95 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Shuttle Runs",
+            "note": "Elevate the average speed from 9.33 km/h through repeated high-effort bursts.",
+            "tag": "High-Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Agility Drills",
+            "note": "Focus on efficient movement patterns to cover distances similar to 53.2 meters with greater fluidity.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Jumps for Speed",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 26.95 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Positional Speed & Movement",
+            "note": "Practice covering significant ground, building on the 53.2 meters total distance, with increased intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 8,
+        "team_label": "Maroon",
+        "top_speed_kmh": 21.17,
+        "avg_speed_kmh": 8.0,
+        "total_distance_m": 50.3,
+        "confidence": "high",
+        "frames_tracked": 726,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Sprint Mechanics & Speed Development",
+            "note": "Focus on improving foundational mechanics to increase the top speed from 21.17 km/h.",
+            "tag": "Speed Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Short Burst Interval Training",
+            "note": "Engage in repeated short, intense efforts to elevate the average speed beyond 8.0 km/h.",
+            "tag": "High-Intensity Efforts",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency Drills",
+            "note": "Work on economical movement patterns to cover distances like 50.3 meters more efficiently.",
+            "tag": "Movement Economy",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometrics for Power",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 21.17 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Positional Drills with Speed Integration",
+            "note": "Practice applying improved speed and covering ground effectively, building on the 50.3 meters total distance.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 6,
+        "team_label": "White",
+        "top_speed_kmh": 35.44,
+        "avg_speed_kmh": 14.29,
+        "total_distance_m": 42.0,
+        "confidence": "high",
+        "frames_tracked": 372,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Maintenance",
+            "note": "Reinforce the ability to reach and sustain the impressive top speed of 35.44 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Extended High-Intensity Runs",
+            "note": "Focus on applying the high average speed of 14.29 km/h over slightly longer distances than 42.0 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Multi-Directional Speed Drills",
+            "note": "Integrate the high top speed of 35.44 km/h into dynamic, changing directions.",
+            "tag": "Agility & Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Repeated Sprint Ability",
+            "note": "Practice maintaining high average speeds, like 14.29 km/h, across multiple short efforts.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Tactical Speed Application",
+            "note": "Engage in drills that require covering more ground than 42.0 meters at high intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 23,
+        "team_label": "White",
+        "top_speed_kmh": 35.09,
+        "avg_speed_kmh": 9.84,
+        "total_distance_m": 41.4,
+        "confidence": "high",
+        "frames_tracked": 499,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Refinement",
+            "note": "Work on optimizing technique to consistently achieve and slightly exceed the top speed of 35.09 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Running Intervals",
+            "note": "Focus on sustaining the average speed of 9.84 km/h over varied distances.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Quickness Drills",
+            "note": "Apply the high top speed of 35.09 km/h effectively in multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Acceleration",
+            "note": "Develop the initial burst to quickly reach high speeds, building on the 41.4 meters covered.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Game-Specific Speed Drills",
+            "note": "Practice covering more ground than 41.4 meters while maintaining a high work rate.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 10,
+        "team_label": "White",
+        "top_speed_kmh": 31.38,
+        "avg_speed_kmh": 7.99,
+        "total_distance_m": 40.8,
+        "confidence": "high",
+        "frames_tracked": 700,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Acceleration & Top Speed Development",
+            "note": "Focus on improving initial acceleration to increase the top speed beyond 31.38 km/h.",
+            "tag": "Speed Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Work Rate Drills",
+            "note": "Elevate the average speed from 7.99 km/h through sustained, intense efforts.",
+            "tag": "High-Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Movement Efficiency",
+            "note": "Work on fluid movement patterns to cover distances like 40.8 meters more effectively.",
+            "tag": "Movement Economy",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometrics for Explosive Power",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 31.38 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Integrated Positional Speed",
+            "note": "Practice covering significant ground, building on the 40.8 meters total distance, with increased average speed.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 53,
+        "team_label": "Maroon",
+        "top_speed_kmh": 35.45,
+        "avg_speed_kmh": 12.24,
+        "total_distance_m": 39.3,
+        "confidence": "high",
+        "frames_tracked": 415,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Optimization",
+            "note": "Refine technique to consistently achieve and slightly exceed the impressive top speed of 35.45 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Sustained High-Intensity Runs",
+            "note": "Focus on applying the high average speed of 12.24 km/h over longer distances than 39.3 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Multi-Directional Speed",
+            "note": "Integrate the high top speed of 35.45 km/h into dynamic, changing directions.",
+            "tag": "Agility & Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Repeated Sprint Power",
+            "note": "Practice maintaining high average speeds, like 12.24 km/h, across multiple short efforts.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Tactical Speed Integration",
+            "note": "Engage in drills that require covering more ground than 39.3 meters at high intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 22,
+        "team_label": "White",
+        "top_speed_kmh": 35.22,
+        "avg_speed_kmh": 11.07,
+        "total_distance_m": 38.8,
+        "confidence": "high",
+        "frames_tracked": 459,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Efficiency",
+            "note": "Work on optimizing technique to consistently achieve and slightly exceed the top speed of 35.22 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Sustained High-Speed Intervals",
+            "note": "Focus on applying the high average speed of 11.07 km/h over longer distances than 38.8 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Quickness",
+            "note": "Integrate the high top speed of 35.22 km/h into dynamic, multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Power for Acceleration",
+            "note": "Develop the initial burst to quickly reach high speeds, building on the 38.8 meters covered.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Game-Specific Speed Application",
+            "note": "Practice covering more ground than 38.8 meters while maintaining a high work rate.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 33,
+        "team_label": "White",
+        "top_speed_kmh": 31.37,
+        "avg_speed_kmh": 10.18,
+        "total_distance_m": 38.5,
+        "confidence": "high",
+        "frames_tracked": 462,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Acceleration & Sprint Form Refinement",
+            "note": "Work on improving initial acceleration to increase the top speed beyond 31.37 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Elevate the average speed from 10.18 km/h through repeated high-effort bursts.",
+            "tag": "High-Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Agility & Quickness",
+            "note": "Focus on efficient movement patterns to cover distances similar to 38.5 meters with greater fluidity.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Power Development",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 31.37 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Positional Speed & Movement Integration",
+            "note": "Practice covering significant ground, building on the 38.5 meters total distance, with increased intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 50,
+        "team_label": "White",
+        "top_speed_kmh": 35.65,
+        "avg_speed_kmh": 12.07,
+        "total_distance_m": 36.9,
+        "confidence": "high",
+        "frames_tracked": 403,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Mastery",
+            "note": "Reinforce the ability to reach and sustain the exceptional top speed of 35.65 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Extended High-Intensity Running",
+            "note": "Focus on applying the high average speed of 12.07 km/h over longer distances than 36.9 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Multi-Directional Speed & Agility",
+            "note": "Integrate the highest top speed of 35.65 km/h into dynamic, changing directions.",
+            "tag": "Agility & Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Repeated Sprint Power Development",
+            "note": "Practice maintaining high average speeds, like 12.07 km/h, across multiple short efforts.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Tactical Speed & Distance Application",
+            "note": "Engage in drills that require covering more ground than 36.9 meters at high intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 16,
+        "team_label": "Maroon",
+        "top_speed_kmh": 33.66,
+        "avg_speed_kmh": 9.86,
+        "total_distance_m": 35.4,
+        "confidence": "high",
+        "frames_tracked": 442,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Technique",
+            "note": "Refine technique to optimize the high top speed of 33.66 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Running Volume",
+            "note": "Focus on sustaining the average speed of 9.86 km/h over increased total distances beyond 35.4 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Quickness Drills",
+            "note": "Apply the high top speed of 33.66 km/h effectively in multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Acceleration Development",
+            "note": "Develop the initial burst to quickly reach high speeds, building on the 35.4 meters covered.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Game-Specific Speed Integration",
+            "note": "Practice covering more ground than 35.4 meters while maintaining a high work rate.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      }
+    ],
+    "_original_players": [
+      {
+        "player_id": 12,
+        "team_label": "White",
+        "top_speed_kmh": 35.21,
+        "avg_speed_kmh": 9.64,
+        "total_distance_m": 56.9,
+        "confidence": "high",
+        "frames_tracked": 708,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Drills",
+            "note": "Focus on maintaining and slightly exceeding the top speed of 35.21 km/h achieved in the peak momentum window.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Runs",
+            "note": "Work on sustaining high speeds over distances similar to the 56.9 meters covered in the analysis.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Movement & Agility",
+            "note": "Incorporate drills that challenge movement efficiency, aiming to improve the average speed of 9.64 km/h in dynamic scenarios.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Acceleration & Deceleration Drills",
+            "note": "Practice rapid changes in speed to complement the high top speed of 35.21 km/h.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Small-Sided Game with Speed Focus",
+            "note": "Apply high-speed movements and cover significant ground, building on the 56.9 meters total distance.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 14,
+        "team_label": "Maroon",
+        "top_speed_kmh": 34.44,
+        "avg_speed_kmh": 10.4,
+        "total_distance_m": 56.7,
+        "confidence": "high",
+        "frames_tracked": 671,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Mechanics",
+            "note": "Refine technique to optimize the impressive top speed of 34.44 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Repeated High-Speed Runs",
+            "note": "Focus on maintaining the high average speed of 10.4 km/h across multiple efforts.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Change of Direction",
+            "note": "Integrate the ability to cover 56.7 meters into dynamic, multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Power Development",
+            "note": "Enhance the burst needed to reach and exceed the top speed of 34.44 km/h.",
+            "tag": "Power",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Integrated Speed Drills",
+            "note": "Practice applying the high average speed of 10.4 km/h in game-like scenarios.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 4,
+        "team_label": "Maroon",
+        "top_speed_kmh": 26.95,
+        "avg_speed_kmh": 9.33,
+        "total_distance_m": 53.2,
+        "confidence": "high",
+        "frames_tracked": 694,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Acceleration & Sprint Form",
+            "note": "Work on improving initial acceleration to increase the top speed beyond 26.95 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Shuttle Runs",
+            "note": "Elevate the average speed from 9.33 km/h through repeated high-effort bursts.",
+            "tag": "High-Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Agility Drills",
+            "note": "Focus on efficient movement patterns to cover distances similar to 53.2 meters with greater fluidity.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Jumps for Speed",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 26.95 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Positional Speed & Movement",
+            "note": "Practice covering significant ground, building on the 53.2 meters total distance, with increased intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 8,
+        "team_label": "Maroon",
+        "top_speed_kmh": 21.17,
+        "avg_speed_kmh": 8.0,
+        "total_distance_m": 50.3,
+        "confidence": "high",
+        "frames_tracked": 726,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Sprint Mechanics & Speed Development",
+            "note": "Focus on improving foundational mechanics to increase the top speed from 21.17 km/h.",
+            "tag": "Speed Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Short Burst Interval Training",
+            "note": "Engage in repeated short, intense efforts to elevate the average speed beyond 8.0 km/h.",
+            "tag": "High-Intensity Efforts",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Movement Efficiency Drills",
+            "note": "Work on economical movement patterns to cover distances like 50.3 meters more efficiently.",
+            "tag": "Movement Economy",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometrics for Power",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 21.17 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Positional Drills with Speed Integration",
+            "note": "Practice applying improved speed and covering ground effectively, building on the 50.3 meters total distance.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 6,
+        "team_label": "White",
+        "top_speed_kmh": 35.44,
+        "avg_speed_kmh": 14.29,
+        "total_distance_m": 42.0,
+        "confidence": "high",
+        "frames_tracked": 372,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Maintenance",
+            "note": "Reinforce the ability to reach and sustain the impressive top speed of 35.44 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Extended High-Intensity Runs",
+            "note": "Focus on applying the high average speed of 14.29 km/h over slightly longer distances than 42.0 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Multi-Directional Speed Drills",
+            "note": "Integrate the high top speed of 35.44 km/h into dynamic, changing directions.",
+            "tag": "Agility & Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Repeated Sprint Ability",
+            "note": "Practice maintaining high average speeds, like 14.29 km/h, across multiple short efforts.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Tactical Speed Application",
+            "note": "Engage in drills that require covering more ground than 42.0 meters at high intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 23,
+        "team_label": "White",
+        "top_speed_kmh": 35.09,
+        "avg_speed_kmh": 9.84,
+        "total_distance_m": 41.4,
+        "confidence": "high",
+        "frames_tracked": 499,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Refinement",
+            "note": "Work on optimizing technique to consistently achieve and slightly exceed the top speed of 35.09 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Running Intervals",
+            "note": "Focus on sustaining the average speed of 9.84 km/h over varied distances.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Quickness Drills",
+            "note": "Apply the high top speed of 35.09 km/h effectively in multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Acceleration",
+            "note": "Develop the initial burst to quickly reach high speeds, building on the 41.4 meters covered.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Game-Specific Speed Drills",
+            "note": "Practice covering more ground than 41.4 meters while maintaining a high work rate.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 10,
+        "team_label": "White",
+        "top_speed_kmh": 31.38,
+        "avg_speed_kmh": 7.99,
+        "total_distance_m": 40.8,
+        "confidence": "high",
+        "frames_tracked": 700,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Acceleration & Top Speed Development",
+            "note": "Focus on improving initial acceleration to increase the top speed beyond 31.38 km/h.",
+            "tag": "Speed Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Work Rate Drills",
+            "note": "Elevate the average speed from 7.99 km/h through sustained, intense efforts.",
+            "tag": "High-Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Movement Efficiency",
+            "note": "Work on fluid movement patterns to cover distances like 40.8 meters more effectively.",
+            "tag": "Movement Economy",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometrics for Explosive Power",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 31.38 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Integrated Positional Speed",
+            "note": "Practice covering significant ground, building on the 40.8 meters total distance, with increased average speed.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 53,
+        "team_label": "Maroon",
+        "top_speed_kmh": 35.45,
+        "avg_speed_kmh": 12.24,
+        "total_distance_m": 39.3,
+        "confidence": "high",
+        "frames_tracked": 415,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Optimization",
+            "note": "Refine technique to consistently achieve and slightly exceed the impressive top speed of 35.45 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Sustained High-Intensity Runs",
+            "note": "Focus on applying the high average speed of 12.24 km/h over longer distances than 39.3 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Multi-Directional Speed",
+            "note": "Integrate the high top speed of 35.45 km/h into dynamic, changing directions.",
+            "tag": "Agility & Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Repeated Sprint Power",
+            "note": "Practice maintaining high average speeds, like 12.24 km/h, across multiple short efforts.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Tactical Speed Integration",
+            "note": "Engage in drills that require covering more ground than 39.3 meters at high intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 22,
+        "team_label": "White",
+        "top_speed_kmh": 35.22,
+        "avg_speed_kmh": 11.07,
+        "total_distance_m": 38.8,
+        "confidence": "high",
+        "frames_tracked": 459,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Efficiency",
+            "note": "Work on optimizing technique to consistently achieve and slightly exceed the top speed of 35.22 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Sustained High-Speed Intervals",
+            "note": "Focus on applying the high average speed of 11.07 km/h over longer distances than 38.8 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Quickness",
+            "note": "Integrate the high top speed of 35.22 km/h into dynamic, multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Power for Acceleration",
+            "note": "Develop the initial burst to quickly reach high speeds, building on the 38.8 meters covered.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Game-Specific Speed Application",
+            "note": "Practice covering more ground than 38.8 meters while maintaining a high work rate.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 33,
+        "team_label": "White",
+        "top_speed_kmh": 31.37,
+        "avg_speed_kmh": 10.18,
+        "total_distance_m": 38.5,
+        "confidence": "high",
+        "frames_tracked": 462,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Acceleration & Sprint Form Refinement",
+            "note": "Work on improving initial acceleration to increase the top speed beyond 31.37 km/h.",
+            "tag": "Acceleration",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Interval Training",
+            "note": "Elevate the average speed from 10.18 km/h through repeated high-effort bursts.",
+            "tag": "High-Intensity",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Dynamic Agility & Quickness",
+            "note": "Focus on efficient movement patterns to cover distances similar to 38.5 meters with greater fluidity.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Plyometric Power Development",
+            "note": "Develop explosive power to contribute to a higher top speed, aiming to surpass 31.37 km/h.",
+            "tag": "Power Development",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Positional Speed & Movement Integration",
+            "note": "Practice covering significant ground, building on the 38.5 meters total distance, with increased intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 50,
+        "team_label": "White",
+        "top_speed_kmh": 35.65,
+        "avg_speed_kmh": 12.07,
+        "total_distance_m": 36.9,
+        "confidence": "high",
+        "frames_tracked": 403,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Mastery",
+            "note": "Reinforce the ability to reach and sustain the exceptional top speed of 35.65 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "Extended High-Intensity Running",
+            "note": "Focus on applying the high average speed of 12.07 km/h over longer distances than 36.9 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Multi-Directional Speed & Agility",
+            "note": "Integrate the highest top speed of 35.65 km/h into dynamic, changing directions.",
+            "tag": "Agility & Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Repeated Sprint Power Development",
+            "note": "Practice maintaining high average speeds, like 12.07 km/h, across multiple short efforts.",
+            "tag": "Repeated Sprints",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Tactical Speed & Distance Application",
+            "note": "Engage in drills that require covering more ground than 36.9 meters at high intensity.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      },
+      {
+        "player_id": 16,
+        "team_label": "Maroon",
+        "top_speed_kmh": 33.66,
+        "avg_speed_kmh": 9.86,
+        "total_distance_m": 35.4,
+        "confidence": "high",
+        "frames_tracked": 442,
+        "sessions": [
+          {
+            "day": "Monday",
+            "title": "Max Velocity Sprint Technique",
+            "note": "Refine technique to optimize the high top speed of 33.66 km/h.",
+            "tag": "Top Speed",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Tuesday",
+            "title": "High-Intensity Running Volume",
+            "note": "Focus on sustaining the average speed of 9.86 km/h over increased total distances beyond 35.4 meters.",
+            "tag": "Speed Endurance",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Wednesday",
+            "title": "Agility and Quickness Drills",
+            "note": "Apply the high top speed of 33.66 km/h effectively in multi-directional movements.",
+            "tag": "Agility",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Thursday",
+            "title": "Explosive Acceleration Development",
+            "note": "Develop the initial burst to quickly reach high speeds, building on the 35.4 meters covered.",
+            "tag": "Explosiveness",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          },
+          {
+            "day": "Friday",
+            "title": "Game-Specific Speed Integration",
+            "note": "Practice covering more ground than 35.4 meters while maintaining a high work rate.",
+            "tag": "Game Application",
+            "edited_fields": [],
+            "chat_confirmed_fields": []
+          }
+        ]
+      }
+    ],
+    "scope_note": "Based on the match's peak-momentum window only \u2014 not a full-match average. Full-match fatigue tracking is on our roadmap.",
+    "generated_at": "2026-09-25T22:01:24.403811+00:00",
+    "_prompt_version": "512596003c5d"
+  },
+  "cv_insights": {
+    "team_insights": [
+      {
+        "team": "White",
+        "observation": "The White team was involved in 4 of the 10 highest-scoring tactical moments identified in this peak-momentum window.",
+        "so_what": "This suggests the White team contributed to a significant portion of the most impactful tactical plays during this intense period, indicating their presence in critical game situations.",
+        "training_implication": "Focus on scenario-based drills that replicate high-pressure, high-impact tactical moments to further enhance their ability to create or influence such situations."
+      },
+      {
+        "team": "Maroon",
+        "observation": "The Maroon team was involved in 6 of the 10 highest-scoring tactical moments identified in this peak-momentum window.",
+        "so_what": "This indicates the Maroon team was frequently at the center of the most decisive tactical actions during this peak phase, suggesting a strong influence on the game's critical junctures.",
+        "training_implication": "Implement tactical decision-making exercises that challenge players to consistently identify and capitalize on opportunities to create high-scoring tactical moments, reinforcing their ability to impact the game."
+      },
+      {
+        "team": "White",
+        "observation": "The average tracking coverage for the White team during this window was 68.4%.",
+        "so_what": "This level of coverage provides a reasonably reliable dataset for analysis, though there were periods where player tracking identity was not maintained, suggesting some data gaps.",
+        "training_implication": "Review the specific moments of lower tracking confidence to understand potential environmental or player movement factors that might affect future data collection accuracy."
+      },
+      {
+        "team": "Maroon",
+        "observation": "The average tracking coverage for the Maroon team during this window was 78.4%.",
+        "so_what": "This higher average tracking coverage indicates a more robust and consistent dataset for the Maroon team, providing greater certainty in the underlying movement data for analysis.",
+        "training_implication": "Continue to optimize tracking protocols to maintain this high level of data reliability, ensuring future analyses are based on the most complete information possible."
+      }
+    ],
+    "player_insights": {
+      "12": [
+        {
+          "observation": "Player 12 was recorded among the top tactical moments for a 'BREAK' event, achieving a speed of 22.9 km/h.",
+          "so_what": "This highlights Player 12's capability to execute high-speed ball-carrying movements, effectively breaking away from defensive pressure into open space.",
+          "training_implication": "Incorporate drills that focus on maintaining ball control and decision-making at high speeds, specifically practicing transitions from receiving to accelerating with the ball in open field scenarios."
+        }
+      ],
+      "14": [
+        {
+          "observation": "Player 14 was recorded among the top tactical moments for an 'ISOLATED' event, being 40.4m from their nearest teammate.",
+          "so_what": "This indicates Player 14 was caught in a situation with significant distance from immediate support, which could present a tactical vulnerability or a challenge in linking play.",
+          "training_implication": "Conduct small-sided games with specific rules that encourage maintaining closer support distances or practicing effective decision-making when isolated, such as holding possession or drawing fouls."
+        }
+      ],
+      "6": [
+        {
+          "observation": "Player 6 had a tracking coverage of 49.5% during this window, with high confidence in the data that was captured.",
+          "so_what": "While the captured data is reliable, the lower coverage percentage suggests that a substantial portion of Player 6's movements during this window was not tracked, limiting the completeness of the analysis for this player.",
+          "training_implication": "Review the specific periods where Player 6's tracking was lost to identify any patterns in movement or field location that might hinder data capture, aiming to improve future tracking consistency."
+        }
+      ],
+      "23": [
+        {
+          "observation": "Player 23 had a tracking coverage of 66.4% during this window, with high confidence in the data that was captured.",
+          "so_what": "This indicates a good level of data reliability for Player 23, providing a solid foundation for analyzing their movements and contributions during this peak phase.",
+          "training_implication": "Continue to monitor tracking consistency for Player 23, ensuring that future analyses benefit from similarly robust and reliable data capture."
+        }
+      ],
+      "53": [
+        {
+          "observation": "Player 53 was recorded among the top tactical moments for a 'PRESS' event, closing 0.7m on the ball carrier as part of a three-player pressing unit. Their tracking coverage was 55.2% with high confidence.",
+          "so_what": "This highlights Player 53's involvement in effective collective defensive pressure, contributing to a coordinated effort to close down opponents, despite some gaps in overall tracking data.",
+          "training_implication": "Implement defensive pressing drills that emphasize coordinated movement and communication among multiple players, focusing on rapid closing distances and maintaining defensive shape."
+        }
+      ],
+      "22": [
+        {
+          "observation": "Player 22 had a tracking coverage of 61.0% during this window, with high confidence in the data that was captured.",
+          "so_what": "This indicates a good level of data reliability for Player 22, providing a solid foundation for analyzing their movements and contributions during this peak phase.",
+          "training_implication": "Continue to monitor tracking consistency for Player 22, ensuring that future analyses benefit from similarly robust and reliable data capture."
+        }
+      ],
+      "33": [
+        {
+          "observation": "Player 33 had a tracking coverage of 61.4% during this window, with high confidence in the data that was captured.",
+          "so_what": "This indicates a good level of data reliability for Player 33, providing a solid foundation for analyzing their movements and contributions during this peak phase.",
+          "training_implication": "Continue to monitor tracking consistency for Player 33, ensuring that future analyses benefit from similarly robust and reliable data capture."
+        }
+      ],
+      "50": [
+        {
+          "observation": "Player 50 was recorded among the top tactical moments for a 'BREAK' event, achieving a speed of 24.5 km/h. Their tracking coverage was 53.6% with high confidence.",
+          "so_what": "This demonstrates Player 50's exceptional ability to execute high-speed ball-carrying movements, effectively driving into space and away from pressure, despite some gaps in overall tracking data.",
+          "training_implication": "Design specific drills that challenge Player 50 to maximize their top-end speed while carrying the ball, focusing on decision-making in transition and exploiting open channels."
+        }
+      ],
+      "16": [
+        {
+          "observation": "Player 16 had a tracking coverage of 58.8% during this window, with high confidence in the data that was captured.",
+          "so_what": "This indicates a good level of data reliability for Player 16, providing a solid foundation for analyzing their movements and contributions during this peak phase.",
+          "training_implication": "Continue to monitor tracking consistency for Player 16, ensuring that future analyses benefit from similarly robust and reliable data capture."
+        }
+      ]
+    },
+    "generated_at": "2026-09-25T22:01:46.369975+00:00",
+    "_prompt_version": "5a110c8a1c85"
+  }
+}

@@ -858,14 +858,24 @@ def load_training_plan(source, key, curated_matches_dir, cache_dir):
 
 
 def save_training_plan(source, key, plan, curated_matches_dir, cache_dir):
+    """Writes through to both CACHE_DIR and, for a curated match, the
+    committed legacy curated_matches_dir location - previously this only
+    ever wrote to CACHE_DIR, so a regenerated/edited curated-match plan
+    was never reflected in the committed file load_training_plan falls
+    back to, and would be silently lost the moment CACHE_DIR was cleared
+    (a redeploy, a 12-hour sleep cycle) - same discipline
+    delete_training_plan already applies to both locations."""
     if not source or not key:
         return False
-    path = get_training_plan_path(source, key, curated_matches_dir, cache_dir)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = str(path) + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(plan, f, indent=2)
-    os.replace(tmp, path)
+    paths = [get_training_plan_path(source, key, curated_matches_dir, cache_dir)]
+    if source == "curated":
+        paths.append(_legacy_curated_training_plan_path(key, curated_matches_dir))
+    for path in paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = str(path) + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(plan, f, indent=2)
+        os.replace(tmp, path)
     return True
 
 

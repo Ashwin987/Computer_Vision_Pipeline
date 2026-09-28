@@ -36,13 +36,25 @@ def _labels_path(cache_dir, match_key):
     return Path(cache_dir) / "player_labels" / f"{match_key}.json"
 
 
-def load_labels(cache_dir, match_key):
+def _legacy_labels_path(curated_matches_dir, match_key):
+    return Path(curated_matches_dir) / match_key / "player_labels.json"
+
+
+def load_labels(cache_dir, match_key, source=None, curated_matches_dir=None):
     """{} (never None) so every call site can use the result directly
     without an extra None-check - an unlabeled match is a normal, common
-    state, not an error."""
+    state, not an error.
+
+    Writable CACHE_DIR wins once anything's been saved there. Until then,
+    falls back to a committed file under curated_matches/<key>/ if one
+    exists - same "committed default, writable override" shape
+    corner_kicks.py/training_plan.py already use for the same
+    CACHE_DIR-resets-on-redeploy problem."""
     if not match_key:
         return {}
     path = _labels_path(cache_dir, match_key)
+    if not path.exists() and source == "curated" and curated_matches_dir:
+        path = _legacy_labels_path(curated_matches_dir, match_key)
     if not path.exists():
         return {}
     try:
@@ -53,17 +65,26 @@ def load_labels(cache_dir, match_key):
         return {}
 
 
-def save_labels(cache_dir, match_key, labels):
+def save_labels(cache_dir, match_key, labels, source=None, curated_matches_dir=None):
     """Only non-blank names are persisted - clearing a name field back to
     blank removes that player's entry rather than saving an empty-string
-    override that would otherwise shadow the real P<id> fallback forever."""
-    path = _labels_path(cache_dir, match_key)
-    path.parent.mkdir(parents=True, exist_ok=True)
+    override that would otherwise shadow the real P<id> fallback forever.
+
+    Writes through to both CACHE_DIR and, for a curated match, the
+    committed curated_matches_dir location - so a save made against a
+    local checkout is immediately ready to commit as the new default,
+    and so CACHE_DIR being wiped (a redeploy, a 12-hour sleep cycle)
+    doesn't silently lose it."""
     cleaned = {str(k): str(v).strip() for k, v in labels.items() if v and str(v).strip()}
-    tmp = str(path) + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(cleaned, f, indent=2)
-    os.replace(tmp, path)
+    paths = [_labels_path(cache_dir, match_key)]
+    if source == "curated" and curated_matches_dir:
+        paths.append(_legacy_labels_path(curated_matches_dir, match_key))
+    for path in paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = str(path) + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(cleaned, f, indent=2)
+        os.replace(tmp, path)
     return cleaned
 
 
