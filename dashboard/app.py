@@ -3304,8 +3304,19 @@ def render_corner_kicks_tab():
                 attacking_token = "team_a" if new_attacking == team_a else "team_b"
                 defending_token = "team_b" if attacking_token == "team_a" else "team_a"
                 mark_id = ck.safe_filename_part(new_label.strip())
+                # This match's own already-confirmed team-color mapping, not
+                # upsert_mark's own default (True) - that default is only
+                # correct for a match where team1 happens to BE team_a (true
+                # for liverpool_psg by coincidence, confirmed FALSE for
+                # barca_madrid_pt1 - see resolve_corner_team_mapping's own
+                # docstring). Every mark was silently getting the same
+                # hardcoded True regardless of which match it belonged to,
+                # since this call never passed the real value through.
+                cv_team_mapping_for_mark = st.session_state.get('cv_team_mapping') or {}
+                reference_team1_is_team_a = cv_team_mapping_for_mark.get('1') == 'team_a'
                 ck.upsert_mark(CACHE_DIR, key, mark_id, new_label.strip(), attacking_token, defending_token,
-                                new_output_dir.strip() or None)
+                                new_output_dir.strip() or None,
+                                reference_team1_is_team_a=reference_team1_is_team_a)
                 st.success(f"Saved mark '{new_label.strip()}'.")
                 st.rerun()
 
