@@ -297,3 +297,51 @@ def render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
         "ball_visible": ball_pos is not None,
     }
     return canvas, meta
+
+
+def render_topdown_video(ctx, player_team, team_bgr, out_path, exclude_gk_from_hull=True,
+                          show_speed_labels=True, fps=None):
+    """Pre-renders every frame of render_topdown_frame to a video file
+    (XVID .avi, matching this project's own render-then-transcode
+    convention — see app.py's _ensure_browser_playable_video and
+    corner_kicks.py's render_team_shape_video docstring for why: a raw
+    cv2.VideoWriter mp4v output isn't reliably browser-playable, so the
+    caller is expected to transcode this .avi the same way).
+
+    Built to fix a real, measured problem, not a guessed one: driving the
+    live single-frame render on a timer (st_autorefresh + a full Streamlit
+    script rerun per tick) was directly measured at a 3.0s gap between
+    visible frame updates for a 0.2s-interval timer - two orders of
+    magnitude slower than intended, because every tick reruns the whole
+    app script, not just this component. Pre-rendering once and playing
+    the result back as a real video sidesteps that entirely: once built,
+    playback is native browser video (measured: currentTime advances in
+    lockstep with wall-clock time, zero Streamlit reruns during playback -
+    a real fix, not just a smaller number). The frame-drawing loop itself is
+    fast (~10ms/frame), but the one-time build this function does is only
+    half the cost the caller pays: the caller's subsequent libx264 transcode
+    (needed because raw cv2.VideoWriter mp4v output isn't reliably
+    browser-playable) dominates and pushes the full first-time build to
+    roughly a minute or more for a ~30s match clip on this machine - budget
+    for that, don't assume "under 10s" covers the whole pipeline.
+
+    goalkeeper_ids is looked up per-frame from ctx itself (not passed in),
+    since it can genuinely vary frame to frame."""
+    fps = fps or ctx.fps
+    first_canvas, _ = render_topdown_frame(ctx, 0, player_team, team_bgr, goalkeeper_ids=(),
+                                            exclude_gk_from_hull=exclude_gk_from_hull,
+                                            show_speed_labels=show_speed_labels)
+    h, w = first_canvas.shape[:2]
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    writer = cv2.VideoWriter(str(out_path), fourcc, fps, (w, h))
+    try:
+        for frame_idx in range(ctx.n_frames):
+            goalkeeper_ids = {tid for tid, info in ctx.players[frame_idx].items() if info.get("is_goalkeeper")}
+            canvas, _ = render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
+                                              goalkeeper_ids=goalkeeper_ids,
+                                              exclude_gk_from_hull=exclude_gk_from_hull,
+                                              show_speed_labels=show_speed_labels)
+            writer.write(canvas)
+    finally:
+        writer.release()
+    return out_path

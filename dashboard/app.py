@@ -2574,6 +2574,9 @@ def render_game_board_tab():
     _render_game_board_core()
 
     st.markdown("---")
+    _render_tactical_map_section()
+
+    st.markdown("---")
     st.markdown("**Why this is useful**")
     st.write(
         "This board lets you try out \"what if\" ideas on a real moment from the match. Pause the "
@@ -2618,19 +2621,78 @@ def _tactical_view_player_team_map(cv_output_dir):
         return {}
 
 
-def render_tactical_view_tab():
-    """The Tactical Map tab: a 2D top-down schematic view of the whole
-    pitch — every player as a team-colored dot at their real calibrated
-    position, a per-team convex-hull shape outline, the ball, and each
-    player's current speed as a label. See tactical_view.py's own module
-    docstring for why this is a genuinely different (and, for a flat
-    diagram, more appropriate) design choice than Game Board's real-frame,
-    no-homography approach."""
-    st.subheader("🗺️ Tactical Map")
+def _tactical_map_video_paths(match_key, team_bgr):
+    """(cache_dir, avi_path, mp4_path) for this match+team-color
+    combination's pre-rendered tactical-map video. Keyed on team_bgr too,
+    not just match_key - a color scheme change (color_a/color_b) would
+    otherwise silently keep serving a stale-colored cached video."""
+    color_sig = f"{team_bgr.get(1)}_{team_bgr.get(2)}"
+    color_hash = hashlib.sha1(color_sig.encode()).hexdigest()[:10]
+    cache_dir = CACHE_DIR / "tactical_map_video_cache" / match_key
+    avi_path = cache_dir / f"tactical_map_{color_hash}.avi"
+    mp4_path = cache_dir / f"tactical_map_{color_hash}_web.mp4"
+    return cache_dir, avi_path, mp4_path
+
+
+def _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr):
+    """Returns a browser-playable mp4 path for this match's whole-window
+    tactical map, rendering + transcoding once and reusing the cached file
+    on every later call - see tactical_view.render_topdown_video's own
+    docstring for why this exists (fixes a measured 3.0s-per-update stutter
+    from driving the live render on an st_autorefresh timer instead)."""
+    cache_dir, avi_path, mp4_path = _tactical_map_video_paths(match_key, team_bgr)
+    if mp4_path.exists():
+        return mp4_path
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    with st.spinner("Rendering the tactical map video (one-time per match - can take a minute or two, mostly spent transcoding for browser playback)..."):
+        tv.render_topdown_video(ctx, player_team, team_bgr, avi_path)
+        try:
+            with VideoFileClip(str(avi_path)) as clip:
+                clip.write_videofile(str(mp4_path), codec="libx264", audio=False, logger=None)
+        except Exception as e:
+            st.error(f"Couldn't prepare the tactical map video for playback: {e}")
+            return None
+    return mp4_path
+
+
+def _render_tactical_map_section():
+    """The Tactical Map, embedded directly under Game Board's video (not a
+    separate tab any more - moved here so both views are visible together
+    with no tab switch). A 2D top-down schematic view of the pitch: every
+    tracked player as a team-colored dot at their real calibrated position,
+    a per-team convex-hull shape outline, the ball, and each player's
+    current speed as a label. See tactical_view.py's own module docstring
+    for why this is a genuinely different (and, for a flat diagram, more
+    appropriate) design choice than Game Board's real-frame, no-homography
+    approach.
+
+    Synced to Game Board's own captured frame (same session_state key
+    _render_game_board_core itself reads/writes: reposition_frame_idx_
+    <match_key>, key_suffix="" since render_game_board_tab calls the core
+    with no suffix) - shown only once Game Board has a frame captured
+    (paused + captured, same gate has_board uses there), since before that
+    there is no "current moment" for the two views to share. The map
+    itself is a pre-rendered video (see _get_or_build_tactical_map_video),
+    started at that captured moment (st.video's start_time) - its own
+    native controls play/pause/scrub independently of Game Board's video
+    above from there."""
+    st.markdown("### 🗺️ Tactical Map")
+
+    source, key = _get_active_match_identity()
+    match_key = key or "session"
+    gameboard_frame_key = f"reposition_frame_idx_{match_key}"
+    gameboard_frame_idx = st.session_state.get(gameboard_frame_key)
+    if gameboard_frame_idx is None:
+        st.caption(
+            "Pause the video above and capture a moment to see its top-down tactical map here, "
+            "side by side with the real footage."
+        )
+        return
+
     st.caption(
-        "A top-down schematic view of the pitch at a chosen moment — every tracked player as a "
-        "team-colored dot at their real calibrated position, each team's shape as a convex-hull "
-        "outline, the ball's position, and each player's current speed (km/h) next to their dot."
+        "The same moment as the board above, redrawn as a top-down schematic — every tracked "
+        "player as a team-colored dot at their real calibrated position, each team's shape as a "
+        "convex-hull outline, the ball's position, and each player's current speed (km/h)."
     )
 
     cv_output_dir = st.session_state.get('cv_job_output_dir')
@@ -2638,7 +2700,6 @@ def render_tactical_view_tab():
         st.info("This match doesn't have a completed CV Deep Analysis job yet — the tactical map needs that first.")
         return
 
-    source, key = _get_active_match_identity()
     video_path = _repositioning_video_path(source, key)
     if not video_path:
         st.info("This match's original CV analysis clip isn't available in this session, so the tactical map can't be built.")
@@ -2671,41 +2732,29 @@ def render_tactical_view_tab():
         2: _hex_to_bgr(color_b if team2_key == 'team_b' else color_a if team2_key == 'team_a' else color_b),
     }
 
-    match_key = key or "session"
-    frame_key = f"tactical_view_frame_{source}_{match_key}"
-    play_key = f"tactical_view_playing_{source}_{match_key}"
-    st.session_state.setdefault(frame_key, 0)
-    st.session_state.setdefault(play_key, False)
+    # Pre-rendered once per match+color combo, then played back as a real
+    # video - genuinely smooth (native browser playback, no server
+    # round-trip per frame), unlike the single-frame-per-Streamlit-rerun
+    # approach this replaced (measured at a 3.0s gap between visible
+    # updates against a 0.2s-interval timer - see tactical_view.
+    # render_topdown_video's docstring for the real numbers).
+    video_path = _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr)
+    if video_path is None:
+        return
+    st.video(str(video_path), start_time=gameboard_frame_idx / ctx.fps)
 
-    ctrl_col1, ctrl_col2 = st.columns([1, 4])
-    with ctrl_col1:
-        playing = st.checkbox("▶ Auto-play", value=st.session_state[play_key], key=f"{play_key}_cb")
-        st.session_state[play_key] = playing
-    if playing:
-        st_autorefresh(interval=200, key=f"{frame_key}_autorefresh")
-        st.session_state[frame_key] = (st.session_state[frame_key] + 2) % ctx.n_frames
-
-    with ctrl_col2:
-        frame_idx = st.slider(
-            "Frame", 0, ctx.n_frames - 1, value=st.session_state[frame_key],
-            key=f"{frame_key}_slider", disabled=playing,
-        )
-        if not playing:
-            st.session_state[frame_key] = frame_idx
-        else:
-            frame_idx = st.session_state[frame_key]
-    st.caption(f"t = {frame_idx / ctx.fps:.1f}s (frame {frame_idx} / {ctx.n_frames - 1})")
-
-    goalkeeper_ids = {tid for tid, info in ctx.players[frame_idx].items() if info.get("is_goalkeeper")}
-    canvas, meta = tv.render_topdown_frame(ctx, frame_idx, player_team, team_bgr, goalkeeper_ids=goalkeeper_ids)
-    st.image(canvas, channels="BGR", width='stretch')
-
+    # Cheap (~10ms) single-frame recompute just for its stats, not to
+    # display - the actual image comes from the pre-rendered video above.
+    goalkeeper_ids = {tid for tid, info in ctx.players[gameboard_frame_idx].items() if info.get("is_goalkeeper")}
+    _, meta = tv.render_topdown_frame(ctx, gameboard_frame_idx, player_team, team_bgr, goalkeeper_ids=goalkeeper_ids)
     off_pitch_note = f", {meta['n_off_pitch']} off-pitch/unresolved" if meta['n_off_pitch'] else ""
     ball_note = "ball visible" if meta['ball_visible'] else "ball not detected this frame"
     st.caption(
+        f"Starts at the board's captured moment above (t = {gameboard_frame_idx / ctx.fps:.1f}s, "
+        f"frame {gameboard_frame_idx} / {ctx.n_frames - 1}) — use the player's own controls to play, "
+        f"pause, or scrub anywhere else in the window. At this frame: "
         f"{meta['n_on_pitch']} of {meta['n_tracked']} tracked players shown{off_pitch_note} · "
-        f"team hulls: {meta['team1_hull_pts']} / {meta['team2_hull_pts']} points · {ball_note} · "
-        "goalkeepers are drawn but excluded from their team's hull shape."
+        f"team hulls: {meta['team1_hull_pts']} / {meta['team2_hull_pts']} points · {ball_note}."
     )
 
 
@@ -4884,8 +4933,8 @@ elif st.session_state.step == 3:
 
             st.header("Match Segment Overview")
 
-            tab_dashboard, tab_coach, tab_game, tab_tactical, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
-                ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🗺️ Tactical Map", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
+            tab_dashboard, tab_coach, tab_game, tab_cv, tab_corners, tab_training, tab_chat = st.tabs(
+                ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
                 st.subheader("Global Control")
@@ -5135,9 +5184,6 @@ elif st.session_state.step == 3:
 
             with tab_game:
                 render_game_board_tab()
-
-            with tab_tactical:
-                render_tactical_view_tab()
 
             with tab_cv:
                 render_cv_deep_analysis_tab()
