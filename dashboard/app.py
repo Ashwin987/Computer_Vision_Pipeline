@@ -1896,6 +1896,51 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     videoEl.addEventListener('loadeddata', setHeight);
     root.appendChild(videoEl);
 
+    // Keep the Tactical Map video (a plain <video id="tactical-map-video">
+    // tag living in the PARENT document, not this component's own iframe -
+    // see _tactical_map_video_url's docstring for why it's rendered that way
+    // instead of st.video) locked to this real video's playback - without
+    // this, embedding them side by side (m4) just places two independently-
+    // clocked <video> elements next to each other: matching fps/frame-count/
+    // duration at build time (verified equal - see render_topdown_video)
+    // doesn't keep them in step once each one's own decode loop is running
+    // independently. This component's iframe and the main Streamlit document
+    // are same-origin (same server), so reaching into window.parent.document
+    // is plain same-origin DOM access, not postMessage - no cooperation
+    // needed beyond that fixed id.
+    function tacticalMapVideo() {
+      try {
+        return window.parent.document.getElementById('tactical-map-video');
+      } catch (e) { /* parent doc not ready yet, or tactical map not mounted this frame */ }
+      return null;
+    }
+    videoEl.addEventListener('play', function() {
+      var tm = tacticalMapVideo();
+      if (tm) { tm.currentTime = videoEl.currentTime; tm.play().catch(function(){}); }
+    });
+    videoEl.addEventListener('pause', function() {
+      var tm = tacticalMapVideo();
+      if (tm) tm.pause();
+    });
+    videoEl.addEventListener('seeked', function() {
+      var tm = tacticalMapVideo();
+      if (tm) tm.currentTime = videoEl.currentTime;
+    });
+    // Periodic drift correction while playing - timeupdate alone fires too
+    // coarsely (browser-dependent, ~4/sec in Chrome) to catch drift quickly,
+    // so this also polls on an interval; either one nudges the follower back
+    // in step past a small (150ms) tolerance rather than fighting its own
+    // decode loop every frame.
+    function resync() {
+      if (videoEl.paused) return;
+      var tm = tacticalMapVideo();
+      if (tm && Math.abs(tm.currentTime - videoEl.currentTime) > 0.15) {
+        tm.currentTime = videoEl.currentTime;
+      }
+    }
+    videoEl.addEventListener('timeupdate', resync);
+    setInterval(resync, 250);
+
     var row = document.createElement('div');
     row.className = 'pr-row';
     var btn = document.createElement('button');
@@ -2655,6 +2700,36 @@ def _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr):
     return mp4_path
 
 
+def _tactical_map_video_url(mp4_path):
+    """Copies the built tactical-map mp4 into the reposition component's own
+    static directory (same one _reposition_video_url already uses for Game
+    Board's real clip) and returns its relative URL - same content-hashed-
+    filename discipline, so a stale previous build is never served under a
+    reused name.
+
+    Why not just st.video(mp4_path): st.video serves the file through
+    Streamlit's own internal media endpoint (a URL like /media/<hash>, not
+    the original filename), which gives no reliable way for the Game Board
+    component's own JS (a separate iframe) to find this exact <video>
+    element again to keep it in sync with the real video's playback -
+    confirmed directly: a currentSrc-based lookup for "tactical_map" never
+    matched anything in the rendered page. Serving it ourselves at a URL we
+    choose means the id we also set on the tag is a reliable, direct target
+    instead."""
+    digest = hashlib.md5(str(mp4_path).encode("utf-8")).hexdigest()[:10]
+    fname = f"tacticalmap_{digest}.mp4"
+    dest = _REPOSITION_COMPONENT_DIR / fname
+    if not dest.exists() or dest.stat().st_mtime < mp4_path.stat().st_mtime:
+        _REPOSITION_COMPONENT_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(mp4_path, dest)
+    # Unlike _reposition_video_url's bare filename (resolved relative to the
+    # component iframe's own base URL), this tag lives in the MAIN document,
+    # so it needs the component's full static path - confirmed directly by
+    # inspecting the rendered page's actual iframe src during this same
+    # investigation: component/app.reposition_widget_<hash>/index.html.
+    return f"component/app.reposition_widget_{_REPOSITION_INDEX_HTML_HASH}/{fname}"
+
+
 def _render_tactical_map_section():
     """The Tactical Map, embedded directly under Game Board's video (not a
     separate tab any more - moved here so both views are visible together
@@ -2741,7 +2816,20 @@ def _render_tactical_map_section():
     video_path = _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr)
     if video_path is None:
         return
-    st.video(str(video_path), start_time=gameboard_frame_idx / ctx.fps)
+    # A raw <video> tag at a URL we control, not st.video() - st.video proxies
+    # the file through Streamlit's own /media/<hash> endpoint, which gives
+    # the Game Board component's JS (a separate iframe) no reliable way to
+    # find this exact element again to keep it playing in step with the real
+    # video (confirmed directly: a currentSrc-based lookup for "tactical_map"
+    # never matched anything against that endpoint's opaque URL). This id is
+    # the thing the sync JS in _REPOSITION_INDEX_HTML actually targets.
+    tm_url = _tactical_map_video_url(video_path)
+    start_t = gameboard_frame_idx / ctx.fps
+    st.markdown(
+        f'<video id="tactical-map-video" controls playsinline '
+        f'src="{tm_url}#t={start_t:.3f}" style="width:100%;border-radius:8px;"></video>',
+        unsafe_allow_html=True,
+    )
 
     # Cheap (~10ms) single-frame recompute just for its stats, not to
     # display - the actual image comes from the pre-rendered video above.

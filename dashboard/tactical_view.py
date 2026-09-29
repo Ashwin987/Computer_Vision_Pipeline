@@ -171,6 +171,52 @@ def frame_player_positions(ctx, frame_idx):
     return positions
 
 
+POSITION_SMOOTH_FRAMES = 2  # +/- frames averaged for dot placement — same
+# established smoothing-window convention this project already applies
+# elsewhere (speed_and_distance_estimator.py's BUFFER_SIZE=3,
+# player_speed_kmh's own SPEED_WINDOW_FRAMES=3 below), just never applied to
+# POSITION until now: player_pitch_position/frame_player_positions were
+# always a raw single-frame homography reprojection with no temporal
+# smoothing, which is why dots visibly jump frame to frame even though
+# speed labels (already windowed) look smooth — this was the actual "jitter"
+# gap, not a homography accuracy problem.
+
+
+def smoothed_player_pitch_position(ctx, frame_idx, tid, window=POSITION_SMOOTH_FRAMES):
+    """Centered moving average of player_pitch_position over frames
+    [frame_idx-window, frame_idx+window], using whichever of those frames
+    actually resolve — not all-or-nothing like player_speed_kmh, since a
+    player visible now with 1-2 unresolved neighbor frames should still get
+    a smoothed dot, not disappear. Returns None only when frame_idx itself
+    doesn't resolve (same "don't draw a player who isn't really there" rule
+    frame_player_positions already follows)."""
+    center = player_pitch_position(ctx, frame_idx, tid)
+    if center is None:
+        return None
+    xs, ys = [], []
+    for f in range(max(0, frame_idx - window), min(ctx.n_frames - 1, frame_idx + window) + 1):
+        pos = player_pitch_position(ctx, f, tid)
+        if pos is not None:
+            xs.append(pos[0])
+            ys.append(pos[1])
+    if not xs:
+        return center
+    return (sum(xs) / len(xs), sum(ys) / len(ys))
+
+
+def frame_player_positions_smoothed(ctx, frame_idx, window=POSITION_SMOOTH_FRAMES):
+    """Smoothed version of frame_player_positions — same on-pitch/tracked
+    inclusion set (decided by frame_idx's own resolution), but each
+    included player's (X, Y) is the centered moving average above instead
+    of a single raw frame's homography reprojection."""
+    positions = {}
+    for tid in ctx.players[frame_idx].keys():
+        pos = smoothed_player_pitch_position(ctx, frame_idx, tid, window=window)
+        if pos is not None:
+            positions[tid] = pos
+    return positions
+
+
 def ball_pitch_position(ctx, frame_idx):
     """The ball's real calibrated pitch position this frame, or None if not
     detected/interpolated for this frame, off-pitch, or no usable homography."""
@@ -245,7 +291,7 @@ def render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
     from their team's hull by default (a GK's usual position badly distorts
     a team-shape hull; this is a real, disclosed choice, not a bug)."""
     canvas = _PITCH_BG.copy()
-    positions = frame_player_positions(ctx, frame_idx)
+    positions = frame_player_positions_smoothed(ctx, frame_idx)
     n_tracked = len(ctx.players[frame_idx])
     n_on_pitch = len(positions)
 
