@@ -397,7 +397,7 @@ def find_clean_patch(ctx, target_frame, rect, search_radius=100, max_blend_frame
     }
 
 
-def composite_patch(dest_img, patch_img, rect, feather_px=10):
+def composite_patch(dest_img, patch_img, rect, feather_px=10, allow_seamless=True):
     """Identical to the polish-pass lib.py - see that module for the full
     docstring (Poisson blend via cv2.seamlessClone, feathered-alpha
     fallback for a patch flush against the frame edge).
@@ -412,7 +412,28 @@ def composite_patch(dest_img, patch_img, rect, feather_px=10):
     original investigation - it just never surfaced before because only
     one actively-dragged player was ever erased per call; erasing every
     player in a frame for the game board makes an edge-adjacent player
-    common enough to hit it directly."""
+    common enough to hit it directly.
+
+    allow_seamless=False skips straight to the feathered-alpha fallback -
+    for a BLENDED patch (find_clean_patch averaged multiple frames because
+    a pitch line crossed the rect), not a real single-frame image. Poisson
+    cloning (cv2.seamlessClone) solves for pixel values from the patch's
+    gradient field, which assumes a coherent real image; a multi-frame
+    average of a moving camera has the white line landing at slightly
+    different pixel positions per source frame, so the blended patch's
+    gradient near that line is internally inconsistent - exactly what
+    seamlessClone is worst at. Confirmed directly on real data, not
+    inferred: liverpool_psg frame 353, tid 21 (bbox landing squarely on
+    the halfway line where it crosses the center circle - the same
+    line_crosses_patch case that triggers blending) rendered as a solid
+    black wedge on the game board, at the exact pixel position of that
+    bbox - cv2.seamlessClone's failure mode for this input, not a search
+    failure (find_clean_patch never returned None here) and not anything
+    to do with tid 21 specifically; frame 478 hit the same failure at the
+    same on-pitch location for a different player (tid 8) standing there
+    instead. Feather blending has no gradient-consistency assumption, so
+    it degrades to a soft (if faintly visible) seam instead of a
+    solid-color artifact."""
     rx1, ry1, rx2, ry2 = [int(round(v)) for v in rect]
     dh, dw = dest_img.shape[:2]
     crx1, cry1 = max(0, rx1), max(0, ry1)
@@ -424,11 +445,29 @@ def composite_patch(dest_img, patch_img, rect, feather_px=10):
     patch_img = patch_img[py1:py1 + h, px1:px1 + w]
     rx1, ry1, rx2, ry2 = crx1, cry1, crx2, cry2
 
-    if 0 < rx1 and rx2 < dest_img.shape[1] and 0 < ry1 and ry2 < dest_img.shape[0]:
+    if allow_seamless and 0 < rx1 and rx2 < dest_img.shape[1] and 0 < ry1 and ry2 < dest_img.shape[0]:
         try:
             mask = np.full((h, w), 255, dtype=np.uint8)
             center = (rx1 + w // 2, ry1 + h // 2)
             cloned = cv2.seamlessClone(patch_img, dest_img, mask, center, cv2.NORMAL_CLONE)
+            # Reject a result cv2.seamlessClone (Poisson/gradient-domain
+            # cloning) has silently diverged on, rather than trust it onto
+            # the board - confirmed directly on real data, not a guessed
+            # edge case: liverpool_psg frame 353, tid 21's patch (mean
+            # brightness 110.6, structurally ordinary grass+line content,
+            # zero pixels darker than 70) came back from seamlessClone as
+            # 32% pixels darker than 70, visibly a solid near-black wedge
+            # on the board - not from a bad/blended source patch (this one
+            # wasn't blended at all, single source frame), just Poisson
+            # blending occasionally diverging on this content. A "new
+            # darkness that wasn't in the source" check catches that
+            # divergence directly, independent of why it happened.
+            patch_gray = patch_img.astype(np.float32).mean(axis=2)
+            cloned_gray = cloned[ry1:ry2, rx1:rx2].astype(np.float32).mean(axis=2)
+            patch_dark_frac = (patch_gray < 70).mean()
+            cloned_dark_frac = (cloned_gray < 70).mean()
+            if cloned_dark_frac > patch_dark_frac + 0.15:
+                raise cv2.error("seamlessClone diverged: introduced dark pixels absent from the source patch")
             return cloned, "seamless"
         except cv2.error:
             pass
@@ -492,7 +531,8 @@ def clean_frame_no_players(ctx, frame_idx, margin=6):
         if found is None:
             n_failed += 1
             continue
-        composite, _ = composite_patch(composite, found["patch"], rect)
+        composite, _ = composite_patch(composite, found["patch"], rect,
+                                        allow_seamless=not found["blended"])
     return composite, n_failed
 
 
