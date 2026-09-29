@@ -316,7 +316,14 @@ def _player_stat_cards(stats_json, team_a, team_b, team_mapping, cv_team_label_f
             # anything about the existing card's displayed content.
             "frames_tracked": p.get('frames_tracked'),
         })
-    cards.sort(key=lambda x: x.get('total_distance_m') or 0, reverse=True)
+    # Sorted by top_speed_kmh, not total_distance_m - distance (like
+    # avg_speed_kmh) sums/averages across a player's whole tracked window,
+    # which stats.json's own tracking_identity_reliability now flags as
+    # untrustworthy on both curated matches (see run_cv_analysis.py's
+    # _build_tracking_identity_reliability_stats). top_speed_kmh is exempt
+    # - it only ever reads a single verified-clean 3-frame window - so it's
+    # the one real number left to rank "most notable" players by.
+    cards.sort(key=lambda x: x.get('top_speed_kmh') or 0, reverse=True)
     return cards[:limit]
 
 
@@ -329,14 +336,30 @@ def generate_player_plan(stats_json, team_a, team_b, team_mapping, cv_team_label
         return None
 
     client = genai.Client(api_key=api_key)
+    # avg_speed_kmh and total_distance_m excluded here deliberately - both
+    # sum/average a display value across a player's WHOLE tracked window,
+    # and stats.json's own tracking_identity_reliability (see
+    # run_cv_analysis.py's _build_tracking_identity_reliability_stats)
+    # flags both as unreliable on real data for this same reason: the
+    # tracker's per-player identity fragments into dozens of segments per
+    # match, so that sum/average silently blends several different real
+    # players' movement together. Never handing these to Gemini means a
+    # generated session note can't cite a number that isn't real.
+    # top_speed_kmh is exempt - it only ever reads a single verified-clean,
+    # uninterrupted 3-frame window - so it's kept.
+    _EXCLUDED_FROM_PROMPT = ('team_label', 'avg_speed_kmh', 'total_distance_m')
     players_payload = json.dumps([
-        {k: v for k, v in c.items() if k != 'team_label'} for c in player_cards
+        {k: v for k, v in c.items() if k not in _EXCLUDED_FROM_PROMPT} for c in player_cards
     ], indent=2)
 
     prompt = f"""
 You are an elite soccer fitness coach. Below is REAL tracked physical data for
 {len(player_cards)} players from a computer-vision analysis of a single ~30-second
 peak-momentum window of a match (NOT the full match, NOT a full-match average).
+Only top_speed_kmh is included per player - average speed and total distance
+were measured but are not currently reliable enough to use (the underlying
+player-tracking identity breaks up too often across the window), so do not
+reference or estimate them.
 
 {players_payload}
 
@@ -639,6 +662,8 @@ _BASE_CSS = """
   .pcard .lbl{font-size:11px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
   .pcard .big{font-size:24px;font-weight:700;}
   .pcard .trend{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .pcard-unreliable{opacity:.55;}
+  .pcard-unreliable .big{color:var(--muted2);font-size:18px;}
   .plan-list{display:flex;flex-direction:column;gap:10px;}
   .plan-item{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
     border-radius:11px;padding:14px 16px;}
@@ -774,27 +799,54 @@ def _render_session_item(s):
     )
 
 
-def render_player_card_html(player, player_insights=None):
+def render_player_card_html(player, player_insights=None, reliability=None):
+    """reliability: this match's stats.json['tracking_identity_reliability']
+    block (see run_cv_analysis.py's _build_tracking_identity_reliability_stats),
+    or None for a caller that hasn't loaded it - falls back to always
+    treating avg_speed/distance as unreliable in that case (the safe
+    default: never silently present a number this project has real
+    evidence against, just because the caller didn't pass the check)."""
     sessions_html = "".join(_render_session_item(s) for s in player.get("sessions", []))
     conf = player.get("confidence", "high")
     conf_badge = "✅ high confidence" if conf == "high" else f"⚠️ {_esc(conf)} confidence"
     top_speed = player.get('top_speed_kmh') or 0
-    avg_speed = player.get('avg_speed_kmh') or 0
-    dist = player.get('total_distance_m') or 0
+
+    top_speed_rel = (reliability or {}).get('top_speed_kmh', {})
+    avg_speed_rel = (reliability or {}).get('avg_speed_kmh', {'reliable': False})
+    verified_badge = ' 🔒' if top_speed_rel.get('reliable', True) else ''
+
+    if avg_speed_rel.get('reliable'):
+        avg_speed = player.get('avg_speed_kmh') or 0
+        dist = player.get('total_distance_m') or 0
+        avg_dist_cards = (
+            f'<div class="pcard" title="Mean speed across every tracked frame for this player in the window - '
+            f'includes standing/walking moments, so it is well below top speed.">'
+            f'<div class="lbl">Average speed (this window)</div><div class="big">{avg_speed:.1f} km/h</div></div>'
+            f'<div class="pcard" title="Total ground covered across the tracked frames of this ~30s window - '
+            f'not a full-match total.">'
+            f'<div class="lbl">Distance covered (this window)</div><div class="big">{dist:.0f} m</div></div>'
+        )
+    else:
+        why = _esc(avg_speed_rel.get(
+            'reason', "This match's player-tracking identity fragments too often across the window "
+                      "to trust a sum/average computed across it."))
+        avg_dist_cards = (
+            f'<div class="pcard pcard-unreliable" title="{why}">'
+            f'<div class="lbl">Average speed &amp; distance</div>'
+            f'<div class="big">Not reliable</div>'
+            f'<div class="trend">pending player re-identification — hover for why</div></div>'
+        )
+
     return (
         _BASE_CSS
         + f'<div class="scope-note">{_esc(PLAYER_PLAN_SCOPE_NOTE)}</div>'
         + '<div class="player-head">'
         + (f'<div class="pcard" title="Fastest single moment tracked for this player during the ~30s window. '
-           f'Confidence reflects how reliably the tracker held this player\'s identity at that moment.">'
-           f'<div class="lbl">Top speed (this window)</div><div class="big">{top_speed:.1f} km/h</div>'
+           f'Confidence reflects how reliably the tracker held this player\'s identity at that moment. '
+           f'{"Verified: computed only from a single uninterrupted, clean tracking window." if verified_badge else ""}">'
+           f'<div class="lbl">Top speed (this window)</div><div class="big">{top_speed:.1f} km/h{verified_badge}</div>'
            f'<div class="trend">{conf_badge}</div></div>')
-        + (f'<div class="pcard" title="Mean speed across every tracked frame for this player in the window - '
-           f'includes standing/walking moments, so it is well below top speed.">'
-           f'<div class="lbl">Average speed (this window)</div><div class="big">{avg_speed:.1f} km/h</div></div>')
-        + (f'<div class="pcard" title="Total ground covered across the tracked frames of this ~30s window - '
-           f'not a full-match total.">'
-           f'<div class="lbl">Distance covered (this window)</div><div class="big">{dist:.0f} m</div></div>')
+        + avg_dist_cards
         + '</div>'
         + f'<div class="plan-list">{sessions_html}</div>'
         + render_cv_insights_html(player_insights)

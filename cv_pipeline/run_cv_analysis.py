@@ -327,7 +327,18 @@ def _build_player_stats(tracks):
             p['frames_tracked'] += 1
             speed = info.get('speed') or 0.0
             p['speed_sum'] += speed
-            if speed > p['top_speed_kmh']:
+            # top_speed_kmh only considers a genuinely BUFFER_SIZE-frame
+            # sustained reading (speed_fully_smoothed), not a 1- or
+            # 2-sample average right after a teleport/ID-switch reset -
+            # see speed_and_distance_estimator.py's
+            # REQUIRE_FULL_BUFFER_FOR_TOP_SPEED for the real-data
+            # investigation behind this (87% of liverpool_psg's reported
+            # top speeds traced to exactly that under-smoothed pattern,
+            # unnaturally clustered near MAX_SPEED_KMH). avg_speed_kmh and
+            # total_distance_m are unaffected - already averaged/summed
+            # across hundreds of frames, so a single under-smoothed
+            # reading doesn't distort them the way a raw max does.
+            if info.get('speed_fully_smoothed') and speed > p['top_speed_kmh']:
                 p['top_speed_kmh'] = speed
                 p['top_speed_confidence'] = info.get('speed_confidence', 'high')
             dist = info.get('distance') or 0.0
@@ -348,6 +359,155 @@ def _build_player_stats(tracks):
         })
     players.sort(key=lambda r: -r['top_speed_kmh'])
     return players
+
+
+def _segment_player_track(object_tracks, target_pid):
+    """Splits one player's raw track into contiguous segments, breaking at
+    every single-frame position jump > MAX_JUMP_M (same threshold and
+    detection speed_and_distance_estimator.py's own TELEPORT filter uses,
+    and render_output2.py's stamina fix's STAMINA_JUMP_M) or any gap where
+    the track id isn't present in a frame at all. Returns a list of
+    {n_frames} dicts, one per segment - this is the same segmentation the
+    h9 investigation (avg_speed_kmh/total_distance_m reliability) used,
+    lifted into the real pipeline so it runs on every processed match, not
+    just as an ad-hoc script."""
+    from speed_and_distance_estimator.speed_and_distance_estimator import MAX_JUMP_M
+    n = len(object_tracks)
+    segments = []
+    current_len = 0
+    in_track = False
+
+    def _in_bounds(pos):
+        try:
+            x, y = float(pos[0]), float(pos[1])
+            return 0.0 <= x <= 105.0 and 0.0 <= y <= 68.0
+        except (TypeError, IndexError, ValueError):
+            return False
+
+    for frame_num in range(1, n):
+        prev_frame = object_tracks[frame_num - 1]
+        curr_frame = object_tracks[frame_num]
+        if target_pid not in curr_frame:
+            if in_track and current_len > 0:
+                segments.append({'n_frames': current_len})
+            in_track = False
+            current_len = 0
+            continue
+
+        if not in_track:
+            in_track = True
+            current_len = 0
+
+        jumped = False
+        if target_pid in prev_frame:
+            pos_prev = prev_frame[target_pid].get('position_transformed')
+            pos_curr = curr_frame[target_pid].get('position_transformed')
+            if pos_prev is not None and pos_curr is not None and _in_bounds(pos_prev) and _in_bounds(pos_curr):
+                dist = ((pos_prev[0] - pos_curr[0]) ** 2 + (pos_prev[1] - pos_curr[1]) ** 2) ** 0.5
+                if dist > MAX_JUMP_M:
+                    jumped = True
+
+        if jumped:
+            if current_len > 0:
+                segments.append({'n_frames': current_len})
+            current_len = 1
+        else:
+            current_len += 1
+
+    if in_track and current_len > 0:
+        segments.append({'n_frames': current_len})
+    return segments
+
+
+# A stat's aggregate value is only trusted when tracking held one real
+# identity together well enough to make "sum/average across the whole
+# match" a meaningful operation. Thresholds are intentionally strict -
+# real per-player segmentation data (see h9's investigation) showed a
+# genuinely well-tracked player (id continuous for nearly the entire
+# window) sitting at n_segments<=2 and longest-segment coverage >=80%;
+# every fragmented player was far below both. Neither curated match comes
+# close on a match-wide (median) basis - this is not a threshold tuned to
+# force a particular answer, it's the bar a trustworthy match-wide average
+# would need to clear.
+RELIABILITY_MAX_MEDIAN_SEGMENTS = 3
+RELIABILITY_MIN_MEDIAN_COVERAGE_PCT = 80.0
+
+
+def _build_tracking_identity_reliability_stats(tracks):
+    """Computed fresh per match (never pooled across matches, never
+    hardcoded) - see _segment_player_track. total_distance_m and
+    avg_speed_kmh sum/average a display quantity across a player's WHOLE
+    raw track, so they're only as trustworthy as that track's identity
+    continuity; top_speed_kmh (since the same investigation's fix) only
+    ever reads from a single verified-clean, uninterrupted 3-frame window,
+    so it doesn't inherit this problem regardless of how fragmented the
+    rest of the track is."""
+    object_tracks = tracks['players']
+    all_pids = sorted({pid for frame in object_tracks for pid, info in frame.items()
+                        if info.get('team') in (1, 2)})
+
+    n_segments_list = []
+    coverage_pct_list = []
+    for pid in all_pids:
+        segs = _segment_player_track(object_tracks, pid)
+        if not segs:
+            continue
+        total_frames = sum(s['n_frames'] for s in segs)
+        if total_frames < 20:
+            continue   # too briefly tracked to be a meaningful sample either way
+        longest = max(s['n_frames'] for s in segs)
+        n_segments_list.append(len(segs))
+        coverage_pct_list.append(100.0 * longest / total_frames)
+
+    def _median(vals):
+        if not vals:
+            return None
+        s = sorted(vals)
+        mid = len(s) // 2
+        return (s[mid] if len(s) % 2 else (s[mid - 1] + s[mid]) / 2)
+
+    median_segments = _median(n_segments_list)
+    median_coverage_pct = _median(coverage_pct_list)
+    n_players_analyzed = len(n_segments_list)
+
+    is_reliable = (
+        median_segments is not None and median_coverage_pct is not None
+        and median_segments <= RELIABILITY_MAX_MEDIAN_SEGMENTS
+        and median_coverage_pct >= RELIABILITY_MIN_MEDIAN_COVERAGE_PCT
+    )
+
+    if median_segments is None:
+        reason_suffix = "no players had enough tracked frames to evaluate."
+    else:
+        reason_suffix = (
+            f"this match's players show a median of {median_segments:.0f} distinct tracking "
+            f"segments each (a new segment starts whenever a player's tracked position jumps "
+            f"more than {5.0:.0f}m in a single frame - almost always a tracker ID switch, not "
+            f"real movement), and even each player's SINGLE LONGEST continuous segment covers "
+            f"a median of only {median_coverage_pct:.1f}% of their total tracked frames."
+        )
+
+    aggregate_reason = (
+        (f"Reliable: " if is_reliable else f"Not reliable: ")
+        + "summing/averaging a display value across a player's whole match track assumes that "
+        + "track is one continuous real identity throughout - " + reason_suffix
+    )
+    top_speed_reason = (
+        "Reliable regardless of the above: only ever reads from a single, verified-clean, "
+        "uninterrupted 3-frame window (see speed_and_distance_estimator.py's "
+        "REQUIRE_FULL_BUFFER_FOR_TOP_SPEED) - never sums or averages across segment "
+        "boundaries, so track fragmentation elsewhere in the match doesn't affect it."
+    )
+
+    return {
+        'n_players_analyzed':                n_players_analyzed,
+        'median_segments_per_player':        round(median_segments, 1) if median_segments is not None else None,
+        'median_longest_segment_coverage_pct': round(median_coverage_pct, 1) if median_coverage_pct is not None else None,
+        'jump_threshold_m':                  5.0,
+        'avg_speed_kmh':    {'reliable': is_reliable, 'reason': aggregate_reason},
+        'total_distance_m': {'reliable': is_reliable, 'reason': aggregate_reason},
+        'top_speed_kmh':    {'reliable': True, 'reason': top_speed_reason},
+    }
 
 
 def _build_match_events_stats(match_events):
@@ -393,6 +553,7 @@ def build_stats(*, match_name, video_path, n_frames, fps,
         'ball':             _build_ball_stats(ball_pre_interp, ball_fallback, n_frames),
         'team_resolution':  _build_team_resolution_stats(team_assigner, tracks, n_merged_pairs),
         'players':          _build_player_stats(tracks),
+        'tracking_identity_reliability': _build_tracking_identity_reliability_stats(tracks),
         'match_events':     _build_match_events_stats(match_events),
         'tactical_events':  _build_tactical_events_stats(tactical_events_detector, ranked_windows),
         'transitions':      {'count': n_transitions},

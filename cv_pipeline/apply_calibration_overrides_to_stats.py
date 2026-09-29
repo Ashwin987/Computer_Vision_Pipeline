@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from camera_movement_estimator.camera_movement_estimator import CameraMovementEstimator
 from view_transformer.view_transformer import ViewTransformer
 from speed_and_distance_estimator.speed_and_distance_estimator import SpeedAndDistance_Estimator
-from run_cv_analysis import _build_player_stats, _build_calibration_stats
+from run_cv_analysis import _build_player_stats, _build_calibration_stats, _build_tracking_identity_reliability_stats
 
 STUBS_DIR = Path(__file__).parent / "stubs"
 OUTPUT_DIR = Path(__file__).parent / "output_videos"
@@ -119,6 +119,7 @@ def reprocess(match_name):
 
     new_players = _build_player_stats(tracks)
     new_calibration = _build_calibration_stats(calibration_confidence_per_frame)
+    new_reliability = _build_tracking_identity_reliability_stats(tracks)
 
     old_players_by_id = {p["player_id"]: p for p in stats["players"]}
     changed = []
@@ -130,6 +131,7 @@ def reprocess(match_name):
 
     stats["players"] = new_players
     stats["calibration"] = new_calibration
+    stats["tracking_identity_reliability"] = new_reliability
     tmp = str(stats_path) + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(stats, f, indent=2)

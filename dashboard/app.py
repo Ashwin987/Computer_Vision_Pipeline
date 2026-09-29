@@ -663,7 +663,7 @@ def _cv_summary_flowables(cv_output_dir, team_a, team_b, cv_team_mapping, styles
         flowables.append(Paragraph("No tactical-event observations were available for this window.", styles['BodyText']))
     return flowables
 
-def _training_plan_flowables(plan, styles, team_a, team_b):
+def _training_plan_flowables(plan, styles, team_a, team_b, reliability=None):
     flowables = []
     if not plan:
         flowables.append(Paragraph("No training plan has been generated for this match yet.", styles['BodyText']))
@@ -707,11 +707,17 @@ def _training_plan_flowables(plan, styles, team_a, team_b):
     if player_plan and player_plan.get('players'):
         flowables.append(Paragraph(_esc_rl(player_plan.get('scope_note', tp.PLAYER_PLAN_SCOPE_NOTE)), styles['Italic']))
         flowables.append(Spacer(1, 6))
+        avg_dist_reliable = ((reliability or {}).get('avg_speed_kmh') or {}).get('reliable', False)
         for p in player_plan['players']:
+            stat_line = f"top speed {p.get('top_speed_kmh') or 0:.1f} km/h (verified clean segment)"
+            if avg_dist_reliable:
+                stat_line += (f", avg {p.get('avg_speed_kmh') or 0:.1f} km/h, "
+                               f"distance {p.get('total_distance_m') or 0:.0f} m")
+            else:
+                stat_line += " — avg speed &amp; distance: not reliable this window, omitted (pending player re-identification)"
             flowables.append(Paragraph(
-                f"<b>P{_esc_rl(p.get('player_id'))} ({_esc_rl(p.get('team_label'))})</b> — "
-                f"top speed {p.get('top_speed_kmh') or 0:.1f} km/h, avg {p.get('avg_speed_kmh') or 0:.1f} km/h, "
-                f"distance {p.get('total_distance_m') or 0:.0f} m", styles['BodyText']))
+                f"<b>P{_esc_rl(p.get('player_id'))} ({_esc_rl(p.get('team_label'))})</b> — {stat_line}",
+                styles['BodyText']))
             for s in (p.get('sessions') or []):
                 edited = set(s.get('edited_fields') or [])
                 chat_confirmed = set(s.get('chat_confirmed_fields') or [])
@@ -780,7 +786,18 @@ def generate_full_pdf_report(team_a, team_b, color_a, color_b, raw_data, ai_repo
 
     flowables.append(Paragraph("Training Plan", styles['Heading1']))
     plan = tp.load_training_plan(source, key, CURATED_MATCHES_DIR, CACHE_DIR) if source else None
-    flowables.extend(_training_plan_flowables(plan, styles, team_a, team_b))
+    pdf_reliability = None
+    if cv_output_dir:
+        pdf_cv_status = get_cv_job_status_safe(cv_output_dir)
+        if pdf_cv_status.get('status') == 'complete' and pdf_cv_status.get('stats_file'):
+            pdf_stats_path = _resolve_cv_path(pdf_cv_status['stats_file'])
+            if pdf_stats_path.exists():
+                try:
+                    with open(pdf_stats_path, 'r') as f:
+                        pdf_reliability = json.load(f).get('tracking_identity_reliability')
+                except (json.JSONDecodeError, OSError):
+                    pdf_reliability = None
+    flowables.extend(_training_plan_flowables(plan, styles, team_a, team_b, pdf_reliability))
     flowables.append(PageBreak())
 
     try:
@@ -2725,33 +2742,99 @@ def render_cv_completed_state(status, cv_output_dir):
             selected_label = st.radio("Choose a rendered output:", labels, horizontal=True, key="cv_video_switcher")
             selected_fname = next(fname for fname, lbl in available if lbl == selected_label)
             st.caption(CV_OUTPUT_DESCRIPTIONS.get(selected_fname, ""))
-            video_path = _resolve_cv_path(outputs[selected_fname])
-            if video_path.exists():
-                with st.spinner("Preparing video for playback (one-time transcode)..."):
-                    playable_path = _ensure_browser_playable_video(video_path)
-                if playable_path and playable_path.exists():
-                    st.video(str(playable_path))
-                else:
-                    st.warning("Couldn't prepare this render for in-browser playback. You can still download the raw file.")
-                    with open(video_path, 'rb') as f:
-                        st.download_button(f"Download raw {selected_label} (.avi)", f.read(),
-                                            file_name=video_path.name, key=f"dl_cv_{selected_fname}")
+
+            if selected_fname == 'output3.avi':
+                # Gated off, not just caveated - see STAMINA_JUMP_M in
+                # render_output2.py and the h9/h10 investigations. Applying
+                # the same jump-split fix used for total_distance_m here
+                # (force a new stable id on every >5m jump) doesn't produce
+                # a usable feature: simulated on real data it creates 2,335
+                # distinct ids for liverpool_psg alone across 752 frames,
+                # median lifespan 3 frames (0.12s) - a bar that would
+                # constantly flicker back to 100% rather than show one
+                # player's fatigue over time. A text caveat next to a
+                # moving bar is a weak signal against a strong visual
+                # narrative the data can't actually support, so this stays
+                # off (not shown, not downloadable) until real
+                # re-identification work lands, rather than presented with
+                # a caveat a viewer can easily miss.
+                rel_for_stamina = (stats or {}).get('tracking_identity_reliability', {})
+                st.warning(
+                    "⏸️ **Player Stamina Panel — temporarily disabled.**\n\n"
+                    "This panel needs to track one continuous real identity per player to show a "
+                    "meaningful fatigue curve, and this match's tracking data can't currently support "
+                    "that."
+                )
+                if rel_for_stamina.get('median_segments_per_player') is not None:
+                    st.caption(
+                        f"This match: median {rel_for_stamina.get('median_segments_per_player')} distinct "
+                        f"tracking segments per player, longest single segment covering a median of "
+                        f"{rel_for_stamina.get('median_longest_segment_coverage_pct')}% of their tracked "
+                        f"window. A correctly-computed stamina bar would reset to 100% every few frames "
+                        f"rather than show one continuous drain — showing that would be more confusing "
+                        f"than showing nothing, and showing a smooth-looking bar instead would be "
+                        f"presenting a fatigue story the data doesn't actually support."
+                    )
+                st.caption(
+                    "Re-enabling this needs real player re-identification (appearance embeddings or "
+                    "jersey-number OCR), not a smarter aggregation - see the same investigation behind "
+                    "avg_speed_kmh/total_distance_m above."
+                )
             else:
-                st.error(f"Expected video file missing on disk: {video_path}")
+                video_path = _resolve_cv_path(outputs[selected_fname])
+                if video_path.exists():
+                    with st.spinner("Preparing video for playback (one-time transcode)..."):
+                        playable_path = _ensure_browser_playable_video(video_path)
+                    if playable_path and playable_path.exists():
+                        st.video(str(playable_path))
+                    else:
+                        st.warning("Couldn't prepare this render for in-browser playback. You can still download the raw file.")
+                        with open(video_path, 'rb') as f:
+                            st.download_button(f"Download raw {selected_label} (.avi)", f.read(),
+                                                file_name=video_path.name, key=f"dl_cv_{selected_fname}")
+                else:
+                    st.error(f"Expected video file missing on disk: {video_path}")
 
     with side_col:
         if stats:
             st.markdown("**Top Speeds — this window**")
+            reliability = stats.get('tracking_identity_reliability', {})
+            top_speed_rel = reliability.get('top_speed_kmh', {})
             for p in stats.get('players', [])[:8]:
                 conf = p.get('top_speed_confidence', 'high')
                 speed_str = f"{p.get('top_speed_kmh', 0):.1f} km/h"
                 team_display = _cv_team_label(p.get('team'), st.session_state.get('team_a', 'Team A'),
                                                st.session_state.get('team_b', 'Team B'), team_mapping)
                 p_label = pl.player_label(p.get('player_id'), team_display, player_labels)
+                verified_badge = " 🔒" if top_speed_rel.get('reliable') else ""
                 if conf == 'high':
-                    st.write(f"**{p_label}** — **{speed_str}** ✅ high confidence")
+                    st.write(f"**{p_label}** — **{speed_str}**{verified_badge} ✅ high confidence")
                 else:
-                    st.caption(f"{p_label} — {speed_str} ⚠️ {conf} confidence")
+                    st.caption(f"{p_label} — {speed_str}{verified_badge} ⚠️ {conf} confidence")
+
+            # avg_speed_kmh and total_distance_m are deliberately NOT shown
+            # here — see the "Why?" expander below. This isn't a missing
+            # field; showing them would mean presenting a whole-match
+            # average/sum computed across a track whose identity this
+            # match's own tracking_identity_reliability numbers show
+            # fragments constantly (see the expander for the real per-match
+            # count). top_speed_kmh is exempt — the 🔒 marks that it's
+            # computed differently (see below) and isn't affected by the
+            # same problem.
+            if reliability and not reliability.get('avg_speed_kmh', {}).get('reliable', True):
+                st.caption(
+                    "🔒 = this player's top speed comes from a verified, uninterrupted tracking window. "
+                    "Average speed and total distance are not shown for any player this window — see why."
+                )
+                with st.expander("Why aren't average speed and distance shown?"):
+                    st.write(reliability.get('avg_speed_kmh', {}).get('reason', ''))
+                    st.caption(
+                        f"This window: {reliability.get('n_players_analyzed', 'N/A')} players analyzed, "
+                        f"median {reliability.get('median_segments_per_player', 'N/A')} tracking segments each, "
+                        f"median longest-segment coverage {reliability.get('median_longest_segment_coverage_pct', 'N/A')}% "
+                        f"of their tracked frames (jump threshold: {reliability.get('jump_threshold_m', 'N/A')}m)."
+                    )
+                    st.write(reliability.get('top_speed_kmh', {}).get('reason', ''))
 
             st.markdown("**Window Stats**")
             team_res = stats.get('team_resolution', {})
@@ -3523,8 +3606,21 @@ def _render_player_plan_subtab(source, key):
         {k: pl.substitute_player_labels(v, player_labels) for k, v in ins.items()}
         for ins in player_insights
     ]
+    reliability = None
+    cv_output_dir_for_rel = st.session_state.get('cv_job_output_dir')
+    if cv_output_dir_for_rel:
+        cv_status_for_rel = get_cv_job_status_safe(cv_output_dir_for_rel)
+        if cv_status_for_rel.get('status') == 'complete' and cv_status_for_rel.get('stats_file'):
+            resolved_for_rel = _resolve_cv_path(cv_status_for_rel['stats_file'])
+            if resolved_for_rel.exists():
+                try:
+                    with open(resolved_for_rel, 'r') as f:
+                        reliability = json.load(f).get('tracking_identity_reliability')
+                except (json.JSONDecodeError, OSError):
+                    reliability = None
     st.iframe(
-        tp.render_player_card_html(player, player_insights), height=440 + (170 * len(player_insights))
+        tp.render_player_card_html(player, player_insights, reliability),
+        height=440 + (170 * len(player_insights))
     )
 
     st.markdown("---")

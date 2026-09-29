@@ -34,6 +34,22 @@ UPDATE_SEC        = 10    # seconds between display refresh
 COUNTER_ATK_KMH   = 15.0
 SWITCH_SHOW_SEC   = 2     # seconds to show "ID: old→new"
 
+# Same real-world-distance threshold speed_and_distance_estimator.py's own
+# TELEPORT filter uses for the identical reason. This panel's reconciliation
+# (recently_lost / proximity re-matching, above) only ever fires when a
+# tracker pid actually leaves and re-enters current_pids - it has no way to
+# notice a pid that never disappears but silently starts representing a
+# different physical player mid-stream (a raw ByteTrack ID switch without a
+# gap). Direct, real-data confirmation this happens and isn't rare: the same
+# investigation that found this pattern driving speed_and_distance_estimator's
+# top_speed_kmh clustering bug found every one of a match's players
+# experiencing 15-109 such continuous-presence position jumps over a single
+# ~750-frame clip. Without this check, a swapped-but-never-absent pid keeps
+# draining stamina onto the SAME stable id as if nothing happened - silently
+# reassigning one real player's fatigue history onto whichever player the
+# tracker's pid pointed to a moment ago and now points to instead.
+STAMINA_JUMP_M = 5.0
+
 DRAIN_SPRINT = 0.50   # %/sec  >20 km/h
 DRAIN_RUN    = 0.20   # %/sec  10-20
 DRAIN_JOG    = 0.10   # %/sec   5-10
@@ -261,6 +277,7 @@ def render_output2(output_video_frames, tracks, team_ball_control, fps,
                     'last_center':     (0.0, 0.0),
                     'last_frame_seen': frame_num,
                     'tracker_pid':     pid,
+                    'last_position_transformed': player_data[pid].get('position_transformed'),
                 }
 
         # ── Per-frame stamina drain for active players ────────────────────────
@@ -268,7 +285,47 @@ def render_output2(output_video_frames, tracks, team_ball_control, fps,
             sid = tracker_to_sid.get(pid)
             if sid is None or sid not in all_players:
                 continue
-            p  = all_players[sid]
+            p = all_players[sid]
+
+            # Continuous-presence ID-switch check: this pid never left
+            # current_pids, so the disappeared/appeared reconciliation above
+            # never ran for it - but its real-world position can still have
+            # silently jumped to a different physical player. Catching this
+            # here, not just at disappear/reappear, is the actual fix for
+            # the "reassigning stat history to the wrong player" complaint -
+            # see STAMINA_JUMP_M above for why this specific gap exists.
+            pos_curr = info.get('position_transformed')
+            pos_prev = p.get('last_position_transformed')
+            if pos_curr is not None and pos_prev is not None:
+                jump_m = ((pos_curr[0] - pos_prev[0]) ** 2
+                          + (pos_curr[1] - pos_prev[1]) ** 2) ** 0.5
+                if jump_m > STAMINA_JUMP_M:
+                    # Freeze the old sid's history where it stood (it
+                    # genuinely represented someone up to the previous
+                    # frame) and make it eligible for the existing
+                    # proximity reconciliation, exactly as if it had
+                    # disappeared - which, physically, whoever it was
+                    # tracking did.
+                    recently_lost[sid] = (*p.get('last_center', (0.0, 0.0)), frame_num)
+                    p['in_frame'] = False
+                    new_sid = next_sid; next_sid += 1
+                    tracker_to_sid[pid] = new_sid
+                    all_players[new_sid] = {
+                        'team':            info.get('team', 0),
+                        'team_color':      info.get('team_color'),
+                        'stamina_actual':  100.0,
+                        'stamina_display': 100.0,
+                        'last_speed':      0.0,
+                        'in_frame':        True,
+                        'last_center':     (0.0, 0.0),
+                        'last_frame_seen': frame_num,
+                        'tracker_pid':     pid,
+                        'last_position_transformed': pos_curr,
+                    }
+                    switch_announce[new_sid] = (f"P{pid}", "JUMP", frame_num)
+                    sid = new_sid
+                    p = all_players[sid]
+
             sp = float(info.get('speed', 0))
 
             p['team']        = info.get('team', p['team'])
@@ -276,6 +333,7 @@ def render_output2(output_video_frames, tracks, team_ball_control, fps,
             p['last_speed']  = sp
             p['in_frame']    = True
             p['tracker_pid'] = pid
+            p['last_position_transformed'] = pos_curr
 
             bbox = info.get('bbox')
             if bbox:

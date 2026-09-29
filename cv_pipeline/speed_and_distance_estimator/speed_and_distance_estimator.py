@@ -8,6 +8,22 @@ BUFFER_SIZE   = 3       # rolling window (3 frames ≈ 125 ms at 24 fps)
 MAX_SPEED_KMH = 36.0    # fastest credible sprint
 MAX_JUMP_M    = 5.0     # max credible single-frame displacement in metres
 
+# A "top speed" is only trustworthy when the rolling buffer behind it is
+# genuinely full - see the real-data investigation this constant comes
+# from: every reported top_speed_kmh whose buffer had fewer than
+# BUFFER_SIZE entries at its peak traced back to the single frame right
+# after a TELEPORT (buf.clear()), i.e. an unsmoothed, single-sample
+# instantaneous reading with no averaging protection at all - not a real
+# sustained sprint. On liverpool_psg, 27 of 31 players' (87%) reported
+# top speed was exactly this pattern, all clustering within 1.1 km/h of
+# MAX_SPEED_KMH by simple construction (0.4m/frame at 25fps == 36.0 km/h,
+# the largest single-frame displacement the CAP filter still allows
+# through), not because 27 different players all genuinely sprint at
+# nearly the same near-maximal human speed. A genuinely full buffer means
+# BUFFER_SIZE consecutive frames all passed the teleport/cap gates with no
+# reset in between - a real, if still short, sustained reading.
+REQUIRE_FULL_BUFFER_FOR_TOP_SPEED = True
+
 # Valid in-pitch world coordinate bounds
 PITCH_X_MAX = 105.0
 PITCH_Y_MAX = 68.0
@@ -99,6 +115,7 @@ class SpeedAndDistance_Estimator():
                     display_speed = last_spd   # hold last good by default
                     inst_kmh      = None
                     bounds_str    = "n/a"
+                    fully_smoothed = False
 
                     if track_id in prev_frame:
                         pos_prev = prev_frame[track_id].get('position_transformed')
@@ -127,6 +144,7 @@ class SpeedAndDistance_Estimator():
                                         total_distance[object][track_id] += dist
                                         display_speed = sum(buf) / len(buf)
                                         bounds_str = "IN"
+                                        fully_smoothed = len(buf) == BUFFER_SIZE
 
                                         if calibration_confidence_per_frame is not None:
                                             pair_frac = min(
@@ -144,6 +162,14 @@ class SpeedAndDistance_Estimator():
                     info['distance']            = total_distance[object][track_id]
                     info['speed_confidence']      = conf_tier
                     info['speed_confidence_frac'] = conf_frac
+                    # True only when this frame's reading is a genuine
+                    # BUFFER_SIZE-consecutive-frame sustained average, not a
+                    # 1- or 2-sample reading right after a teleport/reset -
+                    # see REQUIRE_FULL_BUFFER_FOR_TOP_SPEED above for why
+                    # top-speed aggregation needs this and average-speed/
+                    # distance don't (those already average out a single
+                    # under-smoothed frame over the whole match).
+                    info['speed_fully_smoothed'] = fully_smoothed
 
                     # ── Diagnostic for PID 6 ──────────────────────────────────
                     if track_id == DIAG_PID and frame_num in DIAG_FRAMES:

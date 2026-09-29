@@ -154,6 +154,18 @@ def get_player_stat(stats_json, player_id, field):
     p = players[player_id]
     if field not in p:
         return None, f"'{field}' isn't a tracked field for player {player_id}."
+    # avg_speed_kmh/total_distance_m: only answered when this match's own
+    # tracking_identity_reliability says they're trustworthy - see
+    # _available_data_summary's docstring for the full reasoning
+    # (top_speed_kmh is exempt, always answered normally).
+    if field in ("avg_speed_kmh", "total_distance_m"):
+        reliability = (stats_json.get("tracking_identity_reliability") or {}).get(field, {})
+        if not reliability.get("reliable", False):
+            return None, (
+                f"{field.replace('_', ' ')} isn't currently reliable for this match - the "
+                f"player-tracking identity fragments too often across the window to trust a "
+                f"sum/average computed across it ({reliability.get('reason', 'see tracking_identity_reliability')})"
+            )
     return p[field], None
 
 
@@ -297,7 +309,7 @@ LOOKUP_TOOLS = [
     ),
     types.FunctionDeclaration(
         name="get_player_stat",
-        description="Look up one real tracked physical stat for one player id (top_speed_kmh, avg_speed_kmh, total_distance_m, top_speed_confidence, frames_tracked, team).",
+        description="Look up one real tracked physical stat for one player id (top_speed_kmh, avg_speed_kmh, total_distance_m, top_speed_confidence, frames_tracked, team). avg_speed_kmh and total_distance_m may come back as an honest decline instead of a number if this match's tracking data isn't reliable enough for them - pass that decline straight through to the user rather than estimating a substitute.",
         parameters={
             "type": "OBJECT",
             "properties": {
@@ -853,12 +865,37 @@ def _available_data_summary(df, stats_json):
     and risk that failure mode again."""
     lines = []
     if stats_json and stats_json.get("players"):
-        lines.append("Player stats (player_id: top_speed_kmh, avg_speed_kmh, total_distance_m):")
-        for p in stats_json["players"]:
+        # avg_speed_kmh/total_distance_m are only included when this match's
+        # own tracking_identity_reliability (run_cv_analysis.py's
+        # _build_tracking_identity_reliability_stats) says they're
+        # trustworthy - on real data for both curated matches they aren't
+        # (the tracker's per-player identity fragments into dozens of
+        # segments across the window, so a sum/average across the whole
+        # track silently blends several different real players together).
+        # top_speed_kmh is exempt - it only ever reads a single
+        # verified-clean, uninterrupted 3-frame window. Grounding an edit
+        # proposal (or a chat answer) in a number this project has real
+        # evidence against would be worse than not answering.
+        reliability = (stats_json or {}).get("tracking_identity_reliability") or {}
+        avg_dist_reliable = (reliability.get("avg_speed_kmh") or {}).get("reliable", False)
+        if avg_dist_reliable:
+            lines.append("Player stats (player_id: top_speed_kmh, avg_speed_kmh, total_distance_m):")
+            for p in stats_json["players"]:
+                lines.append(
+                    f"  players.{p.get('player_id')}: top_speed_kmh={p.get('top_speed_kmh')}, "
+                    f"avg_speed_kmh={p.get('avg_speed_kmh')}, total_distance_m={p.get('total_distance_m')}"
+                )
+        else:
             lines.append(
-                f"  players.{p.get('player_id')}: top_speed_kmh={p.get('top_speed_kmh')}, "
-                f"avg_speed_kmh={p.get('avg_speed_kmh')}, total_distance_m={p.get('total_distance_m')}"
+                "Player stats (player_id: top_speed_kmh only - avg_speed_kmh and total_distance_m "
+                "are NOT included: this match's own tracking data shows they are not reliable "
+                "(player-tracking identity fragments too often across the window to trust a "
+                "sum/average computed across it - see tracking_identity_reliability for the real "
+                "numbers). Never state or estimate a player's average speed or distance covered; "
+                "say those aren't currently reliable for this match if asked."
             )
+            for p in stats_json["players"]:
+                lines.append(f"  players.{p.get('player_id')}: top_speed_kmh={p.get('top_speed_kmh')}")
     if stats_json and stats_json.get("tactical_events", {}).get("counts"):
         counts = stats_json["tactical_events"]["counts"]
         lines.append("Tactical event counts (this match's analyzed window):")
