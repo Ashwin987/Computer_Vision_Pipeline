@@ -392,6 +392,48 @@ def metric_card(container, label, value, help_text):
     ad hoc st.metric(...) with help sometimes forgotten."""
     container.metric(label=label, value=value, help=help_text)
 
+
+def _render_minute_evidence(container, minute_timestamps, source, key, key_suffix):
+    """Caption (+ a clip-jump when one's actually available) naming the real
+    per-minute rows behind one Data Dashboard number or chart - never
+    estimated or evenly redistributed, always this match's own real
+    raw_data[].timestamp values.
+
+    minute_timestamps: the real 'MM:SS-MM:SS' timestamp strings (raw_data's
+    own per-row field - already exact, nothing derived) for every minute
+    that fed this particular number/chart.
+
+    Deliberately does NOT try to offer every minute as a playable clip: this
+    app only ever persists ONE minute's actual video file per match -
+    whichever one the CV-analyzed window happens to be
+    (peak_momentum_segment.mp4, identified by cv_segment_timestamp). Every
+    other minute's source chunk was an ephemeral temp file from the
+    original per-minute Gemini analysis pass, never kept. Pretending a jump-
+    to-clip exists for a minute whose file isn't there would be exactly the
+    kind of fabricated-looking evidence this feature exists to avoid -
+    so every minute gets its real, checkable timestamp, and only the one
+    minute with a real file on disk also gets a playable clip."""
+    if not minute_timestamps:
+        return
+    uniq = sorted(set(minute_timestamps), key=_minute_num_from_timestamp)
+    seg_ts = st.session_state.get('cv_segment_timestamp')
+    with container.expander(f"📍 Evidence — {len(uniq)} real minute(s)", expanded=False):
+        st.caption("From this match's own per-minute analysis: " + ", ".join(uniq))
+        if seg_ts in uniq:
+            video_path = _repositioning_video_path(source, key)
+            if video_path:
+                st.caption(f"▶ Clip for {seg_ts} — the only minute whose source clip is still available in this session:")
+                st.video(video_path)
+            else:
+                st.caption(f"{seg_ts}'s clip would be available here, but this match's video isn't loaded in this session.")
+        else:
+            st.caption(
+                "This deployment doesn't retain a separate video file per minute (each was a temporary "
+                "chunk during the original analysis) — only the CV-analyzed window's clip stays available, "
+                f"under the CV Deep Analysis tab. The timestamp above is the real, checkable record of "
+                "which 60-second span of the match produced this."
+            )
+
 # Shared verbatim everywhere momentum score appears (home screen, dashboard,
 # CV tab) - Part 2.3 requires identical wording in every location, not
 # slightly different explanations per view. Uses the same {TEAM_A}/{TEAM_B}
@@ -523,6 +565,22 @@ def compute_block_heatmap_minutes(df, team_a, team_b):
         row = []
         for z in zones:
             mins = sorted(_minute_num_from_timestamp(t) for t in df.loc[mapped_zone == z, 'timestamp'])
+            row.append(", ".join(str(m) for m in mins) if mins else "none")
+        grid.append(row)
+    return grid
+
+def compute_possession_heatmap_minutes(df, color_a, color_b):
+    """Same (team, zone) grid shape as compute_possession_heatmap_data, but
+    each cell holds the real minute numbers that produced that count -
+    same pattern compute_block_heatmap_minutes already established for the
+    Block Height heatmap."""
+    zones = ['defensive_third', 'middle_third', 'attacking_third']
+    grid = []
+    for color in (color_a, color_b):
+        row = []
+        for z in zones:
+            mask = (df['team_in_possession'].str.lower() == color.lower()) & (df['ball_zone'] == z)
+            mins = sorted(_minute_num_from_timestamp(t) for t in df.loc[mask, 'timestamp'])
             row.append(", ".join(str(m) for m in mins) if mins else "none")
         grid.append(row)
     return grid
@@ -5088,52 +5146,73 @@ elif st.session_state.step == 3:
                 ["📊 Data Dashboard", "🎯 Coach Report", "🧩 Game Board", "🎬 CV Deep Analysis", "⚽ Corner Kicks", "🏋️ Training Plan", "💬 Ask the Assistant"])
 
             with tab_dashboard:
+                ev_source, ev_key = _get_active_match_identity()
+
                 st.subheader("Global Control")
                 col1, col2, col3, col4 = st.columns(4)
-            
+
                 with col1:
                     ta_poss_df = df[df['team_a_has_ball'] == 1]['ball_zone']
                     if not ta_poss_df.empty and ta_poss_df.value_counts().iloc[0] >= 2:
-                        ta_zone_display = ta_poss_df.value_counts().index[0].replace('_', ' ').title()
+                        ta_zone_raw = ta_poss_df.value_counts().index[0]
+                        ta_zone_display = ta_zone_raw.replace('_', ' ').title()
+                        ta_zone_minutes = df.loc[(df['team_a_has_ball'] == 1) & (df['ball_zone'] == ta_zone_raw), 'timestamp'].tolist()
                     else:
                         ta_zone_display = "None"
+                        ta_zone_minutes = []
                     metric_card(st, f"{team_a} Primary Zone", ta_zone_display, zone_help)
-                
+                    _render_minute_evidence(st, ta_zone_minutes, ev_source, ev_key, "ta_zone")
+
                 with col2:
                     tb_poss_df = df[df['team_b_has_ball'] == 1]['ball_zone']
                     if not tb_poss_df.empty and tb_poss_df.value_counts().iloc[0] >= 2:
-                        tb_zone_display = tb_poss_df.value_counts().index[0].replace('_', ' ').title()
+                        tb_zone_raw = tb_poss_df.value_counts().index[0]
+                        tb_zone_display = tb_zone_raw.replace('_', ' ').title()
+                        tb_zone_minutes = df.loc[(df['team_b_has_ball'] == 1) & (df['ball_zone'] == tb_zone_raw), 'timestamp'].tolist()
                     else:
                         tb_zone_display = "None"
+                        tb_zone_minutes = []
                     metric_card(st, f"{team_b} Primary Zone", tb_zone_display, zone_help)
-                
+                    _render_minute_evidence(st, tb_zone_minutes, ev_source, ev_key, "tb_zone")
+
                 with col3:
                     metric_card(st, f"{team_a} Time in Attack (min)", f"{ta_att_count}", att_time_help)
+                    ta_att_minutes = df.loc[pd.to_numeric(df.get('team_a_attack_sec', 0), errors='coerce').fillna(0) > 0, 'timestamp'].tolist()
+                    _render_minute_evidence(st, ta_att_minutes, ev_source, ev_key, "ta_att")
                 with col4:
                     metric_card(st, f"{team_b} Time in Attack (min)", f"{tb_att_count}", att_time_help)
-                
+                    tb_att_minutes = df.loc[pd.to_numeric(df.get('team_b_attack_sec', 0), errors='coerce').fillna(0) > 0, 'timestamp'].tolist()
+                    _render_minute_evidence(st, tb_att_minutes, ev_source, ev_key, "tb_att")
+
                 st.markdown("---")
-            
+
                 st.subheader("Advanced Tactical Metrics")
                 col5, col6, col7 = st.columns(3)
-            
+
                 ta_press_avg = round(pd.to_numeric(df['team_a_pressing_intensity'], errors='coerce').mean(), 1)
                 tb_press_avg = round(pd.to_numeric(df['team_b_pressing_intensity'], errors='coerce').mean(), 1)
-            
+                all_minutes = df['timestamp'].tolist()
+
                 block_help = "The primary (most frequent) starting position of the team's defensive wall out of possession."
-            
+
                 with col5:
                     metric_card(st, f"{team_a} Avg Threat", team_a_avg_dom, avg_mom_help)
+                    _render_minute_evidence(st, df.loc[df['smoothed_net_momentum'] > 0, 'timestamp'].tolist(), ev_source, ev_key, "ta_threat")
                     metric_card(st, f"{team_b} Avg Threat", team_b_avg_dom, avg_mom_help)
-                
+                    _render_minute_evidence(st, df.loc[df['smoothed_net_momentum'] < 0, 'timestamp'].tolist(), ev_source, ev_key, "tb_threat")
+
                 with col6:
                     metric_card(st, f"{team_a} Avg Pressing Intensity", f"{ta_press_avg} / 10", press_help)
+                    _render_minute_evidence(st, all_minutes, ev_source, ev_key, "ta_press")
                     metric_card(st, f"{team_b} Avg Pressing Intensity", f"{tb_press_avg} / 10", press_help)
-                
+                    _render_minute_evidence(st, all_minutes, ev_source, ev_key, "tb_press")
+
                 with col7:
                     metric_card(st, f"{team_a} Primary Block Height", ta_block_height.replace('_', ' ').title() + " Block", block_help)
+                    _render_minute_evidence(st, df.loc[df['team_a_block_height'] == ta_block_height, 'timestamp'].tolist(), ev_source, ev_key, "ta_block")
                     metric_card(st, f"{team_b} Primary Block Height", tb_block_height.replace('_', ' ').title() + " Block", block_help)
-            
+                    _render_minute_evidence(st, df.loc[df['team_b_block_height'] == tb_block_height, 'timestamp'].tolist(), ev_source, ev_key, "tb_block")
+
                 st.markdown("---")
                 st.header("Tactical Visualizations")
             
@@ -5203,11 +5282,13 @@ elif st.session_state.step == 3:
                     zone_labels = ['Defensive Third', 'Middle Third', 'Attacking Third']
                     hm_a = [df[(df['team_in_possession'].str.lower() == color_a.lower()) & (df['ball_zone'] == z)].shape[0] for z in zones]
                     hm_b = [df[(df['team_in_possession'].str.lower() == color_b.lower()) & (df['ball_zone'] == z)].shape[0] for z in zones]
+                    poss_minutes_grid = compute_possession_heatmap_minutes(df, color_a, color_b)
 
                     heat_fig = go.Figure(data=go.Heatmap(
                         z=[hm_a, hm_b], x=zone_labels, y=[team_a, team_b],
                         colorscale=THEME_COLORSCALE_BLUE, texttemplate="%{z}",
-                        hovertemplate="%{y} · %{x}: %{z} min<extra></extra>",
+                        customdata=poss_minutes_grid,
+                        hovertemplate="%{y} · %{x}: %{z} min<br>Minutes: %{customdata}<extra></extra>",
                     ))
                     themed_plotly_layout(heat_fig, height=280)
                     heat_fig.update_layout(xaxis_title="Pitch Zone")
@@ -5257,13 +5338,22 @@ elif st.session_state.step == 3:
                     mom_fig.update_layout(yaxis_title="Absolute Attacking Threat", xaxis_tickangle=-45,
                                            hovermode="x unified")
                     st.plotly_chart(mom_fig, width='stretch', key="mom_chart")
+                    st.caption(
+                        "Hover any point for that exact minute's real timestamp — every point on this line "
+                        "is one real analyzed minute, not interpolated."
+                    )
+                    _render_minute_evidence(st, df['timestamp'].tolist(), ev_source, ev_key, "momentum")
 
                     fig4 = build_momentum_mpl(df, team_a, team_b)
                     st.download_button("💾 Download Momentum Graph", fig_to_png_bytes(fig4), "momentum_chart.png", "image/png", key="dl_mom")
 
                 st.markdown("---")
                 st.subheader("💾 Export Raw Data")
-                st.write("Download the fully structured, minute-by-minute tactical dataset to run your own models.")
+                st.write(
+                    "Download the fully structured, minute-by-minute tactical dataset to run your own models — "
+                    "every row carries its own real 'timestamp' column (e.g. '03:00-04:00'), so every number in "
+                    "this export is already traceable to the exact 60-second clip that produced it."
+                )
                 csv_data = df.to_csv(index=False).encode('utf-8')
                 st.download_button(
                     label="💾 Download Tactical Data (CSV)",
