@@ -716,6 +716,7 @@
         "type": "BREAK",
         "player_id": 50,
         "window": 0,
+        "frame": 313,
         "score": 13.21,
         "intensity": 3.21,
         "metric": "24.5 km/h"
@@ -724,6 +725,7 @@
         "type": "BREAK",
         "player_id": 166,
         "window": 1,
+        "frame": 648,
         "score": 13.15,
         "intensity": 3.15,
         "metric": "24.4 km/h"
@@ -732,6 +734,7 @@
         "type": "PRESS",
         "player_id": 53,
         "window": 0,
+        "frame": 425,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "0.7m closed, 3 pressers"
@@ -740,6 +743,7 @@
         "type": "PRESS",
         "player_id": 116,
         "window": 0,
+        "frame": 425,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "0.3m closed, 3 pressers"
@@ -748,6 +752,7 @@
         "type": "PRESS",
         "player_id": 123,
         "window": 0,
+        "frame": 425,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "0.8m closed, 4 pressers"
@@ -756,6 +761,7 @@
         "type": "ISOLATED",
         "player_id": 14,
         "window": 0,
+        "frame": 497,
         "score": 12.85,
         "intensity": 3.85,
         "metric": "40.4m to nearest teammate"
@@ -764,6 +770,7 @@
         "type": "BREAK",
         "player_id": 5,
         "window": 0,
+        "frame": 419,
         "score": 12.51,
         "intensity": 2.51,
         "metric": "23.5 km/h"
@@ -772,6 +779,7 @@
         "type": "BREAK",
         "player_id": 183,
         "window": 1,
+        "frame": 651,
         "score": 12.38,
         "intensity": 2.38,
         "metric": "23.3 km/h"
@@ -780,6 +788,7 @@
         "type": "BREAK",
         "player_id": 12,
         "window": 0,
+        "frame": 313,
         "score": 12.05,
         "intensity": 2.05,
         "metric": "22.9 km/h"
@@ -788,6 +797,7 @@
         "type": "OVERLAP",
         "player_id": 96,
         "window": 0,
+        "frame": 425,
         "score": 12.0,
         "intensity": 5.0,
         "metric": "30.0 km/h run"

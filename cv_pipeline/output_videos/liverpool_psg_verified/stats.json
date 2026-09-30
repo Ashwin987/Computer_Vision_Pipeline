@@ -412,6 +412,7 @@
         "type": "BREAK",
         "player_id": 247,
         "window": 0,
+        "frame": 420,
         "score": 15.0,
         "intensity": 5.0,
         "metric": "31.0 km/h"
@@ -420,6 +421,7 @@
         "type": "BREAK",
         "player_id": 10,
         "window": 0,
+        "frame": 385,
         "score": 13.71,
         "intensity": 3.71,
         "metric": "25.2 km/h"
@@ -428,6 +430,7 @@
         "type": "SPACE",
         "player_id": 9,
         "window": 0,
+        "frame": 0,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "5.02x avg space"
@@ -436,6 +439,7 @@
         "type": "PRESS",
         "player_id": 21,
         "window": 0,
+        "frame": 77,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "0.4m closed, 2 pressers"
@@ -444,6 +448,7 @@
         "type": "PRESS",
         "player_id": 18,
         "window": 0,
+        "frame": 92,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "1.2m closed, 3 pressers"
@@ -452,6 +457,7 @@
         "type": "PRESS",
         "player_id": 9,
         "window": 0,
+        "frame": 98,
         "score": 13.0,
         "intensity": 5.0,
         "metric": "0.4m closed, 2 pressers"
@@ -460,6 +466,7 @@
         "type": "PRESS",
         "player_id": 7,
         "window": 1,
+        "frame": 551,
         "score": 12.97,
         "intensity": 4.97,
         "metric": "0.6m closed, 2 pressers"
@@ -468,6 +475,7 @@
         "type": "PRESS",
         "player_id": 283,
         "window": 1,
+        "frame": 537,
         "score": 12.59,
         "intensity": 4.59,
         "metric": "0.2m closed, 1 pressers"
@@ -476,6 +484,7 @@
         "type": "BREAK",
         "player_id": 14,
         "window": 0,
+        "frame": 178,
         "score": 12.18,
         "intensity": 2.18,
         "metric": "23.1 km/h"
@@ -484,6 +493,7 @@
         "type": "PRESS",
         "player_id": 247,
         "window": 1,
+        "frame": 536,
         "score": 12.11,
         "intensity": 4.11,
         "metric": "1.1m closed, 2 pressers"

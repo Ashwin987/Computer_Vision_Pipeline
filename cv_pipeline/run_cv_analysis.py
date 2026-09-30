@@ -525,10 +525,22 @@ def _build_tactical_events_stats(tactical_events_detector, ranked_windows, top_n
             e['window'] = widx
             all_events.append(e)
     all_events.sort(key=lambda e: e.get('score', 0), reverse=True)
+    # 'frame' is already on every event dict this far (tactical_events_detector
+    # .detect()'s events_by_frame -> event_ranking.rank_events_by_window both
+    # carry it - confirmed directly by reading both, not assumed) - it was
+    # simply never copied into this whitelist before. Keep it now instead of
+    # only the coarse WINDOW_SEC-bucket index, so a highlight can point at a
+    # real moment, not just "sometime in this ~20s bucket". Never fabricate a
+    # substitute when it's genuinely missing (an earlier version of the
+    # dashboard-side caller assumed this field existed and silently defaulted
+    # a missing one to 0, producing a fake "0:00" timestamp that wasn't real
+    # data - see generate_cv_observations' docstring) - None passes through
+    # as None, visible as missing, never coerced to a fake frame number.
     highlights = [{
         'type':      e.get('type'),
         'player_id': e.get('player_id'),
         'window':    e.get('window'),
+        'frame':     e.get('frame'),
         'score':     round(float(e.get('score', 0)), 2),
         'intensity': round(float(e.get('intensity', 0)), 2),
         'metric':    e.get('metric'),
