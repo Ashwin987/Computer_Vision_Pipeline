@@ -655,7 +655,8 @@ def _cv_summary_flowables(cv_output_dir, team_a, team_b, cv_team_mapping, styles
 
     flowables.append(Spacer(1, 8))
     flowables.append(Paragraph("Observations — specific to this match", styles['Heading3']))
-    observations = generate_cv_observations(stats, team_a, team_b, cv_team_mapping)
+    observations = generate_cv_observations(stats, team_a, team_b, cv_team_mapping,
+                                             cv_segment_timestamp=st.session_state.get('cv_segment_timestamp'))
     if observations:
         for obs in observations:
             flowables.append(Paragraph(f"• {_esc_rl(obs)}", styles['BodyText']))
@@ -1592,24 +1593,70 @@ def _cv_team_label(team_num, team_a, team_b, team_mapping=None):
             return team_b
     return f"Team {team_num}"
 
-def generate_cv_observations(stats, team_a, team_b, team_mapping=None, top_n=3):
+def _parse_timestamp_start_seconds(ts):
+    """'MM:SS-MM:SS' window label (e.g. cv_segment_timestamp's '03:00-04:00')
+    -> the window's start offset in seconds, or None if ts isn't in that
+    shape. The CV-analyzed window is whichever 60s span scored highest on
+    momentum, not snapped to a minute grid the way raw_data's per-minute
+    rows are (see process_single_minute) - so the seconds component is read
+    too, not assumed to always be :00."""
+    try:
+        mm, ss = str(ts).split('-')[0].split(':')
+        return int(mm) * 60 + int(ss)
+    except (ValueError, AttributeError, IndexError):
+        return None
+
+
+def _format_event_evidence(frame, fps, cv_segment_timestamp=None):
+    """'(evidence: frame 420, ~1.9s into this window, ~00:16 in the match)'
+    or an explicit "frame not recorded" marker - never a fabricated moment.
+
+    This exists because of a real, documented incident: an earlier version
+    of generate_cv_observations assumed a 'frame' key existed on every
+    highlight, and when it didn't (the field wasn't being kept in stats.json
+    at all at the time), silently defaulted the missing value to 0 -
+    producing a fake "0:00" timestamp that looked like real data but wasn't.
+    frame=None here is a normal, expected state for any stats.json built
+    before the tactical_events backfill (or if an event genuinely never
+    resolved a frame) - reported as missing, never coerced to 0 or any
+    other placeholder."""
+    if frame is None or fps in (None, 0):
+        return "evidence: frame not recorded for this event"
+    window_sec = frame / fps
+    window_str = f"{int(window_sec // 60):01d}:{window_sec % 60:04.1f}"
+    parts = [f"frame {frame}", f"~{window_str} into this analyzed window"]
+    start_sec = _parse_timestamp_start_seconds(cv_segment_timestamp)
+    if start_sec is not None:
+        abs_sec = start_sec + window_sec
+        abs_str = f"{int(abs_sec // 60):02d}:{int(abs_sec % 60):02d}"
+        parts.append(f"~{abs_str} in the match")
+    return "evidence: " + ", ".join(parts)
+
+
+def generate_cv_observations(stats, team_a, team_b, team_mapping=None, top_n=3,
+                              cv_segment_timestamp=None):
     """Plain-English callouts computed directly from this bundle's real
     tactical_events highlights (Part 2.5) - never hardcoded, so it's correct
-    for every match. Picks the top-N highlights by score and describes each.
+    for every match. Picks the top-N highlights by score and describes each,
+    with a real evidence frame/timestamp attached (see
+    _build_tactical_events_stats in run_cv_analysis.py - 'frame' is now kept
+    in stats.json's highlights instead of being discarded, and
+    backfill_tactical_event_frames_to_stats.py backfills it for a match
+    processed before that change).
 
-    NOTE: highlights entries carry a 'window' (a coarse ~20s bucket index),
-    not a 'frame' or exact-second timestamp (confirmed directly against a
-    real stats.json - event_ranking.py's internal per-event dict has 'frame',
-    but that field does not survive into the highlights list this app reads).
-    An earlier version of this function assumed a 'frame' key and silently
-    defaulted to 0 for every event, fabricating a "0:00" timestamp that
-    wasn't real data - fixed by not claiming a specific moment at all."""
+    NOTE: highlights also carry a 'window' (a coarse ~20s bucket index) -
+    kept in the data but no longer the only time signal available. An
+    earlier version of this function assumed a 'frame' key existed when it
+    didn't and silently defaulted a missing one to 0, fabricating a "0:00"
+    timestamp that wasn't real data - see _format_event_evidence's own
+    docstring for how this version avoids repeating that."""
     if not stats:
         return []
     player_team = {p.get('player_id'): p.get('team') for p in stats.get('players', [])}
     highlights = stats.get('tactical_events', {}).get('highlights', [])
     if not highlights:
         return []
+    fps = (stats.get('video') or {}).get('fps')
     ranked = sorted(highlights, key=lambda h: h.get('score', 0), reverse=True)[:top_n]
 
     observations = []
@@ -1619,9 +1666,10 @@ def generate_cv_observations(stats, team_a, team_b, team_mapping=None, top_n=3):
         event_type = str(h.get('type', '')).upper()
         metric = h.get('metric', '')
         superlative = "the standout moment" if i == 0 else "another key moment"
+        evidence = _format_event_evidence(h.get('frame'), fps, cv_segment_timestamp)
         observations.append(
             f"{team_label}'s {event_type.replace('_', ' ').title()} — {metric}, "
-            f"{superlative} in this window (Player {h.get('player_id')})."
+            f"{superlative} in this window (Player {h.get('player_id')}) [{evidence}]."
         )
     return observations
 
@@ -3058,13 +3106,17 @@ def render_cv_completed_state(status, cv_output_dir):
     if stats:
         highlights = stats.get('tactical_events', {}).get('highlights', [])
         if highlights:
+            fps_for_evidence = (stats.get('video') or {}).get('fps')
+            seg_ts_for_evidence = st.session_state.get('cv_segment_timestamp')
             for h in highlights[:10]:
+                evidence = _format_event_evidence(h.get('frame'), fps_for_evidence, seg_ts_for_evidence)
                 st.write(f"- **{str(h.get('type', '')).upper()}** — {pl.player_label(h.get('player_id'), None, player_labels)} · "
-                         f"score {h.get('score')} · {h.get('metric', '')}")
+                         f"score {h.get('score')} · {h.get('metric', '')} · {evidence}")
 
             team_a_name = st.session_state.get('team_a', 'Team A')
             team_b_name = st.session_state.get('team_b', 'Team B')
-            observations = generate_cv_observations(stats, team_a_name, team_b_name, st.session_state.get('cv_team_mapping'))
+            observations = generate_cv_observations(stats, team_a_name, team_b_name, st.session_state.get('cv_team_mapping'),
+                                                      cv_segment_timestamp=seg_ts_for_evidence)
             if observations:
                 st.markdown("**Observations — specific to this match**")
                 for obs in observations:
