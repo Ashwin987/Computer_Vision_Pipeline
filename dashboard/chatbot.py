@@ -169,6 +169,50 @@ def get_player_stat(stats_json, player_id, field):
     return p[field], None
 
 
+def get_player_stat_aggregate(stats_json, field, mode="max", top_n=1):
+    """Max/min/top-N across ALL players for one stat field - the lookup
+    get_player_stat can't do, since it requires a specific player_id
+    already named in the question. Built for superlative questions
+    ("who was the fastest player", "top 3 by distance covered") that
+    previously had no STRUCTURED tool to call, so they fell through to
+    SEMANTIC search over embedded text (coach report / per-minute
+    summaries) - which can't compute a max across structured per-player
+    data either, and confidently answered "this match's data does not
+    cover X" even though the real number was sitting in stats_json the
+    whole time.
+
+    Same reliability gate get_player_stat already applies to
+    avg_speed_kmh/total_distance_m, applied here first and up front -
+    ranking players by a field this match's own tracking_identity_reliability
+    flags as untrustworthy would just amplify whichever player's data
+    happened to be worst-corrupted into a confident-looking "winner"."""
+    if not stats_json:
+        return None, "No CV analysis is available for this match, so there's no player tracking data."
+    players = stats_json.get("players", [])
+    if not players:
+        return None, "No players were tracked in this match's analyzed window."
+
+    if field in ("avg_speed_kmh", "total_distance_m"):
+        reliability = (stats_json.get("tracking_identity_reliability") or {}).get(field, {})
+        if not reliability.get("reliable", False):
+            return None, (
+                f"{field.replace('_', ' ')} isn't currently reliable for this match - the "
+                f"player-tracking identity fragments too often across the window to trust a "
+                f"sum/average computed across it ({reliability.get('reason', 'see tracking_identity_reliability')}), "
+                f"so ranking players by it would just surface whichever one happened to be worst-corrupted, "
+                f"not who's actually fastest/slowest."
+            )
+
+    valid = [(p.get("player_id"), p.get(field)) for p in players if p.get(field) is not None]
+    if not valid:
+        return None, f"'{field}' isn't a tracked field for any player in this match."
+
+    mode = (mode or "max").lower()
+    ranked = sorted(valid, key=lambda pv: pv[1], reverse=(mode != "min"))
+    n = max(1, int(top_n or 1)) if mode == "top" else 1
+    return ranked[:n], None
+
+
 # Real dotted paths into stats.json - the exact same values the CV Deep
 # Analysis tab's Window Stats cards already display (app.py's
 # stats_json['team_resolution']['resolution_rate_pct'] /
@@ -323,6 +367,33 @@ LOOKUP_TOOLS = [
         },
     ),
     types.FunctionDeclaration(
+        name="get_player_stat_aggregate",
+        description=(
+            "Find the player(s) with the maximum, minimum, or top-N value of one real "
+            "tracked physical stat field (top_speed_kmh, avg_speed_kmh, total_distance_m, "
+            "frames_tracked) across ALL players in this match. Use this for superlative/"
+            "aggregate questions - 'who was the fastest player', 'which player covered the "
+            "most distance', 'top 3 players by top speed', 'who ran the least' - never "
+            "get_player_stat for these, since get_player_stat requires a specific player id "
+            "already named in the question. avg_speed_kmh and total_distance_m may come back "
+            "as an honest decline instead of a ranking if this match's tracking data isn't "
+            "reliable enough for them - pass that decline straight through to the user rather "
+            "than estimating a substitute."
+        ),
+        parameters={
+            "type": "OBJECT",
+            "properties": {
+                "field": {"type": "STRING", "description": "e.g. top_speed_kmh, avg_speed_kmh, total_distance_m"},
+                "mode": {
+                    "type": "STRING",
+                    "description": "'max' for fastest/most/highest, 'min' for slowest/least/lowest, 'top' for a ranked top-N list",
+                },
+                "top_n": {"type": "INTEGER", "description": "Only used when mode is 'top' - how many players to return. Defaults to 1."},
+            },
+            "required": ["field", "mode"],
+        },
+    ),
+    types.FunctionDeclaration(
         name="get_tactical_event_highlights",
         description="Get the top-scoring tactical event highlights in this match's analyzed window, optionally filtered by event type.",
         parameters={
@@ -453,6 +524,27 @@ def run_structured_lookup(client, question, df, stats_json, training_plan_draft,
         return (
             f"Player {args['player_id']}'s {args['field'].replace('_', ' ')} was **{value}**.",
             f"players · P{args['player_id']}",
+        )
+
+    if name == "get_player_stat_aggregate":
+        ranked, err = get_player_stat_aggregate(
+            stats_json, args["field"], args.get("mode", "max"), args.get("top_n", 1)
+        )
+        if err:
+            return err, None
+        field_label = args["field"].replace('_', ' ')
+        mode = (args.get("mode") or "max").lower()
+        if mode == "top" and len(ranked) > 1:
+            lines = "\n".join(f"- Player {pid}: **{value}**" for pid, value in ranked)
+            return (
+                f"Top {len(ranked)} players by {field_label}:\n{lines}",
+                f"players · top {field_label}",
+            )
+        pid, value = ranked[0]
+        superlative = "lowest" if mode == "min" else "highest"
+        return (
+            f"Player {pid} had the {superlative} {field_label}: **{value}**.",
+            f"players · {superlative} {field_label}",
         )
 
     if name == "get_tactical_event_highlights":
