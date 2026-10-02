@@ -10,7 +10,7 @@
       "team_a_color": "red",
       "team_b_color": "blue",
       "team_in_possession": "blue",
-      "ball_zone": "attacking_third",
+      "ball_zone": "middle_third",
       "team_a_attack_sec": 0,
       "team_b_attack_sec": 38,
       "team_a_pressing_intensity": 8,
