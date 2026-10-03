@@ -394,45 +394,38 @@ def metric_card(container, label, value, help_text):
 
 
 def _render_minute_evidence(container, minute_timestamps, source, key, key_suffix):
-    """Caption (+ a clip-jump when one's actually available) naming the real
-    per-minute rows behind one Data Dashboard number or chart - never
-    estimated or evenly redistributed, always this match's own real
-    raw_data[].timestamp values.
+    """Caption naming the real per-minute rows behind one Data Dashboard
+    number or chart - never estimated or evenly redistributed, always this
+    match's own real raw_data[].timestamp values.
 
     minute_timestamps: the real 'MM:SS-MM:SS' timestamp strings (raw_data's
     own per-row field - already exact, nothing derived) for every minute
     that fed this particular number/chart.
 
-    Deliberately does NOT try to offer every minute as a playable clip: this
-    app only ever persists ONE minute's actual video file per match -
-    whichever one the CV-analyzed window happens to be
-    (peak_momentum_segment.mp4, identified by cv_segment_timestamp). Every
-    other minute's source chunk was an ephemeral temp file from the
-    original per-minute Gemini analysis pass, never kept. Pretending a jump-
-    to-clip exists for a minute whose file isn't there would be exactly the
-    kind of fabricated-looking evidence this feature exists to avoid -
-    so every minute gets its real, checkable timestamp, and only the one
-    minute with a real file on disk also gets a playable clip."""
+    Text-only, deliberately: this used to also embed a playable clip for
+    whichever one minute per match still has its source video file on disk
+    (the CV-analyzed window, peak_momentum_segment.mp4). Removed - a video
+    next to a claim invites "trust what you see in the clip" the same way a
+    verified number does, but the clip only ever covered one minute out of
+    dozens, and a real bug (a "PSG primary zone: Attacking third" card whose
+    own evidence clip showed PSG nowhere near the final third) was caught
+    specifically BECAUSE that one clip existed - most minutes had no clip to
+    catch the equivalent error. Trusting the 95%+ of claims with no video to
+    check them against was never actually safe; removing the video doesn't
+    fix that, it just stops implying the claims that happen to have one are
+    more trustworthy than the ones that don't. See
+    verify_evidence_citations.py for the real fix: checking every citation
+    against its underlying data directly, not against a clip a person has to
+    watch and happen to notice something wrong in.
+
+    source/key are no longer used here (kept in the signature so every call
+    site doesn't need updating) - the only use was resolving the one
+    available clip's video file."""
     if not minute_timestamps:
         return
     uniq = sorted(set(minute_timestamps), key=_minute_num_from_timestamp)
-    seg_ts = st.session_state.get('cv_segment_timestamp')
     with container.expander(f"📍 Evidence — {len(uniq)} real minute(s)", expanded=False):
         st.caption("From this match's own per-minute analysis: " + ", ".join(uniq))
-        if seg_ts in uniq:
-            video_path = _repositioning_video_path(source, key)
-            if video_path:
-                st.caption(f"▶ Clip for {seg_ts} — the only minute whose source clip is still available in this session:")
-                st.video(video_path)
-            else:
-                st.caption(f"{seg_ts}'s clip would be available here, but this match's video isn't loaded in this session.")
-        else:
-            st.caption(
-                "This deployment doesn't retain a separate video file per minute (each was a temporary "
-                "chunk during the original analysis) — only the CV-analyzed window's clip stays available, "
-                f"under the CV Deep Analysis tab. The timestamp above is the real, checkable record of "
-                "which 60-second span of the match produced this."
-            )
 
 # Shared verbatim everywhere momentum score appears (home screen, dashboard,
 # CV tab) - Part 2.3 requires identical wording in every location, not
