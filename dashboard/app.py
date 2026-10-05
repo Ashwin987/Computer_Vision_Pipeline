@@ -2002,8 +2002,8 @@ _REPOSITION_INDEX_HTML = r"""<!doctype html>
     // pause/seek events, so it only ever moved when this video did and sat
     // frozen on tab open otherwise. Removed per an explicit architectural
     // requirement: the Tactical Map must never depend on this real video's
-    // state to render or play correctly - it now autoplays/loops entirely
-    // on its own (see _render_tactical_map_section's own <video> tag). No
+    // state to render or play correctly - it starts paused and is played
+    // only by its own controls (see _render_tactical_map_section's own <video> tag). No
     // replacement sync code belongs here; the two are genuinely independent
     // views now, not kept in step.
 
@@ -2759,6 +2759,9 @@ def _calibration_cache_sig(cv_output_dir):
     return h.hexdigest()[:10]
 
 
+_TACTICAL_MAP_RENDER_VERSION = 2  # bump when tactical_view's drawn output changes, so cached videos rebuild
+
+
 def _tactical_map_video_paths(match_key, team_bgr, cv_output_dir):
     """(cache_dir, avi_path, mp4_path) for this match+team-color+calibration
     combination's pre-rendered tactical-map video. Keyed on team_bgr (a
@@ -2771,7 +2774,7 @@ def _tactical_map_video_paths(match_key, team_bgr, cv_output_dir):
     happening before this fix - the Sep 28 cache predated and never picked
     up that fix)."""
     cal_sig = _calibration_cache_sig(cv_output_dir)
-    color_sig = f"{team_bgr.get(1)}_{team_bgr.get(2)}_{cal_sig}"
+    color_sig = f"v{_TACTICAL_MAP_RENDER_VERSION}_{team_bgr.get(1)}_{team_bgr.get(2)}_{cal_sig}"
     color_hash = hashlib.sha1(color_sig.encode()).hexdigest()[:10]
     cache_dir = CACHE_DIR / "tactical_map_video_cache" / match_key
     avi_path = cache_dir / f"tactical_map_{color_hash}.avi"
@@ -2830,61 +2833,37 @@ def _tactical_map_video_url(mp4_path):
     return f"component/app.reposition_widget_{_REPOSITION_INDEX_HTML_HASH}/{fname}"
 
 
+_TACTICAL_MAP_REPLAY_JS = """<script>
+(function wire(triesLeft) {
+  var doc = window.parent.document;
+  var v = doc.getElementById('tactical-map-video');
+  if (!v) { if (triesLeft > 0) setTimeout(function () { wire(triesLeft - 1); }, 100); return; }
+  function clearReplay() { var b = doc.getElementById('tactical-map-replay'); if (b) b.remove(); }
+  v.onplay = clearReplay;
+  v.onended = function () {
+    clearReplay();
+    var b = doc.createElement('button');
+    b.id = 'tactical-map-replay';
+    b.textContent = 'Replay';
+    b.style.cssText = 'margin-top:8px;padding:8px 14px;border-radius:8px;border:1px solid #2a3142;' +
+                      'background:#1c2333;color:#e6e6e6;font-size:14px;cursor:pointer;';
+    b.onclick = function () { v.currentTime = 0; v.play(); };
+    v.parentNode.insertBefore(b, v.nextSibling);
+  };
+})(50);
+</script>"""
+
+
 def _render_tactical_map_section():
-    """The Tactical Map, embedded directly under Game Board's video (not a
-    separate tab any more - moved here so both views are visible together
-    with no tab switch). A 2D top-down schematic view of the pitch: every
-    tracked player as a team-colored dot at their real calibrated position,
-    a per-team convex-hull shape outline, the ball, and each player's
-    current speed as a label. See tactical_view.py's own module docstring
-    for why this is a genuinely different (and, for a flat diagram, more
-    appropriate) design choice than Game Board's real-frame, no-homography
-    approach.
+    """The Tactical Map under Game Board's video. A top-down schematic of the same
+    30-second clip: each tracked player as a team-colored dot at their calibrated
+    position, a convex-hull outline per team, and the ball. Starts paused at frame 0
+    and is played by the user with its own native controls. Independent of Game
+    Board's playback and captured-board state.
 
-    Fully independent of Game Board's real video and captured-board state on
-    purpose - two separate regressions found and fixed in the same
-    investigation, both traced to the same underlying cause (this section
-    was never actually independent, despite looking like it should be from
-    the code alone):
-
-    1. An earlier version hard-gated on reposition_frame_idx_<match_key>
-       (None until the user paused the real video AND clicked "Show
-       tactical board for this frame"), so the map never appeared until
-       well after tab-open. That gate was removed (the m8 investigation),
-       but the symptom came back anyway - because of #2, below, which the
-       m8 fix never touched.
-    2. The actual persisting cause: _REPOSITION_INDEX_HTML's JS made this
-       video's play/pause/currentTime entirely SLAVED to the real Game
-       Board video's own play/pause/seeked events (a currentTime=/.play()
-       call inside those listeners, plus a 250ms resync poll). On a fresh
-       tab open, nothing has told the real video to play yet, so this one
-       sat frozen on its first frame indefinitely - which looks exactly
-       like "doesn't load", and once something DID trigger it, motion was
-       driven by discrete re-sync seeks rather than free-running playback,
-       which looks like frame-by-frame stepping instead of a normal video.
-
-    Confirmed directly (not just reasoned about) with a live headless
-    Playwright check: on tab open, the <video id="tactical-map-video">
-    element existed immediately but stayed at currentTime=0/paused=true for
-    4+ full seconds with zero interaction with the real video above;
-    calling .play() on it directly produced smooth, continuous, native
-    playback (currentTime advancing in lockstep with wall-clock time) - so
-    the pre-rendered video file and native <video> playback were always
-    fine, only the autoplay wiring was missing. Fixed by deleting the sync
-    JS entirely and making this tag autoplay+loop+muted on its own (see its
-    own <video> tag below) - it needs nothing from Game Board's video, ctx/
-    player_team/team_bgr are all this function needs and all are available
-    immediately on tab open.
-
-    No reference to Game Board's capture state at all any more, not even a
-    cosmetic one: an earlier version of this fix still read
-    reposition_frame_idx_<match_key> to pick this video's initial seek
-    position (start at a captured moment if one existed, else frame 0) -
-    harmless functionally, but a soft conceptual tie this task asked to
-    remove outright. Always starts at frame 0 and loops now, full stop -
-    has its own play/pause/scrubber via the native <video controls>
-    element, genuinely zero dependency on Game Board's video or board state
-    in either direction."""
+    Frames with no usable calibration are gap-filled in tactical_view (see
+    frame_positions_with_gap_fill) or labelled as having no calibration; the note
+    under the video reports the real count from the data."""
     st.markdown("### 🗺️ Tactical Map")
 
     source, key = _get_active_match_identity()
@@ -2893,8 +2872,7 @@ def _render_tactical_map_section():
     st.caption(
         "Every tracked player as a team-colored dot at their real calibrated position, each "
         "team's shape as a convex-hull outline, the ball's position, and each player's current "
-        "speed (km/h). Plays on its own as soon as this tab opens — independent of the real "
-        "video above, which can be playing, paused, or anywhere in its own timeline."
+        "speed (km/h). Starts paused at frame 0 — press play to run it, independent of the real video above."
     )
 
     cv_output_dir = st.session_state.get('cv_job_output_dir')
@@ -2943,54 +2921,20 @@ def _render_tactical_map_section():
     video_path = _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr, cv_output_dir)
     if video_path is None:
         return
-    # A raw <video> tag at a URL we control, not st.video() - st.video proxies
-    # the file through Streamlit's own /media/<hash> endpoint, which this
-    # project's reposition component previously tried to look up by id to
-    # keep this video in step with the real Game Board video (confirmed
-    # directly: a currentSrc-based lookup for "tactical_map" never matched
-    # anything against that endpoint's opaque URL anyway). That whole sync
-    # relationship is gone now (see _REPOSITION_INDEX_HTML's ensureSkeleton
-    # docstring) - this tag just needs a real, fixed URL of its own.
-    #
-    # autoplay+loop+muted: this must render and play on its own, independent
-    # of whether the real Game Board video above is playing, paused, or in
-    # any particular state - a prior version only moved when told to by that
-    # other video's play/pause/seek events, so on a fresh tab open (nothing
-    # has played yet) it sat frozen on frame 0 indefinitely, which read as
-    # "the map doesn't load". muted is required for autoplay to be allowed
-    # without a user gesture - harmless here, this render has no audio track
-    # regardless (cv2.VideoWriter output, see render_topdown_video).
     tm_url = _tactical_map_video_url(video_path)
     st.markdown(
-        f'<video id="tactical-map-video" controls autoplay muted loop playsinline '
+        f'<video id="tactical-map-video" controls playsinline preload="auto" '
         f'src="{tm_url}" style="width:100%;border-radius:8px;"></video>',
         unsafe_allow_html=True,
     )
-    # The autoplay attribute above is real but inert: confirmed directly
-    # (live Playwright check) that it never actually starts playback,
-    # because st.markdown inserts this tag via innerHTML, and the HTML
-    # autoplay attribute only auto-triggers when the browser's PARSER
-    # encounters it during real document parsing - not for markup injected
-    # this way, in any browser. A real <script> is required to call .play()
-    # explicitly, and st.markdown's unsafe_allow_html doesn't execute
-    # <script> tags either (same reasoning, see _get_reposition_component's
-    # docstring for the one-way-vs-component distinction). st.components.v1.
-    # html runs in a real iframe document (srcdoc), where inline <script>
-    # tags DO execute normally - same sandbox token set already proven safe
-    # here (allow-same-origin allow-scripts, confirmed in
-    # _get_reposition_component's docstring) reaches into window.parent.
-    # document to find this video by its fixed id. This is a ONE-TIME kick
-    # to start playback, not an ongoing relationship - nothing here reads
-    # or reacts to the real Game Board video's state at all.
-    st.components.v1.html(
-        """<script>
-        (function retryPlay(triesLeft) {
-          var v = window.parent.document.getElementById('tactical-map-video');
-          if (v) { v.play().catch(function(){}); return; }
-          if (triesLeft > 0) setTimeout(function(){ retryPlay(triesLeft - 1); }, 100);
-        })(20);
-        </script>""",
-        height=0,
+    st.components.v1.html(_TACTICAL_MAP_REPLAY_JS, height=0)
+
+    n_blank = tv.blank_calibration_frame_count(ctx)
+    st.caption(
+        f"{n_blank} of {ctx.n_frames} frames in this clip have no usable pitch calibration for any player. "
+        "Where a player's position can be bridged from their own calibrated positions within 1 second, "
+        "they are drawn as hollow dots labelled interpolated. Calibrated dots can still sit metres from "
+        "the real player, so read this as a schematic, not a measurement."
     )
 
     # Cheap (~10ms) single-frame recompute just for its stats, not to

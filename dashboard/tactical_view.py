@@ -231,6 +231,51 @@ def ball_pitch_position(ctx, frame_idx):
     return pos
 
 
+INTERP_MAX_GAP_FRAMES = 25  # 1 s at 25 fps: longest observed per-player gap that is
+# still a plausible straight-line guess; longer gaps (up to ~45 frames on barca) are not drawn
+
+
+def frame_positions_with_gap_fill(ctx, frame_idx):
+    """({tid: (X, Y)} calibrated, {tid: (X, Y)} interpolated) for this frame.
+
+    Calibrated positions are exactly frame_player_positions_smoothed's. A tracked
+    player with no usable calibration at this frame is interpolated only when
+    their own calibrated positions exist on both sides within
+    INTERP_MAX_GAP_FRAMES; no homography is ever carried across a gap."""
+    calibrated = frame_player_positions_smoothed(ctx, frame_idx)
+    interpolated = {}
+    for tid in ctx.players[frame_idx].keys():
+        if tid in calibrated or str(tid) in calibrated:
+            continue
+        before = None
+        for g in range(frame_idx - 1, max(-1, frame_idx - INTERP_MAX_GAP_FRAMES - 2), -1):
+            p = smoothed_player_pitch_position(ctx, g, tid)
+            if p is not None:
+                before = (g, p)
+                break
+        after = None
+        for g in range(frame_idx + 1, min(ctx.n_frames, frame_idx + INTERP_MAX_GAP_FRAMES + 2)):
+            p = smoothed_player_pitch_position(ctx, g, tid)
+            if p is not None:
+                after = (g, p)
+                break
+        if before is None or after is None:
+            continue
+        a, pa = before
+        b, pb = after
+        if (b - a - 1) > INTERP_MAX_GAP_FRAMES:
+            continue
+        w = (frame_idx - a) / (b - a)
+        interpolated[tid] = (pa[0] + (pb[0] - pa[0]) * w, pa[1] + (pb[1] - pa[1]) * w)
+    return calibrated, interpolated
+
+
+def blank_calibration_frame_count(ctx):
+    """Frames where no tracked player resolves to a calibrated on-pitch position
+    at all - the frames the map cannot draw from calibration alone."""
+    return sum(1 for f in range(ctx.n_frames) if not frame_player_positions(ctx, f))
+
+
 def player_speed_kmh(ctx, frame_idx, tid, window=SPEED_WINDOW_FRAMES):
     """Instantaneous speed (km/h), smoothed over a small frame window either
     side of frame_idx — same reasoning as this project's own
@@ -276,6 +321,17 @@ def team_hull_points(positions, player_team, team_num, exclude_ids=()):
     return hull, pts
 
 
+def _put_label(canvas, text, origin, scale, color):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    (tw, th), _ = cv2.getTextSize(text, font, scale, 2)
+    H, W = canvas.shape[:2]
+    if origin is None:
+        origin = ((W - tw) // 2, (H + th) // 2)
+    x, y = origin
+    cv2.putText(canvas, text, (x, y), font, scale, (0, 0, 0), 4, cv2.LINE_AA)
+    cv2.putText(canvas, text, (x, y), font, scale, color, 2, cv2.LINE_AA)
+
+
 def render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
                           goalkeeper_ids=(), exclude_gk_from_hull=True,
                           show_speed_labels=True):
@@ -291,16 +347,18 @@ def render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
     from their team's hull by default (a GK's usual position badly distorts
     a team-shape hull; this is a real, disclosed choice, not a bug)."""
     canvas = _PITCH_BG.copy()
-    positions = frame_player_positions_smoothed(ctx, frame_idx)
+    positions, interpolated = frame_positions_with_gap_fill(ctx, frame_idx)
     n_tracked = len(ctx.players[frame_idx])
     n_on_pitch = len(positions)
+    n_interpolated = len(interpolated)
+    drawn = {**positions, **interpolated}
 
     gk_ids = set(str(g) for g in goalkeeper_ids)
     hull_meta = {}
     for team_num in (1, 2):
         color = team_bgr.get(team_num, (150, 150, 150))
         exclude = gk_ids if exclude_gk_from_hull else set()
-        hull, pts = team_hull_points(positions, player_team, team_num, exclude_ids=exclude)
+        hull, pts = team_hull_points(drawn, player_team, team_num, exclude_ids=exclude)
         if hull is not None:
             overlay = canvas.copy()
             cv2.fillPoly(overlay, [hull], color)
@@ -311,11 +369,17 @@ def render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
             cv2.line(canvas, pts[0], pts[1], color, 2, cv2.LINE_AA)
         hull_meta[team_num] = len(pts)
 
-    for tid, pos in positions.items():
+    for tid, pos in drawn.items():
         team_num = player_team.get(str(tid))
         color = team_bgr.get(team_num, (150, 150, 150))
         text_color = _contrast_text_color(color)
         cx, cy = _pt(*pos)
+        if tid in interpolated:
+            cv2.circle(canvas, (cx, cy), 8, color, 2, cv2.LINE_AA)
+            cv2.circle(canvas, (cx, cy), 8, (0, 0, 0), 1, cv2.LINE_AA)
+            cv2.putText(canvas, str(tid), (cx - 8, cy + 3),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.32, color, 1, cv2.LINE_AA)
+            continue
         cv2.circle(canvas, (cx, cy), 8, color, -1, cv2.LINE_AA)
         cv2.circle(canvas, (cx, cy), 8, (0, 0, 0), 1, cv2.LINE_AA)
         cv2.putText(canvas, str(tid), (cx - 8, cy + 3),
@@ -334,9 +398,16 @@ def render_topdown_frame(ctx, frame_idx, player_team, team_bgr,
         cv2.circle(canvas, (bx, by), 5, BALL_COLOR_BGR, -1, cv2.LINE_AA)
         cv2.circle(canvas, (bx, by), 5, (30, 30, 30), 1, cv2.LINE_AA)
 
+    if n_interpolated:
+        _put_label(canvas, f"interpolated: {n_interpolated} player(s), no calibration this frame",
+                   (10, 22), 0.5, (120, 220, 255))
+    if not drawn and n_tracked:
+        _put_label(canvas, "No calibration for this moment", None, 0.8, (255, 255, 255))
+
     meta = {
         "n_tracked": n_tracked,
         "n_on_pitch": n_on_pitch,
+        "n_interpolated": n_interpolated,
         "n_off_pitch": n_tracked - n_on_pitch,
         "team1_hull_pts": hull_meta.get(1, 0),
         "team2_hull_pts": hull_meta.get(2, 0),
