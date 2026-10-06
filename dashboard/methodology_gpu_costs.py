@@ -7,6 +7,8 @@ Methodology branch in app.py only needs a single call.
 import pandas as pd
 import streamlit as st
 
+from methodology_cost_calculator import render_cost_calculator
+
 # Marker in app.py's methodology_text that this block is rendered just above,
 # so it sits directly under the existing "Scalability & Cost" section.
 ABOUT_SECTION_MARKER = "---\n### 👨‍💻 About the Creator"
@@ -107,3 +109,5 @@ def render_gpu_compute_and_cost():
         _table(GPU_COUNT_ROWS, ["GPUs at once", "Finish time"])
 
         st.markdown(SUMMARY_MD)
+
+        render_cost_calculator()
