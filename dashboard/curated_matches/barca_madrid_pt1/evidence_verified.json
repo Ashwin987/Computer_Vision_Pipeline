@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "description": "Independently verified evidence items for this match's Data Dashboard. Additive: never edits bundle.json or raw_data. Lists only items confirmed by a check other than the per-minute Gemini analysis itself. An empty list means nothing has been independently verified.",
+  "match_id": "barca_madrid_pt1",
+  "items": [],
+  "excluded": [
+    {
+      "field": "ball_zone",
+      "minute": "03:00-04:00",
+      "value": "attacking_third",
+      "reason": "CV ball tracking over the first 30 s was a 2-frame tie (318 attacking / 316 middle / 17 defensive of 651 frames), too close to count as agreement.",
+      "method": "cv_pipeline/verify_evidence_citations.py",
+      "checked_on": "2026-10-06"
+    }
+  ]
+}

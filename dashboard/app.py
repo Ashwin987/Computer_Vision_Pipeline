@@ -393,39 +393,55 @@ def metric_card(container, label, value, help_text):
     container.metric(label=label, value=value, help=help_text)
 
 
-def _render_minute_evidence(container, minute_timestamps, source, key, key_suffix):
-    """Caption naming the real per-minute rows behind one Data Dashboard
-    number or chart - never estimated or evenly redistributed, always this
-    match's own real raw_data[].timestamp values.
+def _load_verified_evidence(source, key):
+    """Independently verified evidence items for the active curated match,
+    read from curated_matches/<id>/evidence_verified.json - an additive file
+    kept apart from bundle.json/raw_data, listing only items some check other
+    than the per-minute Gemini analysis itself has confirmed. Returns [] when
+    the match isn't curated, the file is missing or unreadable, or it lists
+    nothing - every caller treats all of those as "nothing verified yet"."""
+    if source != "curated" or not key:
+        return []
+    path = CURATED_MATCHES_DIR / str(key) / "evidence_verified.json"
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            items = json.load(f).get("items", [])
+    except (OSError, ValueError, AttributeError):
+        return []
+    return [it for it in items if isinstance(it, dict)] if isinstance(items, list) else []
 
-    minute_timestamps: the real 'MM:SS-MM:SS' timestamp strings (raw_data's
-    own per-row field - already exact, nothing derived) for every minute
-    that fed this particular number/chart.
 
-    Text-only, deliberately: this used to also embed a playable clip for
-    whichever one minute per match still has its source video file on disk
-    (the CV-analyzed window, peak_momentum_segment.mp4). Removed - a video
-    next to a claim invites "trust what you see in the clip" the same way a
-    verified number does, but the clip only ever covered one minute out of
-    dozens, and a real bug (a "PSG primary zone: Attacking third" card whose
-    own evidence clip showed PSG nowhere near the final third) was caught
-    specifically BECAUSE that one clip existed - most minutes had no clip to
-    catch the equivalent error. Trusting the 95%+ of claims with no video to
-    check them against was never actually safe; removing the video doesn't
-    fix that, it just stops implying the claims that happen to have one are
-    more trustworthy than the ones that don't. See
-    verify_evidence_citations.py for the real fix: checking every citation
-    against its underlying data directly, not against a clip a person has to
-    watch and happen to notice something wrong in.
-
-    source/key are no longer used here (kept in the signature so every call
-    site doesn't need updating) - the only use was resolving the one
-    available clip's video file."""
-    if not minute_timestamps:
+def _render_verification_status_note(container, source, key):
+    """One short, plain statement of what has and hasn't been independently
+    checked, shown under the Active Possession heatmap. Replaces the old
+    per-card "Evidence - N real minute(s)" expanders, which only re-listed
+    the same per-minute Gemini rows each number was computed from - where a
+    number came from, not a check that it was right. Wording names the real
+    method; only the CV ball-tracking cross-check
+    (cv_pipeline/verify_evidence_citations.py) is recognised here, so an
+    item of any other kind shows nothing rather than a claim this text
+    can't back."""
+    checked = []
+    for it in _load_verified_evidence(source, key):
+        rng = it.get("time_range_sec") or {}
+        try:
+            window_sec = int(round(float(rng["end"]) - float(rng["start"])))
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (it.get("method_id") == "cv_ball_tracking_crosscheck" and it.get("field") == "ball_zone"
+                and it.get("minute") and window_sec > 0):
+            checked.append((it["minute"], window_sec))
+    if not checked:
+        container.caption(
+            "No statistic here has been independently verified yet. Values are per-minute estimates from Gemini."
+        )
         return
-    uniq = sorted(set(minute_timestamps), key=_minute_num_from_timestamp)
-    with container.expander(f"📍 Evidence — {len(uniq)} real minute(s)", expanded=False):
-        st.caption("From this match's own per-minute analysis: " + ", ".join(uniq))
+    for minute, window_sec in checked:
+        container.caption(
+            f"Independent check: in minute {minute}, the ball zone was cross-checked against computer-vision "
+            f"ball tracking for the first {window_sec} seconds and agreed. All other statistics shown are "
+            "per-minute estimates from Gemini and have not yet been independently verified."
+        )
 
 # Shared verbatim everywhere momentum score appears (home screen, dashboard,
 # CV tab) - Part 2.3 requires identical wording in every location, not
@@ -5157,33 +5173,23 @@ elif st.session_state.step == 3:
                     if not ta_poss_df.empty and ta_poss_df.value_counts().iloc[0] >= 2:
                         ta_zone_raw = ta_poss_df.value_counts().index[0]
                         ta_zone_display = ta_zone_raw.replace('_', ' ').title()
-                        ta_zone_minutes = df.loc[(df['team_a_has_ball'] == 1) & (df['ball_zone'] == ta_zone_raw), 'timestamp'].tolist()
                     else:
                         ta_zone_display = "None"
-                        ta_zone_minutes = []
                     metric_card(st, f"{team_a} Primary Zone", ta_zone_display, zone_help)
-                    _render_minute_evidence(st, ta_zone_minutes, ev_source, ev_key, "ta_zone")
 
                 with col2:
                     tb_poss_df = df[df['team_b_has_ball'] == 1]['ball_zone']
                     if not tb_poss_df.empty and tb_poss_df.value_counts().iloc[0] >= 2:
                         tb_zone_raw = tb_poss_df.value_counts().index[0]
                         tb_zone_display = tb_zone_raw.replace('_', ' ').title()
-                        tb_zone_minutes = df.loc[(df['team_b_has_ball'] == 1) & (df['ball_zone'] == tb_zone_raw), 'timestamp'].tolist()
                     else:
                         tb_zone_display = "None"
-                        tb_zone_minutes = []
                     metric_card(st, f"{team_b} Primary Zone", tb_zone_display, zone_help)
-                    _render_minute_evidence(st, tb_zone_minutes, ev_source, ev_key, "tb_zone")
 
                 with col3:
                     metric_card(st, f"{team_a} Time in Attack (min)", f"{ta_att_count}", att_time_help)
-                    ta_att_minutes = df.loc[pd.to_numeric(df.get('team_a_attack_sec', 0), errors='coerce').fillna(0) > 0, 'timestamp'].tolist()
-                    _render_minute_evidence(st, ta_att_minutes, ev_source, ev_key, "ta_att")
                 with col4:
                     metric_card(st, f"{team_b} Time in Attack (min)", f"{tb_att_count}", att_time_help)
-                    tb_att_minutes = df.loc[pd.to_numeric(df.get('team_b_attack_sec', 0), errors='coerce').fillna(0) > 0, 'timestamp'].tolist()
-                    _render_minute_evidence(st, tb_att_minutes, ev_source, ev_key, "tb_att")
 
                 st.markdown("---")
 
@@ -5192,27 +5198,20 @@ elif st.session_state.step == 3:
 
                 ta_press_avg = round(pd.to_numeric(df['team_a_pressing_intensity'], errors='coerce').mean(), 1)
                 tb_press_avg = round(pd.to_numeric(df['team_b_pressing_intensity'], errors='coerce').mean(), 1)
-                all_minutes = df['timestamp'].tolist()
 
                 block_help = "The primary (most frequent) starting position of the team's defensive wall out of possession."
 
                 with col5:
                     metric_card(st, f"{team_a} Avg Threat", team_a_avg_dom, avg_mom_help)
-                    _render_minute_evidence(st, df.loc[df['smoothed_net_momentum'] > 0, 'timestamp'].tolist(), ev_source, ev_key, "ta_threat")
                     metric_card(st, f"{team_b} Avg Threat", team_b_avg_dom, avg_mom_help)
-                    _render_minute_evidence(st, df.loc[df['smoothed_net_momentum'] < 0, 'timestamp'].tolist(), ev_source, ev_key, "tb_threat")
 
                 with col6:
                     metric_card(st, f"{team_a} Avg Pressing Intensity", f"{ta_press_avg} / 10", press_help)
-                    _render_minute_evidence(st, all_minutes, ev_source, ev_key, "ta_press")
                     metric_card(st, f"{team_b} Avg Pressing Intensity", f"{tb_press_avg} / 10", press_help)
-                    _render_minute_evidence(st, all_minutes, ev_source, ev_key, "tb_press")
 
                 with col7:
                     metric_card(st, f"{team_a} Primary Block Height", ta_block_height.replace('_', ' ').title() + " Block", block_help)
-                    _render_minute_evidence(st, df.loc[df['team_a_block_height'] == ta_block_height, 'timestamp'].tolist(), ev_source, ev_key, "ta_block")
                     metric_card(st, f"{team_b} Primary Block Height", tb_block_height.replace('_', ' ').title() + " Block", block_help)
-                    _render_minute_evidence(st, df.loc[df['team_b_block_height'] == tb_block_height, 'timestamp'].tolist(), ev_source, ev_key, "tb_block")
 
                 st.markdown("---")
                 st.header("Tactical Visualizations")
@@ -5294,6 +5293,7 @@ elif st.session_state.step == 3:
                     themed_plotly_layout(heat_fig, height=280)
                     heat_fig.update_layout(xaxis_title="Pitch Zone")
                     st.plotly_chart(heat_fig, width='stretch', key="heat_possession")
+                    _render_verification_status_note(st, ev_source, ev_key)
 
                     heatmap_data = compute_possession_heatmap_data(df, team_a, team_b, color_a, color_b)
                     fig3 = build_heatmap_mpl(heatmap_data, 'Blues')
@@ -5340,10 +5340,9 @@ elif st.session_state.step == 3:
                                            hovermode="x unified")
                     st.plotly_chart(mom_fig, width='stretch', key="mom_chart")
                     st.caption(
-                        "Hover any point for that exact minute's real timestamp — every point on this line "
-                        "is one real analyzed minute, not interpolated."
+                        "Hover any point for that minute's timestamp — each point on this line is one analysed "
+                        "minute and is a Gemini estimate that has not been independently verified."
                     )
-                    _render_minute_evidence(st, df['timestamp'].tolist(), ev_source, ev_key, "momentum")
 
                     fig4 = build_momentum_mpl(df, team_a, team_b)
                     st.download_button("💾 Download Momentum Graph", fig_to_png_bytes(fig4), "momentum_chart.png", "image/png", key="dl_mom")
@@ -5352,8 +5351,8 @@ elif st.session_state.step == 3:
                 st.subheader("💾 Export Raw Data")
                 st.write(
                     "Download the fully structured, minute-by-minute tactical dataset to run your own models — "
-                    "every row carries its own real 'timestamp' column (e.g. '03:00-04:00'), so every number in "
-                    "this export is already traceable to the exact 60-second clip that produced it."
+                    "every row carries its own 'timestamp' column (e.g. '03:00-04:00') naming the analysed minute "
+                    "it describes. Each row is a Gemini estimate for that minute and has not been independently verified."
                 )
                 csv_data = df.to_csv(index=False).encode('utf-8')
                 st.download_button(
