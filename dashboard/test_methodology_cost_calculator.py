@@ -1,6 +1,7 @@
 """Unit tests for the Methodology cost calculator's estimate() function.
 Run from the dashboard folder: python -m unittest -v test_methodology_cost_calculator
 """
+import os
 import unittest
 
 import methodology_cost_calculator as calc
@@ -168,3 +169,102 @@ class EstimateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestTargetTurnaroundAndCalculatorApp(unittest.TestCase):
+    def _estimate(self, video, target, tier="budget", products=ALL_PRODUCTS):
+        return calc.estimate(video, target, tier, products)
+
+    def test_45_min_in_10_min_finishes_exactly_at_target(self):
+        g = self._estimate(45, 10)["gpu"]
+        self.assertEqual(calc.format_duration_range(g["finish_minutes_low"], g["finish_minutes_high"]), "10 min")
+        self.assertEqual((g["gpus_low"], g["gpus_high"]), (59, 90))
+
+    def test_90_min_in_20_min_finishes_exactly_at_target(self):
+        g = self._estimate(90, 20)["gpu"]
+        self.assertEqual(calc.format_duration_range(g["finish_minutes_low"], g["finish_minutes_high"]), "20 min")
+        self.assertEqual((g["gpus_low"], g["gpus_high"]), (59, 90))
+
+    def test_90_min_in_10_min_budget_shows_cost_and_gpus(self):
+        r = self._estimate(90, 10)
+        self.assertEqual(calc.format_usd_range(r["total_low"], r["total_high"]), "$10 to $16")
+        self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (117, 180))
+
+    def test_90_min_in_50_min_budget_costs_about_10_to_16(self):
+        r = self._estimate(90, 50)
+        self.assertEqual(calc.format_usd_range(r["total_low"], r["total_high"]), "$10 to $16")
+
+    def test_target_longer_than_single_gpu_time_uses_one_gpu(self):
+        r = self._estimate(90, 5000)
+        self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (1, 1))
+        self.assertEqual(r["warnings"], [])
+        self.assertEqual(calc.format_duration_range(r["gpu"]["finish_minutes_low"], r["gpu"]["finish_minutes_high"]), "19.5 to 30 h")
+
+    def test_custom_targets_are_costed_for_any_whole_minute(self):
+        for target in (1, 7, 13, 25, 37, 240):
+            r = self._estimate(90, target)
+            self.assertGreater(r["total_high"], 0, target)
+            self.assertGreaterEqual(r["gpu"]["gpus_high"], r["gpu"]["gpus_low"], target)
+
+    def test_240_minute_target_on_90_minute_video(self):
+        r = self._estimate(90, 240)
+        self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (5, 8))
+        self.assertEqual(r["warnings"], [calc.CHUNKING_WARNING])
+
+    def test_non_whole_or_non_positive_targets_are_rejected(self):
+        for bad in (0, -5, 2.5, 0.5, float("nan")):
+            with self.assertRaises(ValueError, msg=repr(bad)):
+                calc.estimate(90, bad, "budget", ALL_PRODUCTS)
+
+    def test_app_shows_cost_for_custom_targets_and_tiers(self):
+        for tier in calc.GPU_TIERS:
+            at = _run_calculator(90, 7, tier)
+            self.assertFalse(at.error, tier)
+            self.assertIn("Total", _total_text(at), tier)
+            self.assertEqual(_metric(at, "Expected finish time (CV models)"), "7 min", tier)
+
+    def test_app_rejects_zero_and_negative_targets_without_cost(self):
+        for bad in (0, -5):
+            at = _run_calculator(90, bad, "budget")
+            self.assertTrue(at.error, bad)
+            self.assertIn("whole number", at.error[0].value)
+            self.assertEqual(_total_text(at), "", bad)
+
+    def test_app_recalculates_when_target_changes(self):
+        at = _run_calculator(90, 10, "budget")
+        self.assertEqual(_metric(at, "Expected finish time (CV models)"), "10 min")
+        at.number_input(key="mcc_target_minutes").set_value(25).run()
+        self.assertEqual(_metric(at, "Expected finish time (CV models)"), "25 min")
+        self.assertIn("Total", _total_text(at))
+
+    def test_app_shows_gpu_assumption_caption(self):
+        at = _run_calculator(90, 10, "budget")
+        captions = " ".join(c.value for c in at.caption)
+        self.assertIn("Assumes about 117 to 180 GPUs running in parallel", captions)
+
+
+def _run_calculator(video, target, tier, products=None):
+    from streamlit.testing.v1 import AppTest
+    here = os.path.dirname(os.path.abspath(__file__))
+    code = (
+        "import sys\n"
+        f"sys.path.insert(0, {here!r})\n"
+        "import methodology_cost_calculator as mcc\n"
+        "mcc.render_cost_calculator()\n"
+    )
+    at = AppTest.from_string(code, default_timeout=60).run()
+    at.number_input(key=calc._MINUTES_KEY).set_value(float(video)).run()
+    at.radio(key="mcc_speed").set_value(calc._TARGET).run()
+    at.number_input(key="mcc_target_minutes").set_value(float(target)).run()
+    at.selectbox(key="mcc_tier").set_value(tier).run()
+    for key in calc.PRODUCTS:
+        at.checkbox(key=f"mcc_product_{key}").set_value(products is None or key in products).run()
+    return at
+
+
+def _total_text(at):
+    return " ".join(m.value for m in at.markdown if m.value.startswith("**Total"))
+
+
+def _metric(at, label):
+    return {m.label: m.value for m in at.metric}.get(label)

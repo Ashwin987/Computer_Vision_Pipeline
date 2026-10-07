@@ -176,7 +176,10 @@ def _cv_models(video_minutes, target_minutes, tier):
         gpus = [max(1, math.ceil(h / (target_minutes / 60) - 1e-9)) for h in hours]
     # Overhead only applies at an end of the range that really is split across GPUs.
     costs = [h * rate * (1 + PARALLEL_OVERHEAD_FRACTION if n > 1 else 1) for h, n in zip(hours, gpus)]
-    finish_minutes = [h * 60 / n for h, n in zip(hours, gpus)]
+    finish_minutes = [
+        h * 60 if (target_minutes is None or n == 1) else target_minutes
+        for h, n in zip(hours, gpus)
+    ]
     low_s, high_s = (f"{s:g}" for s in CV_COMPUTE_SEC_PER_VIDEO_SEC)
     how = (
         f"Rented GPU. Compute hours = video seconds x {low_s} to {high_s} / 3600, "
@@ -222,8 +225,8 @@ def estimate(video_minutes, target_minutes, tier, products):
         raise ValueError("Video length must be a number of minutes greater than zero.")
     if target_minutes is not None and (
             isinstance(target_minutes, bool) or not isinstance(target_minutes, (int, float))
-            or not math.isfinite(target_minutes) or target_minutes <= 0):
-        raise ValueError("Target turnaround must be a number of minutes greater than zero.")
+            or not math.isfinite(target_minutes) or target_minutes < 1 or target_minutes != int(target_minutes)):
+        raise ValueError("Target turnaround must be a whole number of minutes, 1 or more.")
     if tier not in GPU_TIERS:
         raise ValueError(f"Unknown GPU tier: {tier!r}.")
     selected = list(dict.fromkeys(products))
@@ -370,8 +373,8 @@ def render_cost_calculator():
         speed = st.radio("How fast do you want it?", [_NO_RUSH, _TARGET], key="mcc_speed", horizontal=True)
         target_minutes = None
         if speed == _TARGET:
-            target_minutes = st.number_input("Target turnaround (minutes)", min_value=0.0, value=20.0, step=1.0,
-                                             format="%g", key="mcc_target_minutes")
+            target_minutes = st.number_input("Target turnaround (minutes)", value=20, step=1, format="%d",
+                                             key="mcc_target_minutes")
 
         tier = st.selectbox(
             "GPU tier", list(GPU_TIERS), key="mcc_tier",
@@ -416,6 +419,12 @@ def render_cost_calculator():
             col_gpus, col_finish = st.columns(2)
             col_gpus.metric("GPUs needed at once", gpus)
             col_finish.metric("Expected finish time (CV models)", finish)
+            if gpu["gpus_low"] == gpu["gpus_high"] == 1:
+                st.caption("Assumes 1 GPU.")
+            elif gpu["gpus_low"] == gpu["gpus_high"]:
+                st.caption(f"Assumes about {gpu['gpus_low']} GPUs running in parallel.")
+            else:
+                st.caption(f"Assumes about {gpu['gpus_low']} to {gpu['gpus_high']} GPUs running in parallel.")
             st.caption(
                 f"Both figures are a {ESTIMATE_LABEL}. The turnaround applies to the CV models only; "
                 "how long the Gemini calls take is not modelled."
