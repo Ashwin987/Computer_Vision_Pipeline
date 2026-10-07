@@ -2732,6 +2732,9 @@ def _tactical_view_player_team_map(cv_output_dir):
         return {}
 
 
+import tactical_map_layer as tml  # the Tactical Map's reviewed map layer; only this block uses it
+
+
 def _calibration_cache_sig(cv_output_dir):
     """Content hash of every file that actually feeds player_repositioning.
     load_context's ctx.homography (what tactical_view's renderer reads for
@@ -2748,7 +2751,12 @@ def _calibration_cache_sig(cv_output_dir):
     e.g. c114037's frame_overrides additions change this hash, which is
     exactly the fix: any future calibration_status.json/repositioning_data.
     json edit for either curated match invalidates the cached video
-    automatically instead of silently going stale again."""
+    automatically instead of silently going stale again.
+
+    Also folds in tml.layer_content_sig - the content hash of the reviewed
+    map-layer files (approved homographies + per-box outcomes) that feed the
+    render when a match has them - so swapping in a new players file
+    rebuilds the video the same way."""
     h = hashlib.sha1()
     for fname in ("repositioning_data.json", "calibration_status.json"):
         p = Path(cv_output_dir) / fname if cv_output_dir else None
@@ -2756,10 +2764,11 @@ def _calibration_cache_sig(cv_output_dir):
             h.update(p.read_bytes())
         else:
             h.update(b"MISSING:" + fname.encode())
+    h.update(b"MAPLAYER:" + tml.layer_content_sig(cv_output_dir).encode())
     return h.hexdigest()[:10]
 
 
-_TACTICAL_MAP_RENDER_VERSION = 2  # bump when tactical_view's drawn output changes, so cached videos rebuild
+_TACTICAL_MAP_RENDER_VERSION = 3  # bump when tactical_view's drawn output changes, so cached videos rebuild
 
 
 def _tactical_map_video_paths(match_key, team_bgr, cv_output_dir):
@@ -2782,18 +2791,24 @@ def _tactical_map_video_paths(match_key, team_bgr, cv_output_dir):
     return cache_dir, avi_path, mp4_path
 
 
-def _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr, cv_output_dir):
+def _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr, cv_output_dir, layer=None):
     """Returns a browser-playable mp4 path for this match's whole-window
     tactical map, rendering + transcoding once and reusing the cached file
     on every later call - see tactical_view.render_topdown_video's own
     docstring for why this exists (fixes a measured 3.0s-per-update stutter
-    from driving the live render on an st_autorefresh timer instead)."""
+    from driving the live render on an st_autorefresh timer instead).
+
+    With a reviewed map layer the video comes from tml.render_video (one
+    picture per sampled second) instead of tactical_view's per-frame render."""
     cache_dir, avi_path, mp4_path = _tactical_map_video_paths(match_key, team_bgr, cv_output_dir)
     if mp4_path.exists():
         return mp4_path
     cache_dir.mkdir(parents=True, exist_ok=True)
     with st.spinner("Rendering the tactical map video (one-time per match - can take a minute or two, mostly spent transcoding for browser playback)..."):
-        tv.render_topdown_video(ctx, player_team, team_bgr, avi_path)
+        if layer is not None:
+            tml.render_video(layer, team_bgr, avi_path, fps=ctx.fps)
+        else:
+            tv.render_topdown_video(ctx, player_team, team_bgr, avi_path)
         try:
             with VideoFileClip(str(avi_path)) as clip:
                 clip.write_videofile(str(mp4_path), codec="libx264", audio=False, logger=None)
@@ -2863,19 +2878,36 @@ def _render_tactical_map_section():
 
     Frames with no usable calibration are gap-filled in tactical_view (see
     frame_positions_with_gap_fill) or labelled as having no calibration; the note
-    under the video reports the real count from the data."""
+    under the video reports the real count from the data.
+
+    A match with reviewed map-layer files (see tactical_map_layer) is drawn from
+    those instead: one picture per sampled second, team1/team2/goalkeeper boxes
+    only, through the approved homographies."""
     st.markdown("### 🗺️ Tactical Map")
 
     source, key = _get_active_match_identity()
     match_key = key or "session"
 
-    st.caption(
-        "Every tracked player as a team-colored dot at their real calibrated position, each "
-        "team's shape as a convex-hull outline, the ball's position, and each player's current "
-        "speed (km/h). Starts paused at frame 0 — press play to run it, independent of the real video above."
-    )
-
     cv_output_dir = st.session_state.get('cv_job_output_dir')
+    try:
+        layer = tml.load_layer(cv_output_dir) if cv_output_dir else None
+    except tml.MapLayerError as e:
+        st.warning(f"This match's reviewed tactical map data can't be used, so the map isn't shown: {e}")
+        return
+
+    if layer is not None:
+        st.caption(
+            "Each reviewed player as a team-colored dot at their calibrated position, goalkeepers in "
+            "yellow, and each team's shape as a convex-hull outline. The map updates once per second of "
+            "the clip. Starts paused — press play to run it, independent of the real video above."
+        )
+    else:
+        st.caption(
+            "Every tracked player as a team-colored dot at their real calibrated position, each "
+            "team's shape as a convex-hull outline, the ball's position, and each player's current "
+            "speed (km/h). Starts paused at frame 0 — press play to run it, independent of the real video above."
+        )
+
     if not cv_output_dir:
         st.info("This match doesn't have a completed CV Deep Analysis job yet — the tactical map needs that first.")
         return
@@ -2918,7 +2950,7 @@ def _render_tactical_map_section():
     # approach this replaced (measured at a 3.0s gap between visible
     # updates against a 0.2s-interval timer - see tactical_view.
     # render_topdown_video's docstring for the real numbers).
-    video_path = _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr, cv_output_dir)
+    video_path = _get_or_build_tactical_map_video(match_key, ctx, player_team, team_bgr, cv_output_dir, layer=layer)
     if video_path is None:
         return
     tm_url = _tactical_map_video_url(video_path)
@@ -2928,6 +2960,21 @@ def _render_tactical_map_section():
         unsafe_allow_html=True,
     )
     st.components.v1.html(_TACTICAL_MAP_REPLAY_JS, height=0)
+
+    if layer is not None:
+        first = layer.stats[layer.frames[0]]
+        st.caption(
+            f"{len(layer.frames)} seconds of the clip, one picture each. Only boxes reviewed as a team player "
+            f"or a goalkeeper are drawn ({layer.total('drawn')} dots in all); referees and boxes the review "
+            f"could not settle are left off ({layer.total('not_drawn')}), as are {layer.total('off_map')} whose "
+            "position falls outside the pitch. Dots can still sit metres from the real player, so read this "
+            "as a schematic, not a measurement."
+        )
+        st.caption(
+            f"Opening-second counts (t = 0s): {first['team1']} / {first['team2']} outfield dots per team · "
+            f"{first['goalkeeper']} goalkeeper(s) · {first['not_drawn']} box(es) not drawn."
+        )
+        return
 
     n_blank = tv.blank_calibration_frame_count(ctx)
     st.caption(
