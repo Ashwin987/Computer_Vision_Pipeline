@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "description": "Independently verified evidence items for this match's Data Dashboard. Additive: never edits bundle.json or raw_data. Lists only items confirmed by a check other than the per-minute Gemini analysis itself. An empty list means nothing has been independently verified.",
+  "match_id": "liverpool_psg",
+  "items": [
+    {
+      "stat_id": "raw_data.ball_zone@00:00-01:00",
+      "field": "ball_zone",
+      "value": "middle_third",
+      "minute": "00:00-01:00",
+      "claim": "In minute 00:00-01:00, with PSG in possession, the ball zone was the middle third.",
+      "time_range_sec": {
+        "start": 0,
+        "end": 30,
+        "basis": "seconds from the start of the match video; the first 30 s of the minute"
+      },
+      "method_id": "cv_ball_tracking_crosscheck",
+      "method": "cv_pipeline/verify_evidence_citations.py",
+      "how_verified": "Automatic cross-check against computer-vision ball tracking over the first 30 seconds of the minute: the tracked ball was in the middle third (relative to the possessing team's attacking direction) in the majority of frames, matching the Gemini label.",
+      "details": {
+        "frames_with_ball_position": 725,
+        "attacking_third": 129,
+        "middle_third": 542,
+        "defensive_third": 54
+      },
+      "verified_on": "2026-10-06",
+      "supports_dashboard_stat": null,
+      "limits": "Covers only the first 30 s of a 60 s minute and only the ball_zone field of that one minute. It does not verify any aggregate statistic shown on the dashboard."
+    }
+  ]
+}
