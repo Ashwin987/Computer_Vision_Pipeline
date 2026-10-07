@@ -5160,7 +5160,15 @@ elif st.session_state.step == 3:
 
     if nav_selection == "Methodology & Project Report":
         get_pdf_download_button()
-        st.markdown(methodology_text)
+        # GPU compute and cost tables sit directly under "Scalability & Cost",
+        # i.e. just above "About the Creator". If that heading is ever renamed
+        # the partition finds nothing and the block simply renders at the end.
+        import methodology_gpu_costs as mgc
+        _meth_body, _meth_sep, _meth_about = methodology_text.partition(mgc.ABOUT_SECTION_MARKER)
+        st.markdown(_meth_body)
+        mgc.render_gpu_compute_and_cost()
+        if _meth_sep:
+            st.markdown(_meth_sep + _meth_about)
 
     elif nav_selection == "Match Dashboard":
         
