@@ -16,19 +16,22 @@ import streamlit as st
 # GPU rental rates per tier, USD per hour. Same approximate figures as the
 # GPU tables above the calculator; hourly rates must be checked live.
 GPU_TIERS = {
-    "budget": {"label": "Budget marketplace (T4 or RTX 4090)", "usd_per_hour": 0.40},
-    "mid": {"label": "Mid (L4 or A10 class)", "usd_per_hour": 0.80},
-    "a100": {"label": "Datacenter (A100)", "usd_per_hour": 1.50},
-    "serverless_a100": {"label": "Serverless A100 (premium)", "usd_per_hour": 2.50},
+    "budget": {"label": "Budget marketplace (T4 or RTX 4090)", "usd_per_hour": 0.40, "speed_factor": 1.0},
+    "mid": {"label": "Mid (L4 or A10 class)", "usd_per_hour": 0.80, "speed_factor": 1.0},
+    "a100": {"label": "Datacenter (A100)", "usd_per_hour": 1.50, "speed_factor": 1.0},
+    "serverless_a100": {"label": "Serverless A100 (premium)", "usd_per_hour": 2.50, "speed_factor": 1.0},
 }
+# speed_factor: unmeasured: all tiers are currently assumed to run at the same speed;
+# a 10-minute GPU timing test would set these. Compute hours = base hours / speed_factor.
 
 # Compute seconds per second of video for the CV models (low, high).
 # Planning assumption, NOT derived from the code and unmeasured on the target
 # GPU. The one timing recorded in this repo is a CPU-only run.
 CV_COMPUTE_SEC_PER_VIDEO_SEC = (13.0, 20.0)
 
-# Extra cost when the work is split across several GPUs (model load, spin-up).
-PARALLEL_OVERHEAD_FRACTION = 0.25
+# Model load and container start, billed on every GPU used.
+# Unmeasured planning assumption.
+STARTUP_MINUTES_PER_GPU = 5.0
 
 # The tables above stop at 90 GPUs at once; anything needing more is flagged.
 TABLE_MAX_GPUS = 90
@@ -167,30 +170,35 @@ def _training_plan(video_minutes):
 
 
 def _cv_models(video_minutes, target_minutes, tier):
-    rate = GPU_TIERS[tier]["usd_per_hour"]
+    tier_info = GPU_TIERS[tier]
+    rate = tier_info["usd_per_hour"]
+    speed = tier_info["speed_factor"]
     video_seconds = video_minutes * 60
-    hours = [video_seconds * s / 3600 for s in CV_COMPUTE_SEC_PER_VIDEO_SEC]
+    hours = [video_seconds * s / 3600 / speed for s in CV_COMPUTE_SEC_PER_VIDEO_SEC]
     if target_minutes is None:
         gpus = [1, 1]
     else:
         gpus = [max(1, math.ceil(h / (target_minutes / 60) - 1e-9)) for h in hours]
-    # Overhead only applies at an end of the range that really is split across GPUs.
-    costs = [h * rate * (1 + PARALLEL_OVERHEAD_FRACTION if n > 1 else 1) for h, n in zip(hours, gpus)]
+    startup_hours = STARTUP_MINUTES_PER_GPU / 60
+    costs = [h * rate + n * startup_hours * rate for h, n in zip(hours, gpus)]
+    compute_costs = [h * rate for h in hours]
     finish_minutes = [
         h * 60 if (target_minutes is None or n == 1) else target_minutes
         for h, n in zip(hours, gpus)
     ]
     low_s, high_s = (f"{s:g}" for s in CV_COMPUTE_SEC_PER_VIDEO_SEC)
     how = (
-        f"Rented GPU. Compute hours = video seconds x {low_s} to {high_s} / 3600, "
-        f"x about ${rate:.2f}/h"
-        + (f", plus about {PARALLEL_OVERHEAD_FRACTION:.0%} overhead for running in parallel." if gpus[1] > 1 else ".")
-        + " Runs the player and ball detector, tracker, pitch-keypoint model and team classification; "
-        "the Tactical Map and Game Board reuse that output and add no model runs."
+        f"Rented GPU. Compute hours = video seconds x {low_s} to {high_s} / 3600"
+        + (f" / {speed:g} (tier speed factor)" if speed != 1 else "")
+        + f", x about ${rate:.2f}/h, plus {STARTUP_MINUTES_PER_GPU:g} min of model load and container start "
+        "for each GPU used. Runs the player and ball detector, tracker, pitch-keypoint model and team "
+        "classification; the Tactical Map and Game Board reuse that output and add no model runs."
     )
     gpu = {
         "compute_hours_low": hours[0],
         "compute_hours_high": hours[1],
+        "compute_cost_low": compute_costs[0],
+        "compute_cost_high": compute_costs[1],
         "gpus_low": gpus[0],
         "gpus_high": gpus[1],
         "finish_minutes_low": finish_minutes[0],
@@ -317,7 +325,10 @@ def _assumptions_table():
     low_s, high_s = (f"{s:g}" for s in CV_COMPUTE_SEC_PER_VIDEO_SEC)
     rows += [
         ("CV compute per second of video", f"{low_s} to {high_s} s", "Planning assumption; unmeasured on the target GPU"),
-        ("Parallel overhead", f"{PARALLEL_OVERHEAD_FRACTION:.0%}", "Planning assumption"),
+        ("Model load and container start per GPU", f"{STARTUP_MINUTES_PER_GPU:g} min",
+         "Unmeasured planning assumption"),
+        ("GPU speed factor by tier", ", ".join(f"{t['speed_factor']:g}" for t in GPU_TIERS.values()),
+         "Unmeasured: all tiers are currently assumed to run at the same speed; a 10-minute GPU timing test would set these"),
         (f"Gemini input ({GEMINI_MODEL})", f"${GEMINI_USD_PER_M_INPUT_TOKENS:.2f} per 1M tokens",
          f"{GEMINI_RATE_SOURCE}; {GEMINI_RATE_NOTE}"),
         ("Gemini audio input", f"${GEMINI_USD_PER_M_AUDIO_INPUT_TOKENS:.2f} per 1M tokens",
@@ -354,6 +365,31 @@ def _assumptions_table():
     st.table(df.set_index("Assumption"))
 
 
+def _total_text(result):
+    if any(i["status"] == "ok" for i in result["items"]):
+        return format_usd_range(result["total_low"], result["total_high"])
+    return "nothing costed yet"
+
+
+def _gpu_texts(gpu):
+    if not gpu:
+        return "none needed", "not applicable"
+    gpus = str(gpu["gpus_low"]) if gpu["gpus_low"] == gpu["gpus_high"] else f"{gpu['gpus_low']} to {gpu['gpus_high']}"
+    return gpus, format_duration_range(gpu["finish_minutes_low"], gpu["finish_minutes_high"])
+
+
+def price_grid(video_lengths, targets, tier, products):
+    """Rows of (video length, [total text per target]); targets None means no rush."""
+    return [
+        (length, [_total_text(estimate(length, target, tier, products)) for target in targets])
+        for length in video_lengths
+    ]
+
+
+PRICE_GRID_LENGTHS = (10, 45, 90)
+PRICE_GRID_TARGETS = (10, 20, 30, 60, 120, None)
+
+
 def render_cost_calculator():
     with st.container(key="methodology_cost_calculator"):
         st.markdown("#### 🧮 Cost calculator (planning estimate, not a quote)")
@@ -384,41 +420,23 @@ def render_cost_calculator():
         st.markdown("**Products to include**")
         selected = [key for key, label in PRODUCTS.items() if st.checkbox(label, value=True, key=f"mcc_product_{key}")]
 
-        st.markdown("---")
+        minutes = st.session_state[_MINUTES_KEY]
         try:
-            result = estimate(st.session_state[_MINUTES_KEY], target_minutes, tier, selected)
+            result = estimate(minutes, target_minutes, tier, selected)
         except ValueError as exc:
             st.error(f"{exc} No estimate shown.")
             return
-        if not result["items"]:
-            st.info("Select at least one product to see an estimate.")
-            return
 
-        st.markdown(f"**Cost per product ({ESTIMATE_LABEL})**")
-        rows = [
-            (i["label"],
-             format_usd_range(i["low"], i["high"]) if i["status"] == "ok" else UNKNOWN_LABEL,
-             i["how"])
-            for i in result["items"]
-        ]
-        df = pd.DataFrame([[_md(c) for c in r] for r in rows], columns=["Product", "Cost range", "How it was calculated"])
-        st.table(df.set_index("Product"))
-
-        if any(i["status"] == "ok" for i in result["items"]):
-            total = format_usd_range(result["total_low"], result["total_high"])
-        else:
-            total = "nothing costed yet"
-        st.markdown(_md(f"**{result['total_label']}: {total}** ({ESTIMATE_LABEL})"))
-        if result["has_unknown"]:
-            st.caption("Corner kicks is not in the total because its cost cannot be derived from the code yet.")
-
+        gpus_text, finish_text = _gpu_texts(result["gpu"])
+        c_cost, c_gpus, c_finish = st.columns(3)
+        c_cost.metric("Estimated total cost", _md(_total_text(result)))
+        c_gpus.metric("GPUs needed at once", gpus_text)
+        c_finish.metric("Expected finish time (CV models)", finish_text)
+        st.caption(f"Planning estimate, not a quote. Excludes any product marked unknown. ({ESTIMATE_LABEL})")
+        if "corner_kicks" in selected:
+            st.markdown("**Corner kicks: not costed yet (unknown), not included in the total.**")
         gpu = result["gpu"]
         if gpu:
-            gpus = str(gpu["gpus_low"]) if gpu["gpus_low"] == gpu["gpus_high"] else f"{gpu['gpus_low']} to {gpu['gpus_high']}"
-            finish = format_duration_range(gpu["finish_minutes_low"], gpu["finish_minutes_high"])
-            col_gpus, col_finish = st.columns(2)
-            col_gpus.metric("GPUs needed at once", gpus)
-            col_finish.metric("Expected finish time (CV models)", finish)
             if gpu["gpus_low"] == gpu["gpus_high"] == 1:
                 st.caption("Assumes 1 GPU.")
             elif gpu["gpus_low"] == gpu["gpus_high"]:
@@ -426,14 +444,41 @@ def render_cost_calculator():
             else:
                 st.caption(f"Assumes about {gpu['gpus_low']} to {gpu['gpus_high']} GPUs running in parallel.")
             st.caption(
-                f"Both figures are a {ESTIMATE_LABEL}. The turnaround applies to the CV models only; "
-                "how long the Gemini calls take is not modelled."
+                "The turnaround applies to the CV models only; how long the Gemini calls take is not modelled."
             )
-        else:
-            st.caption(f"No GPU is needed for the selected products ({ESTIMATE_LABEL}).")
 
         for warning in result["warnings"]:
             st.warning(warning)
+
+        with st.expander("Price for every combination", expanded=True):
+            lengths = list(PRICE_GRID_LENGTHS)
+            if minutes not in lengths:
+                lengths.append(minutes)
+            lengths.sort()
+            grid = price_grid(lengths, PRICE_GRID_TARGETS, tier, selected)
+            col_labels = [f"{t} min" if t is not None else "No rush" for t in PRICE_GRID_TARGETS]
+            rows = [
+                [f"{length:g} min video" + (" (entered)" if length == minutes and length not in PRICE_GRID_LENGTHS else "")]
+                + [_md(cell) for cell in cells]
+                for length, cells in grid
+            ]
+            df = pd.DataFrame(rows, columns=["Video length"] + col_labels)
+            st.table(df.set_index("Video length"))
+            st.caption(
+                f"Each cell: total for the selected GPU tier and products ({ESTIMATE_LABEL}). "
+                f"Tier: {GPU_TIERS[tier]['label']}."
+            )
+
+        if result["items"]:
+            st.markdown(f"**Cost per product ({ESTIMATE_LABEL})**")
+            rows = [
+                (i["label"],
+                 format_usd_range(i["low"], i["high"]) if i["status"] == "ok" else UNKNOWN_LABEL,
+                 i["how"])
+                for i in result["items"]
+            ]
+            df = pd.DataFrame([[_md(c) for c in r] for r in rows], columns=["Product", "Cost range", "How it was calculated"])
+            st.table(df.set_index("Product"))
 
         with st.expander("Assumptions behind these figures"):
             _assumptions_table()

@@ -42,9 +42,10 @@ class EstimateTests(unittest.TestCase):
         r = calc.estimate(10, None, "budget", ["cv_models"])
         _show("10 min, budget, single GPU, CV models", r)
         cv = _item(r, "cv_models")
-        # 600 s x 13 to 20 = 2.17 to 3.33 h, x $0.40/h, no overhead on one GPU.
-        self.assertAlmostEqual(cv["low"], 600 * 13 / 3600 * 0.40)
-        self.assertAlmostEqual(cv["high"], 600 * 20 / 3600 * 0.40)
+        # 600 s x 13 to 20 = 2.17 to 3.33 h, x $0.40/h, plus 5 min of startup on the one GPU.
+        startup = calc.STARTUP_MINUTES_PER_GPU / 60 * 0.40
+        self.assertAlmostEqual(cv["low"], 600 * 13 / 3600 * 0.40 + startup)
+        self.assertAlmostEqual(cv["high"], 600 * 20 / 3600 * 0.40 + startup)
         self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (1, 1))
         self.assertAlmostEqual(r["gpu"]["finish_minutes_low"], 130)
         self.assertAlmostEqual(r["gpu"]["finish_minutes_high"], 200)
@@ -54,7 +55,7 @@ class EstimateTests(unittest.TestCase):
         r = calc.estimate(45, 10, "a100", ["cv_models"])
         _show("45 min in 10 min, A100, CV models", r)
         cv = _item(r, "cv_models")
-        self.assertEqual(calc.format_usd_range(cv["low"], cv["high"]), "$18 to $28")  # Table 3, Datacenter A100
+        self.assertEqual(calc.format_usd_range(cv["low"], cv["high"]), "$22 to $34")  # Table 3, Datacenter A100
         self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (59, 90))   # "about 60 to 90 GPUs"
         self.assertLessEqual(r["gpu"]["finish_minutes_high"], 10 + 1e-6)
         self.assertEqual(r["warnings"], [calc.CHUNKING_WARNING])
@@ -67,17 +68,14 @@ class EstimateTests(unittest.TestCase):
         self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (59, 90))
         self.assertEqual(r["warnings"], [calc.CHUNKING_WARNING])
 
-    def test_table_3_all_tiers_with_overhead(self):
-        expected = {
-            ("budget", 45, 10): "$5 to $8", ("budget", 90, 20): "$10 to $15",
-            ("mid", 45, 10): "$10 to $15", ("mid", 90, 20): "$20 to $30",
-            ("a100", 45, 10): "$18 to $28", ("a100", 90, 20): "$37 to $56",
-            ("serverless_a100", 45, 10): "$30 to $47", ("serverless_a100", 90, 20): "$61 to $94",
-        }
-        for (tier, minutes, target), text in expected.items():
-            cv = _item(calc.estimate(minutes, target, tier, ["cv_models"]), "cv_models")
-            # The table shows whole dollars; the calculator keeps cents under $10.
-            self.assertEqual(f"${cv['low']:.0f} to ${cv['high']:.0f}", text, (tier, minutes, target))
+    def test_table_3_all_tiers_match_the_calculator(self):
+        from methodology_gpu_costs import _table3_rows, TABLE3_TIER_NAMES
+        rows = {name: row for name, row in zip(TABLE3_TIER_NAMES.values(), _table3_rows())}
+        for tier, name in TABLE3_TIER_NAMES.items():
+            half = calc.estimate(45, 10, tier, ["cv_models"])
+            match = calc.estimate(90, 20, tier, ["cv_models"])
+            self.assertEqual(rows[name][3], calc.format_usd_range(half["total_low"], half["total_high"]), tier)
+            self.assertEqual(rows[name][5], calc.format_usd_range(match["total_low"], match["total_high"]), tier)
 
     def test_each_product_alone(self):
         for key in ALL_PRODUCTS:
@@ -106,8 +104,9 @@ class EstimateTests(unittest.TestCase):
         self.assertAlmostEqual(r["total_high"], sum(i["high"] for i in known))
         # Full match on the budget tier: 19.5 to 30 h x $0.40 = $7.80 to $12 for the CV models.
         cv = _item(r, "cv_models")
-        self.assertAlmostEqual(cv["low"], 7.80)
-        self.assertAlmostEqual(cv["high"], 12.00)
+        startup = calc.STARTUP_MINUTES_PER_GPU / 60 * 0.40
+        self.assertAlmostEqual(cv["low"], 7.80 + startup)
+        self.assertAlmostEqual(cv["high"], 12.00 + startup)
 
     def test_unknown_cost_product_is_excluded_from_total(self):
         with_unknown = calc.estimate(45, None, "mid", ["cv_models", "corner_kicks"])
@@ -187,12 +186,12 @@ class TestTargetTurnaroundAndCalculatorApp(unittest.TestCase):
 
     def test_90_min_in_10_min_budget_shows_cost_and_gpus(self):
         r = self._estimate(90, 10)
-        self.assertEqual(calc.format_usd_range(r["total_low"], r["total_high"]), "$10 to $16")
+        self.assertEqual(calc.format_usd_range(r["total_low"], r["total_high"]), "$12 to $19")
         self.assertEqual((r["gpu"]["gpus_low"], r["gpu"]["gpus_high"]), (117, 180))
 
     def test_90_min_in_50_min_budget_costs_about_10_to_16(self):
         r = self._estimate(90, 50)
-        self.assertEqual(calc.format_usd_range(r["total_low"], r["total_high"]), "$10 to $16")
+        self.assertEqual(calc.format_usd_range(r["total_low"], r["total_high"]), "$9.05 to $14")
 
     def test_target_longer_than_single_gpu_time_uses_one_gpu(self):
         r = self._estimate(90, 5000)
@@ -220,7 +219,7 @@ class TestTargetTurnaroundAndCalculatorApp(unittest.TestCase):
         for tier in calc.GPU_TIERS:
             at = _run_calculator(90, 7, tier)
             self.assertFalse(at.error, tier)
-            self.assertIn("Total", _total_text(at), tier)
+            self.assertIn("$", _total_text(at), tier)
             self.assertEqual(_metric(at, "Expected finish time (CV models)"), "7 min", tier)
 
     def test_app_rejects_zero_and_negative_targets_without_cost(self):
@@ -235,7 +234,7 @@ class TestTargetTurnaroundAndCalculatorApp(unittest.TestCase):
         self.assertEqual(_metric(at, "Expected finish time (CV models)"), "10 min")
         at.number_input(key="mcc_target_minutes").set_value(25).run()
         self.assertEqual(_metric(at, "Expected finish time (CV models)"), "25 min")
-        self.assertIn("Total", _total_text(at))
+        self.assertIn("$", _total_text(at))
 
     def test_app_shows_gpu_assumption_caption(self):
         at = _run_calculator(90, 10, "budget")
@@ -263,8 +262,82 @@ def _run_calculator(video, target, tier, products=None):
 
 
 def _total_text(at):
-    return " ".join(m.value for m in at.markdown if m.value.startswith("**Total"))
+    return {m.label: m.value for m in at.metric}.get("Estimated total cost", "")
 
 
 def _metric(at, label):
     return {m.label: m.value for m in at.metric}.get(label)
+
+
+class TestStartupModelAndLayout(unittest.TestCase):
+    TARGETS = (10, 20, 30, 50, 60, 120)
+
+    def _total(self, video, target, tier="budget", products=None):
+        return calc.estimate(video, target, tier, products or ALL_PRODUCTS)
+
+    def test_shorter_target_costs_more_whenever_gpu_count_differs(self):
+        for video in (45, 90):
+            results = [(t, self._total(video, t)) for t in self.TARGETS]
+            for (t_short, r_short), (t_long, r_long) in zip(results, results[1:]):
+                if r_short["gpu"]["gpus_high"] != r_long["gpu"]["gpus_high"]:
+                    self.assertGreater(r_short["total_high"], r_long["total_high"], (video, t_short, t_long))
+
+    def test_target_longer_than_single_gpu_time_costs_the_no_rush_price(self):
+        for video in (45, 90):
+            self.assertAlmostEqual(self._total(video, 5000)["total_high"], self._total(video, None)["total_high"])
+            self.assertAlmostEqual(self._total(video, 5000)["total_low"], self._total(video, None)["total_low"])
+
+    def test_speed_factor_halves_compute_cost_at_two(self):
+        from unittest import mock
+        base = calc._cv_models(90, None, "budget")[3]["compute_cost_high"]
+        with mock.patch.dict(calc.GPU_TIERS["budget"], {"speed_factor": 2.0}):
+            fast = calc._cv_models(90, None, "budget")[3]["compute_cost_high"]
+        self.assertAlmostEqual(fast, base / 2)
+
+    def test_price_grid_cells_equal_the_calculator(self):
+        lengths = [10, 45, 90]
+        grid = calc.price_grid(lengths, self.TARGETS + (None,), "mid", ALL_PRODUCTS)
+        for length, cells in grid:
+            for target, cell in zip(self.TARGETS + (None,), cells):
+                expected = calc._total_text(calc.estimate(length, target, "mid", ALL_PRODUCTS))
+                self.assertEqual(cell, expected, (length, target))
+
+    def test_cost_card_is_first_and_before_the_breakdown_table(self):
+        for kwargs in (dict(video=90, target=20), dict(video=45, target=10), dict(video=90, target=None)):
+            at = _run_calculator(kwargs["video"], kwargs["target"] or 20, "budget")
+            if kwargs["target"] is None:
+                at.radio(key="mcc_speed").set_value(calc._NO_RUSH).run()
+            order = _element_types(at)
+            self.assertIn("metric", order)
+            first_table = order.index("table")
+            self.assertLess(order.index("metric"), first_table, kwargs)
+            self.assertIn("$", _total_text(at), kwargs)
+
+    def test_only_corner_kicks_shows_nothing_costed_not_blank(self):
+        at = _run_calculator(90, 20, "budget", products=["corner_kicks"])
+        self.assertEqual(_total_text(at), "nothing costed yet")
+        self.assertIn("Corner kicks: not costed yet (unknown), not included in the total.",
+                      " ".join(m.value for m in at.markdown))
+
+    def test_match_report_only_shows_a_cost_card(self):
+        at = _run_calculator(90, 20, "budget", products=["match_report"])
+        self.assertIn("$", _total_text(at))
+        self.assertEqual(_metric(at, "GPUs needed at once"), "none needed")
+
+    def test_no_rush_shows_a_cost_card(self):
+        at = _run_calculator(90, 20, "budget")
+        at.radio(key="mcc_speed").set_value(calc._NO_RUSH).run()
+        self.assertIn("$", _total_text(at))
+        self.assertEqual(_metric(at, "GPUs needed at once"), "1")
+
+
+def _element_types(at):
+    out = []
+
+    def walk(node):
+        for child in getattr(node, "children", {}).values():
+            out.append(getattr(child, "type", ""))
+            walk(child)
+
+    walk(at.main)
+    return out
