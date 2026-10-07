@@ -148,7 +148,7 @@ class MapLayer:
     frames: the sampled frame indices, in order (one per sampled second).
     dots:   {frame: [(outcome, X, Y), ...]} - drawable boxes only.
     stats:  {frame: {"boxes", "drawn", "team1", "team2", "goalkeeper",
-            "not_drawn", "off_map", "has_homography"}}."""
+            "not_drawn", "off_map", "outside_pitch", "has_homography"}}."""
 
     def __init__(self, match, frames, dots, stats, sources):
         self.match = match
@@ -202,7 +202,7 @@ def load_layer(cv_output_dir):
         for frame in frames:
             H = H_by_frame[frame]
             boxes = boxes_by_frame.get(frame, [])
-            frame_dots, off_map = [], 0
+            frame_dots, off_map, outside_pitch = [], 0, 0
             for box in boxes:
                 outcome = _box_outcome(box)
                 if outcome not in DRAWN_OUTCOMES or H is None:
@@ -214,8 +214,7 @@ def load_layer(cv_output_dir):
                     continue
                 X, Y = out[0] / out[2], out[1] / out[2]
                 if not tv._in_pitch_bounds(X, Y):
-                    off_map += 1
-                    continue
+                    outside_pitch += 1
                 frame_dots.append((outcome, float(X), float(Y)))
             n_reviewed_drawable = sum(1 for b in boxes if _box_outcome(b) in DRAWN_OUTCOMES)
             dots[frame] = frame_dots
@@ -227,6 +226,7 @@ def load_layer(cv_output_dir):
                 "goalkeeper": sum(1 for d in frame_dots if d[0] == "goalkeeper"),
                 "not_drawn": len(boxes) - n_reviewed_drawable,
                 "off_map": off_map,
+                "outside_pitch": outside_pitch,
                 "has_homography": H is not None,
             }
     except MapLayerError:

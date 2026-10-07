@@ -2966,8 +2966,8 @@ def _render_tactical_map_section():
         st.caption(
             f"{len(layer.frames)} seconds of the clip, one picture each. Only boxes reviewed as a team player "
             f"or a goalkeeper are drawn ({layer.total('drawn')} dots in all); referees and boxes the review "
-            f"could not settle are left off ({layer.total('not_drawn')}), as are {layer.total('off_map')} whose "
-            "position falls outside the pitch. Dots can still sit metres from the real player, so read this "
+            f"could not settle are left off ({layer.total('not_drawn')}). {layer.total('outside_pitch')} dots sit "
+            "just outside the pitch lines and are drawn where the review placed them. Dots can still sit metres from the real player, so read this "
             "as a schematic, not a measurement."
         )
         st.caption(
